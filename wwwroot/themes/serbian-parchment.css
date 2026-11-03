@@ -1,0 +1,508 @@
+/* ========================================================
+   THEME: SERBIAN PARCHMENT (СВЕТЛА ТЕМА / ТОПЛИ ПЕРГАМЕНТ)
+   Национална и византијска палета боја:
+   - Краљевска црвена: #C6363C
+   - Византијско плава: #0C4076
+   - Топли пергамент:   #FAF6F0
+   - Тамни угаљ:        #1E242B
+   - Богато старо злато: #D4AF37
+   Инспирација: Рукописни пергамент, Студеница бели мермер,
+   свети српски летописи, византијско злато и пиротски ћилим.
+   ======================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Marcellus&display=swap');
+
+.theme-serbian-parchment {
+  font-family: "Cinzel", "Marcellus", "Georgia", "Palatino Linotype", "Times New Roman", serif;
+  color: #1E242B;
+}
+
+/* Authentic Pirot Kilim Ribbon Pattern */
+.theme-serbian-parchment .pirot-ribbon {
+  display: block;
+  height: 8px;
+  width: 100%;
+  flex-shrink: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='8' viewBox='0 0 24 8'%3E%3Crect width='24' height='8' fill='%231E242B'/%3E%3Cpolygon points='6,0 12,4 6,8 0,4' fill='%23C6363C'/%3E%3Cpolygon points='6,2 10,4 6,6 2,4' fill='%23D4AF37'/%3E%3Cpolygon points='18,0 24,4 18,8 12,4' fill='%230C4076'/%3E%3Cpolygon points='18,2 22,4 18,6 14,4' fill='%23FAF6F0'/%3E%3Ccircle cx='6' cy='4' r='1' fill='%23FAF6F0'/%3E%3Ccircle cx='18' cy='4' r='1' fill='%23D4AF37'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  border-bottom: 1.5px solid #D4AF37;
+}
+
+.theme-serbian-parchment .pirot-ribbon-bottom {
+  border-bottom: none;
+  border-top: 1.5px solid #D4AF37;
+}
+
+/* Glass HUD Shell: Warm Translucent Monastery Parchment */
+.theme-serbian-parchment .hud-container {
+  background: rgba(250, 246, 240, 0.94);
+  backdrop-filter: blur(34px);
+  -webkit-backdrop-filter: blur(34px);
+  border: 1.5px solid #D4AF37;
+  box-shadow: 
+    0 30px 80px rgba(0, 0, 0, 0.45),
+    0 0 35px rgba(212, 175, 55, 0.25),
+    inset 0 0 1px 1px rgba(255, 255, 255, 0.8);
+}
+
+/* Byzantine Rosette Watermark in Warm Gold */
+.theme-serbian-parchment .ambient-visual {
+  position: absolute;
+  right: -50px;
+  bottom: -50px;
+  width: 520px;
+  height: 520px;
+  border-radius: 50%;
+  border: 2px dashed rgba(212, 175, 55, 0.25);
+  box-shadow: 
+    0 0 80px rgba(212, 175, 55, 0.1),
+    inset 0 0 60px rgba(198, 54, 60, 0.08);
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.08) 0%, rgba(198, 54, 60, 0.04) 50%, transparent 75%);
+  pointer-events: none;
+}
+
+.theme-serbian-parchment .ambient-visual::before {
+  content: "☦";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 270px;
+  color: rgba(198, 54, 60, 0.04);
+  font-family: serif;
+}
+
+.theme-serbian-parchment .scanlines {
+  display: none;
+}
+
+/* Header & Heraldic Crest */
+.theme-serbian-parchment .theme-glyph-jp,
+.theme-serbian-parchment .theme-glyph-cyber,
+.theme-serbian-parchment .theme-glyph-russian,
+.theme-serbian-parchment .theme-glyph-byzantine { display: none; }
+.theme-serbian-parchment .theme-glyph-serbian { 
+  display: inline-block;
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.theme-serbian-parchment .brand-glyph {
+  background: #C6363C;
+  border: 2px solid #D4AF37;
+  color: #FAF6F0;
+  border-radius: 6px 6px 14px 14px;
+  box-shadow: 0 3px 12px rgba(198, 54, 60, 0.35);
+}
+
+.theme-serbian-parchment .brand-title {
+  color: #C6363C;
+  letter-spacing: 0.18em;
+  font-weight: 800;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+.theme-serbian-parchment .brand-status {
+  color: #0C4076; /* Byzantine Blue */
+  letter-spacing: 0.12em;
+  font-weight: 700;
+}
+
+/* Navigation buttons */
+.theme-serbian-parchment .nav-kanji,
+.theme-serbian-parchment .nav-cyber,
+.theme-serbian-parchment .nav-russian,
+.theme-serbian-parchment .nav-byzantine { display: none; }
+.theme-serbian-parchment .nav-serbian {
+  display: inline-block;
+  font-size: 0.74rem;
+  color: #C6363C;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+}
+
+.theme-serbian-parchment .nav-btn {
+  font-family: inherit;
+  color: #1E242B;
+  border-radius: 8px;
+  border: 1px solid transparent;
+}
+
+.theme-serbian-parchment .nav-btn:hover {
+  background: rgba(12, 64, 118, 0.1);
+  border-color: rgba(12, 64, 118, 0.25);
+  color: #0C4076;
+}
+
+.theme-serbian-parchment .nav-btn.active {
+  background: #0C4076;
+  border: 1.5px solid #D4AF37;
+  color: #FAF6F0;
+  box-shadow: 0 4px 14px rgba(12, 64, 118, 0.35);
+}
+
+.theme-serbian-parchment .nav-btn.active .nav-serbian {
+  color: #D4AF37;
+}
+
+.theme-serbian-parchment .nav-key {
+  background: rgba(198, 54, 60, 0.15);
+  color: #C6363C;
+  border: 1px solid rgba(198, 54, 60, 0.35);
+}
+
+.theme-serbian-parchment .nav-btn.active .nav-key {
+  background: rgba(212, 175, 55, 0.3);
+  color: #FAF6F0;
+  border-color: #D4AF37;
+}
+
+.theme-serbian-parchment .theme-switch-pill {
+  background: #FAF6F0;
+  border: 1.5px solid #D4AF37;
+  color: #0C4076;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.theme-serbian-parchment .action-btn {
+  border-color: rgba(212, 175, 55, 0.45);
+  color: #1E242B;
+  background: #FAF6F0;
+}
+
+.theme-serbian-parchment .action-btn:hover {
+  background: #C6363C;
+  border-color: #D4AF37;
+  color: #FAF6F0;
+}
+
+/* Global Search Bar */
+.theme-serbian-parchment .search-bar-wrap {
+  background: #FFFFFF;
+  border: 1.5px solid #D4AF37;
+  border-bottom: 2.5px solid #C6363C;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.theme-serbian-parchment .search-bar-wrap:focus-within {
+  background: #FFFFFF;
+  border-color: #0C4076;
+  border-bottom-color: #C6363C;
+  box-shadow: 0 6px 24px rgba(12, 64, 118, 0.18), 0 0 10px rgba(212, 175, 55, 0.2);
+}
+
+.theme-serbian-parchment .search-icon svg {
+  stroke: #C6363C;
+}
+
+.theme-serbian-parchment .search-input {
+  font-family: inherit;
+  color: #1E242B;
+}
+
+.theme-serbian-parchment .tab-action-hint {
+  background: rgba(12, 64, 118, 0.12);
+  border: 1px solid #0C4076;
+  color: #0C4076;
+  border-radius: 6px;
+}
+
+.theme-serbian-parchment .indexer-badge {
+  background: rgba(212, 175, 55, 0.2);
+  color: #1E242B;
+  border: 1px solid #D4AF37;
+}
+
+/* Result Cards */
+.theme-serbian-parchment .result-card {
+  background: #FFFFFF;
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+}
+
+.theme-serbian-parchment .result-card:hover {
+  border-color: #0C4076;
+  box-shadow: 0 6px 20px rgba(12, 64, 118, 0.15);
+  transform: translateY(-1px);
+}
+
+.theme-serbian-parchment .file-ext-badge {
+  background: #C6363C;
+  color: #FAF6F0;
+  border: 1px solid #D4AF37;
+  font-weight: 700;
+}
+
+.theme-serbian-parchment .file-name {
+  color: #1E242B;
+  font-weight: 700;
+}
+
+.theme-serbian-parchment .excerpt-line {
+  background: #F4EFE6;
+  border-left: 3px solid #0C4076;
+  color: #1E242B;
+}
+
+.theme-serbian-parchment mark.highlight {
+  background: rgba(212, 175, 55, 0.4);
+  color: #0C4076;
+  font-weight: 700;
+  border-bottom: 2px solid #C6363C;
+}
+
+/* System Stats */
+.theme-serbian-parchment .stat-card,
+.theme-serbian-parchment .stat-panel {
+  background: #FFFFFF;
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.theme-serbian-parchment .card-val {
+  color: #C6363C;
+  font-weight: 800;
+}
+
+.theme-serbian-parchment .bar-fill {
+  background: linear-gradient(90deg, #0C4076, #C6363C, #D4AF37);
+}
+
+.theme-serbian-parchment .drive-item,
+.theme-serbian-parchment .process-item {
+  background: #F7F3EB;
+  border-left: 3px solid #0C4076;
+}
+
+/* Notes Layout */
+.theme-serbian-parchment .notes-sidebar {
+  background: #FAF6F0;
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: 10px;
+}
+
+.theme-serbian-parchment .note-item-card {
+  background: #FFFFFF;
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-radius: 8px;
+  color: #1E242B;
+}
+
+.theme-serbian-parchment .note-item-card:hover {
+  background: #F4EFE6;
+  border-color: #0C4076;
+}
+
+.theme-serbian-parchment .note-item-card.active {
+  background: #0C4076;
+  border-color: #D4AF37;
+  color: #FAF6F0;
+  box-shadow: 0 3px 12px rgba(12, 64, 118, 0.3);
+}
+
+.theme-serbian-parchment .note-item-card.active .note-item-title {
+  color: #FAF6F0;
+}
+
+.theme-serbian-parchment .note-item-card.active .note-item-date {
+  color: #D4AF37;
+}
+
+.theme-serbian-parchment .notes-editor-pane {
+  background: #FFFFFF;
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: 10px;
+}
+
+.theme-serbian-parchment .note-title-input {
+  color: #1E242B;
+  border-bottom: 2px solid #D4AF37;
+  padding-bottom: 4px;
+}
+
+.theme-serbian-parchment .note-textarea {
+  color: #1E242B;
+}
+
+.theme-serbian-parchment .save-badge {
+  background: rgba(12, 64, 118, 0.12);
+  color: #0C4076;
+  border: 1px solid #0C4076;
+}
+
+.theme-serbian-parchment .btn-delete-note:hover {
+  background: #C6363C;
+  color: #FAF6F0;
+  border-color: #C6363C;
+}
+
+/* Context Menu */
+.theme-serbian-parchment .hud-context-menu {
+  background: #FAF6F0;
+  backdrop-filter: blur(34px);
+  border: 1.5px solid #D4AF37;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.3), 0 0 20px rgba(212, 175, 55, 0.2);
+  color: #1E242B;
+}
+
+.theme-serbian-parchment .ctx-item:hover {
+  background: #0C4076;
+  color: #FAF6F0;
+}
+
+.theme-serbian-parchment .ctx-divider {
+  background: rgba(212, 175, 55, 0.4);
+}
+
+.theme-serbian-parchment .ctx-check {
+  color: #C6363C;
+  font-weight: 800;
+}
+
+/* ========================================================
+   Psalter Serbian Parchment Aesthetic (Inspiration Portal Cards)
+   ======================================================== */
+
+.theme-serbian-parchment .psalter-layer-bar {
+  border-bottom: 1.5px solid #D4AF37;
+  background: #FAF6F0;
+}
+
+.theme-serbian-parchment .psalter-brand-badge {
+  color: #C6363C;
+  font-weight: 800;
+}
+
+.theme-serbian-parchment .layer-pill.active {
+  background: #0C4076;
+  color: #FAF6F0;
+  border: 1.5px solid #D4AF37;
+  box-shadow: 0 2px 10px rgba(12, 64, 118, 0.3);
+}
+
+/* Inactive Cards: Crisp Parchment White */
+.theme-serbian-parchment .katizma-card,
+.theme-serbian-parchment .psalm-card {
+  border: 1.5px solid rgba(212, 175, 55, 0.4);
+  background: #FFFFFF;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.theme-serbian-parchment .katizma-card:hover,
+.theme-serbian-parchment .psalm-card:hover {
+  border-color: #0C4076;
+  box-shadow: 0 6px 20px rgba(12, 64, 118, 0.18);
+}
+
+/* Active Selected Card: Deep Byzantine Blue with Old Gold Border */
+.theme-serbian-parchment .katizma-card.selected,
+.theme-serbian-parchment .psalm-card.selected {
+  border: 2px solid #D4AF37;
+  background: #0C4076;
+  color: #FAF6F0;
+  box-shadow: 0 8px 24px rgba(12, 64, 118, 0.4), 0 0 14px rgba(212, 175, 55, 0.3);
+}
+
+.theme-serbian-parchment .katizma-card-num,
+.theme-serbian-parchment .psalm-card-num {
+  background: #C6363C;
+  color: #FAF6F0;
+  border: 1px solid #D4AF37;
+  font-weight: 800;
+  border-radius: 4px;
+}
+
+.theme-serbian-parchment .katizma-card-title,
+.theme-serbian-parchment .psalm-card-title {
+  color: #1E242B;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.theme-serbian-parchment .katizma-card.selected .katizma-card-title,
+.theme-serbian-parchment .psalm-card.selected .psalm-card-title {
+  color: #FAF6F0;
+}
+
+.theme-serbian-parchment .katizma-card.selected .katizma-card-count {
+  color: #D4AF37;
+}
+
+.theme-serbian-parchment .katizma-badge {
+  background: #C6363C;
+  color: #FAF6F0;
+  border: 1px solid #D4AF37;
+  font-weight: 700;
+}
+
+.theme-serbian-parchment .psalm-range-badge {
+  color: #0C4076;
+  font-weight: 700;
+}
+
+.theme-serbian-parchment .btn-back-layer:hover,
+.theme-serbian-parchment .layer-nav-arrow:hover {
+  background: #0C4076;
+  border-color: #D4AF37;
+  color: #FAF6F0;
+}
+
+.theme-serbian-parchment .psalm-title {
+  color: #C6363C;
+  font-family: "Cinzel", "Marcellus", "Georgia", serif;
+  font-weight: 800;
+}
+
+.theme-serbian-parchment .psalm-subtitle {
+  color: #0C4076;
+  font-style: italic;
+  font-weight: 600;
+}
+
+.theme-serbian-parchment .ornament-symbol {
+  color: #D4AF37;
+}
+
+.theme-serbian-parchment .ornament-line {
+  background: linear-gradient(90deg, transparent, #D4AF37, transparent);
+}
+
+.theme-serbian-parchment .verse-num {
+  color: #C6363C;
+  font-weight: 800;
+}
+
+.theme-serbian-parchment .verse-text {
+  color: #1E242B;
+}
+
+.theme-serbian-parchment .reader-nav-btn {
+  border-color: #D4AF37;
+  background: #FFFFFF;
+  color: #1E242B;
+}
+
+.theme-serbian-parchment .reader-nav-btn:hover {
+  background: #0C4076;
+  border-color: #D4AF37;
+  color: #FAF6F0;
+}
+
+.theme-serbian-parchment .reader-nav-btn.primary {
+  background: #C6363C;
+  border: 1.5px solid #D4AF37;
+  color: #FAF6F0;
+  font-weight: 800;
+  box-shadow: 0 3px 12px rgba(198, 54, 60, 0.35);
+}
+
+.theme-serbian-parchment .reader-nav-btn.primary:hover {
+  background: #D4AF37;
+  color: #1E242B;
+  border-color: #C6363C;
+}

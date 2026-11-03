@@ -29,6 +29,11 @@ html, body {
   pointer-events: auto;
 }
 
+
+.pirot-ribbon {
+  display: none;
+}
+
 /* Ambient Layer behind views */
 .hud-ambient {
   position: absolute;

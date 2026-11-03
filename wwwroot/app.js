@@ -7,7 +7,8 @@
 
   // --- State ---
   const THEMES = [
-    { id: 'serbian-orthodox', name: 'Српски ☦' },
+    { id: 'serbian-orthodox', name: 'Српски (Тамни) ☦' },
+    { id: 'serbian-parchment', name: 'Српски (Пергамент) 📜' },
     { id: 'russian-orthodox', name: 'Русский ☦' },
     { id: 'byzantine-orthodox', name: 'Βυζάντιο ☧' },
     { id: 'japanese', name: 'Japan 🌸' },
@@ -38,6 +39,7 @@
   const moduleViews = document.querySelectorAll('.module-view');
   const contextMenu = document.getElementById('hud-context-menu');
   const checkSerbian = document.getElementById('check-serbian-orthodox');
+  const checkSerbianParchment = document.getElementById('check-serbian-parchment');
   const checkRussian = document.getElementById('check-russian-orthodox');
   const checkByzantine = document.getElementById('check-byzantine-orthodox');
   const checkJapanese = document.getElementById('check-japanese');
@@ -211,6 +213,7 @@
     activeThemeName.textContent = validTheme.name;
 
     if (checkSerbian) checkSerbian.textContent = currentTheme === 'serbian-orthodox' ? '✓' : '';
+    if (checkSerbianParchment) checkSerbianParchment.textContent = currentTheme === 'serbian-parchment' ? '✓' : '';
     if (checkRussian) checkRussian.textContent = currentTheme === 'russian-orthodox' ? '✓' : '';
     if (checkByzantine) checkByzantine.textContent = currentTheme === 'byzantine-orthodox' ? '✓' : '';
     if (checkJapanese) checkJapanese.textContent = currentTheme === 'japanese' ? '✓' : '';
