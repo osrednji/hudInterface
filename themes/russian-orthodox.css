@@ -1,0 +1,393 @@
+/* ========================================================
+   THEME: RUSSIAN ORTHODOX (РУССКИЙ ПРАВОСЛАВНЫЙ СТИЛЬ)
+   Inspiration: Northern Thebaid, Andrei Rublev icon gold,
+   Kremlin Gilded Onion Domes, Winter Midnight Azure & Beeswax Amber
+   ======================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Cormorant+Garamond:ital,wght@0,600;0,700;1,400&display=swap');
+
+.theme-russian-orthodox {
+  font-family: "Cinzel", "Cormorant Garamond", "Georgia", "Palatino Linotype", "Times New Roman", serif;
+  color: #eef3fc;
+}
+
+/* Glass HUD Shell with Russian Midnight Blue & Radiant Dome Gold */
+.theme-russian-orthodox .hud-container {
+  background: rgba(10, 16, 28, 0.88);
+  backdrop-filter: blur(34px) saturate(120%);
+  -webkit-backdrop-filter: blur(34px) saturate(120%);
+  border: 1px solid rgba(240, 196, 83, 0.35);
+  box-shadow: 
+    0 30px 90px rgba(0, 0, 0, 0.88),
+    0 0 45px rgba(240, 196, 83, 0.15),
+    inset 0 0 1px 1px rgba(240, 196, 83, 0.2);
+}
+
+/* Russian Orthodox 3-Bar Cross & Holy Halo Watermark */
+.theme-russian-orthodox .ambient-visual {
+  position: absolute;
+  right: -70px;
+  bottom: -70px;
+  width: 540px;
+  height: 540px;
+  border-radius: 50%;
+  border: 2px solid rgba(240, 196, 83, 0.1);
+  box-shadow: 
+    0 0 90px rgba(240, 196, 83, 0.08),
+    inset 0 0 80px rgba(30, 75, 138, 0.12);
+  background: radial-gradient(circle, rgba(240, 196, 83, 0.05) 0%, rgba(30, 75, 138, 0.06) 50%, transparent 75%);
+  pointer-events: none;
+}
+
+.theme-russian-orthodox .ambient-visual::before {
+  content: "☦";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 280px;
+  color: rgba(240, 196, 83, 0.04);
+  font-family: serif;
+}
+
+.theme-russian-orthodox .scanlines {
+  display: none;
+}
+
+/* Header & Brand */
+.theme-russian-orthodox .theme-glyph-jp,
+.theme-russian-orthodox .theme-glyph-cyber,
+.theme-russian-orthodox .theme-glyph-serbian,
+.theme-russian-orthodox .theme-glyph-byzantine { display: none; }
+.theme-russian-orthodox .theme-glyph-russian { 
+  display: inline-block;
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+.theme-russian-orthodox .brand-glyph {
+  background: linear-gradient(135deg, rgba(240, 196, 83, 0.28), rgba(22, 55, 105, 0.5));
+  border: 1px solid rgba(240, 196, 83, 0.7);
+  color: #ffd700;
+  box-shadow: 0 0 20px rgba(240, 196, 83, 0.35);
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
+}
+
+.theme-russian-orthodox .brand-title {
+  color: #eef3fc;
+  letter-spacing: 0.16em;
+  font-weight: 700;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
+}
+
+.theme-russian-orthodox .brand-status {
+  color: #ffd700; /* Russian Dome Gold */
+  letter-spacing: 0.14em;
+  font-weight: 700;
+}
+
+/* Navigation buttons */
+.theme-russian-orthodox .nav-kanji,
+.theme-russian-orthodox .nav-cyber { display: none; }
+.theme-russian-orthodox .nav-russian {
+  display: inline-block;
+  font-size: 0.75rem;
+  color: #ffd700;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+}
+
+.theme-russian-orthodox .nav-btn {
+  font-family: inherit;
+  color: rgba(238, 243, 252, 0.7);
+  border-radius: 6px;
+  border: 1px solid transparent;
+}
+
+.theme-russian-orthodox .nav-btn:hover {
+  background: rgba(240, 196, 83, 0.12);
+  border-color: rgba(240, 196, 83, 0.3);
+  color: #fff;
+}
+
+.theme-russian-orthodox .nav-btn.active {
+  background: linear-gradient(135deg, rgba(30, 75, 138, 0.55), rgba(15, 40, 80, 0.65));
+  border: 1px solid rgba(240, 196, 83, 0.65);
+  color: #fff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), 0 0 14px rgba(240, 196, 83, 0.28);
+}
+
+.theme-russian-orthodox .nav-key {
+  background: rgba(240, 196, 83, 0.16);
+  color: #ffd700;
+  border: 1px solid rgba(240, 196, 83, 0.3);
+}
+
+.theme-russian-orthodox .theme-switch-pill {
+  background: linear-gradient(135deg, rgba(240, 196, 83, 0.22), rgba(30, 75, 138, 0.3));
+  border: 1px solid rgba(240, 196, 83, 0.45);
+  color: #ffd700;
+  box-shadow: 0 0 12px rgba(240, 196, 83, 0.18);
+}
+
+.theme-russian-orthodox .action-btn {
+  border-color: rgba(240, 196, 83, 0.25);
+  color: #dce5f5;
+}
+
+.theme-russian-orthodox .action-btn:hover {
+  background: rgba(30, 75, 138, 0.35);
+  border-color: rgba(240, 196, 83, 0.5);
+  color: #fff;
+}
+
+/* Search Bar */
+.theme-russian-orthodox .search-bar-wrap {
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(240, 196, 83, 0.22);
+  border-bottom: 2px solid rgba(240, 196, 83, 0.65);
+}
+
+.theme-russian-orthodox .search-bar-wrap:focus-within {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(240, 196, 83, 0.55);
+  border-bottom-color: #ffd700;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(240, 196, 83, 0.25);
+}
+
+.theme-russian-orthodox .search-icon svg {
+  stroke: #ffd700;
+}
+
+.theme-russian-orthodox .search-input {
+  font-family: inherit;
+  color: #eef3fc;
+}
+
+.theme-russian-orthodox .tab-action-hint {
+  background: rgba(30, 75, 138, 0.35);
+  border: 1px solid rgba(240, 196, 83, 0.45);
+  color: #ffd700;
+}
+
+.theme-russian-orthodox .indexer-badge {
+  background: rgba(240, 196, 83, 0.18);
+  color: #ffd700;
+  border: 1px solid rgba(240, 196, 83, 0.35);
+}
+
+/* Result Cards */
+.theme-russian-orthodox .result-card {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(240, 196, 83, 0.12);
+  border-radius: 8px;
+}
+
+.theme-russian-orthodox .result-card:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(240, 196, 83, 0.45);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), 0 0 14px rgba(240, 196, 83, 0.2);
+  transform: translateY(-1px);
+}
+
+.theme-russian-orthodox .file-ext-badge {
+  background: linear-gradient(135deg, rgba(30, 75, 138, 0.4), rgba(18, 45, 90, 0.5));
+  color: #9ac2ff;
+  border: 1px solid rgba(240, 196, 83, 0.35);
+}
+
+.theme-russian-orthodox .file-name {
+  color: #eef3fc;
+}
+
+.theme-russian-orthodox .excerpt-line {
+  background: rgba(0, 0, 0, 0.4);
+  border-left: 2px solid #ffd700;
+}
+
+.theme-russian-orthodox mark.highlight {
+  background: rgba(240, 196, 83, 0.35);
+  color: #ffffff;
+  border-bottom: 1px solid #ffd700;
+}
+
+/* System Stats */
+.theme-russian-orthodox .stat-card,
+.theme-russian-orthodox .stat-panel {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(240, 196, 83, 0.16);
+}
+
+.theme-russian-orthodox .card-val {
+  color: #ffd700;
+}
+
+.theme-russian-orthodox .bar-fill {
+  background: linear-gradient(90deg, #1e4b8a, #ffd700, #ffaa33);
+}
+
+.theme-russian-orthodox .drive-item,
+.theme-russian-orthodox .process-item {
+  background: rgba(0, 0, 0, 0.28);
+  border-left: 2px solid rgba(240, 196, 83, 0.35);
+}
+
+/* Notes Layout */
+.theme-russian-orthodox .notes-sidebar {
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(240, 196, 83, 0.14);
+}
+
+.theme-russian-orthodox .note-item-card {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid transparent;
+}
+
+.theme-russian-orthodox .note-item-card:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(240, 196, 83, 0.25);
+}
+
+.theme-russian-orthodox .note-item-card.active {
+  background: rgba(30, 75, 138, 0.32);
+  border-color: rgba(240, 196, 83, 0.55);
+  box-shadow: 0 2px 12px rgba(30, 75, 138, 0.3);
+}
+
+.theme-russian-orthodox .notes-editor-pane {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(240, 196, 83, 0.14);
+}
+
+.theme-russian-orthodox .note-title-input {
+  border-bottom: 1px solid rgba(240, 196, 83, 0.4);
+  padding-bottom: 4px;
+}
+
+.theme-russian-orthodox .save-badge {
+  background: rgba(240, 196, 83, 0.2);
+  color: #ffd700;
+  border: 1px solid rgba(240, 196, 83, 0.35);
+}
+
+/* Context Menu */
+.theme-russian-orthodox .hud-context-menu {
+  background: rgba(10, 16, 30, 0.96);
+  backdrop-filter: blur(32px);
+  border: 1px solid rgba(240, 196, 83, 0.4);
+  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.9), 0 0 30px rgba(240, 196, 83, 0.18);
+  color: #eef3fc;
+}
+
+.theme-russian-orthodox .ctx-item:hover {
+  background: linear-gradient(90deg, rgba(30, 75, 138, 0.4), rgba(240, 196, 83, 0.25));
+  color: #fff;
+}
+
+.theme-russian-orthodox .ctx-divider {
+  background: rgba(240, 196, 83, 0.18);
+}
+
+.theme-russian-orthodox .ctx-check {
+  color: #ffd700;
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+}
+
+/* Psalter Russian Orthodox Aesthetic */
+.theme-russian-orthodox .psalter-layer-bar {
+  border-bottom: 1px solid rgba(240, 196, 83, 0.28);
+  background: rgba(8, 14, 25, 0.85);
+}
+
+.theme-russian-orthodox .psalter-brand-badge {
+  color: #ffd700;
+  text-shadow: 0 0 12px rgba(255, 215, 0, 0.45);
+}
+
+.theme-russian-orthodox .layer-pill.active {
+  background: linear-gradient(135deg, rgba(30, 75, 138, 0.5), rgba(15, 40, 80, 0.6));
+  color: #fff;
+  border: 1px solid rgba(240, 196, 83, 0.7);
+  box-shadow: 0 2px 14px rgba(30, 75, 138, 0.4), 0 0 10px rgba(240, 196, 83, 0.35);
+}
+
+.theme-russian-orthodox .katizma-card,
+.theme-russian-orthodox .psalm-card {
+  border-color: rgba(240, 196, 83, 0.16);
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.theme-russian-orthodox .katizma-card:hover,
+.theme-russian-orthodox .psalm-card:hover {
+  border-color: rgba(240, 196, 83, 0.5);
+  background: rgba(240, 196, 83, 0.08);
+  box-shadow: 0 4px 22px rgba(0, 0, 0, 0.65), 0 0 16px rgba(240, 196, 83, 0.2);
+}
+
+.theme-russian-orthodox .katizma-card.selected,
+.theme-russian-orthodox .psalm-card.selected {
+  border-color: rgba(240, 196, 83, 0.75);
+  background: linear-gradient(135deg, rgba(30, 75, 138, 0.3), rgba(240, 196, 83, 0.15));
+  box-shadow: 0 6px 26px rgba(0, 0, 0, 0.75), 0 0 20px rgba(240, 196, 83, 0.35);
+}
+
+.theme-russian-orthodox .katizma-card-num,
+.theme-russian-orthodox .psalm-card-num {
+  background: rgba(240, 196, 83, 0.2);
+  color: #ffd700;
+  border: 1px solid rgba(240, 196, 83, 0.3);
+}
+
+.theme-russian-orthodox .katizma-badge {
+  background: rgba(30, 75, 138, 0.35);
+  color: #ffd700;
+  border: 1px solid rgba(240, 196, 83, 0.4);
+}
+
+.theme-russian-orthodox .btn-back-layer:hover,
+.theme-russian-orthodox .layer-nav-arrow:hover {
+  background: rgba(30, 75, 138, 0.35);
+  border-color: rgba(240, 196, 83, 0.55);
+  color: #fff;
+}
+
+.theme-russian-orthodox .psalm-title {
+  color: #ffffff;
+  font-family: "Cinzel", "Cormorant Garamond", "Georgia", serif;
+  text-shadow: 0 2px 16px rgba(240, 196, 83, 0.35);
+}
+
+.theme-russian-orthodox .psalm-subtitle {
+  color: #cddcf2;
+  font-style: italic;
+}
+
+.theme-russian-orthodox .ornament-symbol {
+  color: #ffd700;
+  text-shadow: 0 0 16px rgba(255, 215, 0, 0.7);
+}
+
+.theme-russian-orthodox .ornament-line {
+  background: linear-gradient(90deg, transparent, rgba(240, 196, 83, 0.65), transparent);
+}
+
+.theme-russian-orthodox .verse-num {
+  color: #ffd700;
+  font-weight: 700;
+}
+
+.theme-russian-orthodox .reader-nav-btn {
+  border-color: rgba(240, 196, 83, 0.28);
+}
+
+.theme-russian-orthodox .reader-nav-btn:hover {
+  background: rgba(30, 75, 138, 0.38);
+  border-color: rgba(240, 196, 83, 0.55);
+  color: #fff;
+}
+
+.theme-russian-orthodox .reader-nav-btn.primary {
+  background: linear-gradient(135deg, rgba(30, 75, 138, 0.5), rgba(240, 196, 83, 0.3));
+  border-color: rgba(240, 196, 83, 0.65);
+  color: #ffd700;
+}

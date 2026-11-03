@@ -1,0 +1,393 @@
+/* ========================================================
+   THEME: SERBIAN ORTHODOX (СРПСКИ ПРАВОСЛАВНИ / МОРАВСКИ СТИЛ)
+   Inspiration: Studenica, Hilandar, Mileševa (White Angel Azure),
+   Royal Nemanjić Crimson & Monastic Beeswax Gold
+   ======================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Marcellus&display=swap');
+
+.theme-serbian-orthodox {
+  font-family: "Cinzel", "Marcellus", "Georgia", "Palatino Linotype", "Times New Roman", serif;
+  color: #f7f3ea;
+}
+
+/* Glass HUD Shell with Monastic Gold & Morava Crimson Accent */
+.theme-serbian-orthodox .hud-container {
+  background: rgba(16, 12, 17, 0.86);
+  backdrop-filter: blur(34px) saturate(125%);
+  -webkit-backdrop-filter: blur(34px) saturate(125%);
+  border: 1px solid rgba(229, 184, 105, 0.28);
+  box-shadow: 
+    0 30px 90px rgba(0, 0, 0, 0.85),
+    0 0 40px rgba(184, 46, 46, 0.12),
+    inset 0 0 1px 1px rgba(229, 184, 105, 0.15);
+}
+
+/* Serbian Monastery Halo & Orthodox Cross Watermark */
+.theme-serbian-orthodox .ambient-visual {
+  position: absolute;
+  right: -60px;
+  bottom: -60px;
+  width: 520px;
+  height: 520px;
+  border-radius: 50%;
+  border: 2px solid rgba(229, 184, 105, 0.08);
+  box-shadow: 
+    0 0 80px rgba(229, 184, 105, 0.06),
+    inset 0 0 60px rgba(184, 46, 46, 0.05);
+  background: radial-gradient(circle, rgba(229, 184, 105, 0.04) 0%, rgba(184, 46, 46, 0.03) 40%, transparent 70%);
+  pointer-events: none;
+}
+
+.theme-serbian-orthodox .ambient-visual::before {
+  content: "☦";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 260px;
+  color: rgba(229, 184, 105, 0.035);
+  font-family: serif;
+}
+
+.theme-serbian-orthodox .scanlines {
+  display: none;
+}
+
+/* Header & Brand */
+.theme-serbian-orthodox .theme-glyph-jp,
+.theme-serbian-orthodox .theme-glyph-cyber,
+.theme-serbian-orthodox .theme-glyph-russian,
+.theme-serbian-orthodox .theme-glyph-byzantine { display: none; }
+.theme-serbian-orthodox .theme-glyph-serbian { 
+  display: inline-block;
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.theme-serbian-orthodox .brand-glyph {
+  background: linear-gradient(135deg, rgba(184, 46, 46, 0.35), rgba(43, 92, 143, 0.25));
+  border: 1px solid rgba(229, 184, 105, 0.6);
+  color: #f5cf82;
+  box-shadow: 0 0 16px rgba(229, 184, 105, 0.25);
+  text-shadow: 0 0 8px rgba(229, 184, 105, 0.6);
+}
+
+.theme-serbian-orthodox .brand-title {
+  color: #f7f3ea;
+  letter-spacing: 0.16em;
+  font-weight: 700;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+}
+
+.theme-serbian-orthodox .brand-status {
+  color: #e5b869; /* Hilandar Gold */
+  letter-spacing: 0.12em;
+  font-weight: 600;
+}
+
+/* Navigation buttons */
+.theme-serbian-orthodox .nav-kanji,
+.theme-serbian-orthodox .nav-cyber { display: none; }
+.theme-serbian-orthodox .nav-serbian {
+  display: inline-block;
+  font-size: 0.75rem;
+  color: #e5b869;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+}
+
+.theme-serbian-orthodox .nav-btn {
+  font-family: inherit;
+  color: rgba(247, 243, 234, 0.7);
+  border-radius: 6px;
+  border: 1px solid transparent;
+}
+
+.theme-serbian-orthodox .nav-btn:hover {
+  background: rgba(229, 184, 105, 0.1);
+  border-color: rgba(229, 184, 105, 0.25);
+  color: #fff;
+}
+
+.theme-serbian-orthodox .nav-btn.active {
+  background: linear-gradient(135deg, rgba(184, 46, 46, 0.32), rgba(120, 25, 25, 0.4));
+  border: 1px solid rgba(229, 184, 105, 0.55);
+  color: #fff;
+  box-shadow: 0 4px 18px rgba(184, 46, 46, 0.28), 0 0 10px rgba(229, 184, 105, 0.18);
+}
+
+.theme-serbian-orthodox .nav-key {
+  background: rgba(229, 184, 105, 0.15);
+  color: #f5cf82;
+  border: 1px solid rgba(229, 184, 105, 0.25);
+}
+
+.theme-serbian-orthodox .theme-switch-pill {
+  background: linear-gradient(135deg, rgba(184, 46, 46, 0.2), rgba(43, 92, 143, 0.2));
+  border: 1px solid rgba(229, 184, 105, 0.4);
+  color: #f5cf82;
+  box-shadow: 0 0 10px rgba(229, 184, 105, 0.12);
+}
+
+.theme-serbian-orthodox .action-btn {
+  border-color: rgba(229, 184, 105, 0.22);
+  color: #e8e3d5;
+}
+
+.theme-serbian-orthodox .action-btn:hover {
+  background: rgba(184, 46, 46, 0.22);
+  border-color: rgba(184, 46, 46, 0.45);
+  color: #fff;
+}
+
+/* Search Bar with Morava Red / Gold Accent */
+.theme-serbian-orthodox .search-bar-wrap {
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(229, 184, 105, 0.18);
+  border-bottom: 2px solid rgba(184, 46, 46, 0.7);
+}
+
+.theme-serbian-orthodox .search-bar-wrap:focus-within {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(229, 184, 105, 0.45);
+  border-bottom-color: #e5b869;
+  box-shadow: 0 8px 28px rgba(184, 46, 46, 0.22), 0 0 16px rgba(229, 184, 105, 0.15);
+}
+
+.theme-serbian-orthodox .search-icon svg {
+  stroke: #e5b869;
+}
+
+.theme-serbian-orthodox .search-input {
+  font-family: inherit;
+  color: #f7f3ea;
+}
+
+.theme-serbian-orthodox .tab-action-hint {
+  background: rgba(184, 46, 46, 0.25);
+  border: 1px solid rgba(229, 184, 105, 0.35);
+  color: #f5cf82;
+}
+
+.theme-serbian-orthodox .indexer-badge {
+  background: rgba(229, 184, 105, 0.16);
+  color: #f5cf82;
+  border: 1px solid rgba(229, 184, 105, 0.3);
+}
+
+/* Result Cards */
+.theme-serbian-orthodox .result-card {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(229, 184, 105, 0.1);
+  border-radius: 8px;
+}
+
+.theme-serbian-orthodox .result-card:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(229, 184, 105, 0.4);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5), 0 0 12px rgba(184, 46, 46, 0.15);
+  transform: translateY(-1px);
+}
+
+.theme-serbian-orthodox .file-ext-badge {
+  background: linear-gradient(135deg, rgba(184, 46, 46, 0.28), rgba(120, 25, 25, 0.35));
+  color: #ff9e9e;
+  border: 1px solid rgba(184, 46, 46, 0.45);
+}
+
+.theme-serbian-orthodox .file-name {
+  color: #f7f3ea;
+}
+
+.theme-serbian-orthodox .excerpt-line {
+  background: rgba(0, 0, 0, 0.35);
+  border-left: 2px solid #e5b869;
+}
+
+.theme-serbian-orthodox mark.highlight {
+  background: rgba(229, 184, 105, 0.32);
+  color: #ffeab0;
+  border-bottom: 1px solid #e5b869;
+}
+
+/* System Stats */
+.theme-serbian-orthodox .stat-card,
+.theme-serbian-orthodox .stat-panel {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(229, 184, 105, 0.14);
+}
+
+.theme-serbian-orthodox .card-val {
+  color: #f5cf82;
+}
+
+.theme-serbian-orthodox .bar-fill {
+  background: linear-gradient(90deg, #b82e2e, #e5b869, #3d7ab8);
+}
+
+.theme-serbian-orthodox .drive-item,
+.theme-serbian-orthodox .process-item {
+  background: rgba(0, 0, 0, 0.24);
+  border-left: 2px solid rgba(229, 184, 105, 0.3);
+}
+
+/* Notes Layout */
+.theme-serbian-orthodox .notes-sidebar {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(229, 184, 105, 0.12);
+}
+
+.theme-serbian-orthodox .note-item-card {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid transparent;
+}
+
+.theme-serbian-orthodox .note-item-card:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(229, 184, 105, 0.2);
+}
+
+.theme-serbian-orthodox .note-item-card.active {
+  background: rgba(184, 46, 46, 0.22);
+  border-color: rgba(229, 184, 105, 0.45);
+  box-shadow: 0 2px 10px rgba(184, 46, 46, 0.18);
+}
+
+.theme-serbian-orthodox .notes-editor-pane {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(229, 184, 105, 0.12);
+}
+
+.theme-serbian-orthodox .note-title-input {
+  border-bottom: 1px solid rgba(229, 184, 105, 0.35);
+  padding-bottom: 4px;
+}
+
+.theme-serbian-orthodox .save-badge {
+  background: rgba(229, 184, 105, 0.18);
+  color: #f5cf82;
+  border: 1px solid rgba(229, 184, 105, 0.3);
+}
+
+/* Context Menu */
+.theme-serbian-orthodox .hud-context-menu {
+  background: rgba(18, 14, 20, 0.96);
+  backdrop-filter: blur(30px);
+  border: 1px solid rgba(229, 184, 105, 0.35);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.9), 0 0 24px rgba(184, 46, 46, 0.15);
+  color: #f7f3ea;
+}
+
+.theme-serbian-orthodox .ctx-item:hover {
+  background: linear-gradient(90deg, rgba(184, 46, 46, 0.3), rgba(43, 92, 143, 0.25));
+  color: #fff;
+}
+
+.theme-serbian-orthodox .ctx-divider {
+  background: rgba(229, 184, 105, 0.15);
+}
+
+.theme-serbian-orthodox .ctx-check {
+  color: #f5cf82;
+  text-shadow: 0 0 6px rgba(229, 184, 105, 0.5);
+}
+
+/* Psalter Serbian Orthodox Aesthetic */
+.theme-serbian-orthodox .psalter-layer-bar {
+  border-bottom: 1px solid rgba(229, 184, 105, 0.25);
+  background: rgba(14, 10, 15, 0.82);
+}
+
+.theme-serbian-orthodox .psalter-brand-badge {
+  color: #f5cf82;
+  text-shadow: 0 0 10px rgba(229, 184, 105, 0.35);
+}
+
+.theme-serbian-orthodox .layer-pill.active {
+  background: linear-gradient(135deg, rgba(184, 46, 46, 0.35), rgba(120, 25, 25, 0.45));
+  color: #fff;
+  border: 1px solid rgba(229, 184, 105, 0.6);
+  box-shadow: 0 2px 12px rgba(184, 46, 46, 0.3), 0 0 8px rgba(229, 184, 105, 0.25);
+}
+
+.theme-serbian-orthodox .katizma-card,
+.theme-serbian-orthodox .psalm-card {
+  border-color: rgba(229, 184, 105, 0.14);
+  background: rgba(0, 0, 0, 0.28);
+}
+
+.theme-serbian-orthodox .katizma-card:hover,
+.theme-serbian-orthodox .psalm-card:hover {
+  border-color: rgba(229, 184, 105, 0.45);
+  background: rgba(229, 184, 105, 0.06);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), 0 0 12px rgba(184, 46, 46, 0.15);
+}
+
+.theme-serbian-orthodox .katizma-card.selected,
+.theme-serbian-orthodox .psalm-card.selected {
+  border-color: rgba(229, 184, 105, 0.65);
+  background: linear-gradient(135deg, rgba(184, 46, 46, 0.2), rgba(229, 184, 105, 0.1));
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.7), 0 0 16px rgba(229, 184, 105, 0.3);
+}
+
+.theme-serbian-orthodox .katizma-card-num,
+.theme-serbian-orthodox .psalm-card-num {
+  background: rgba(229, 184, 105, 0.18);
+  color: #f5cf82;
+  border: 1px solid rgba(229, 184, 105, 0.25);
+}
+
+.theme-serbian-orthodox .katizma-badge {
+  background: rgba(184, 46, 46, 0.25);
+  color: #f5cf82;
+  border: 1px solid rgba(229, 184, 105, 0.35);
+}
+
+.theme-serbian-orthodox .btn-back-layer:hover,
+.theme-serbian-orthodox .layer-nav-arrow:hover {
+  background: rgba(184, 46, 46, 0.25);
+  border-color: rgba(229, 184, 105, 0.45);
+  color: #fff;
+}
+
+.theme-serbian-orthodox .psalm-title {
+  color: #fff6e0;
+  font-family: "Cinzel", "Marcellus", "Georgia", serif;
+  text-shadow: 0 2px 14px rgba(229, 184, 105, 0.3);
+}
+
+.theme-serbian-orthodox .psalm-subtitle {
+  color: #d6ccba;
+  font-style: italic;
+}
+
+.theme-serbian-orthodox .ornament-symbol {
+  color: #e5b869;
+  text-shadow: 0 0 12px rgba(229, 184, 105, 0.6);
+}
+
+.theme-serbian-orthodox .ornament-line {
+  background: linear-gradient(90deg, transparent, rgba(229, 184, 105, 0.55), transparent);
+}
+
+.theme-serbian-orthodox .verse-num {
+  color: #e5b869;
+  font-weight: 700;
+}
+
+.theme-serbian-orthodox .reader-nav-btn {
+  border-color: rgba(229, 184, 105, 0.25);
+}
+
+.theme-serbian-orthodox .reader-nav-btn:hover {
+  background: rgba(184, 46, 46, 0.28);
+  border-color: rgba(229, 184, 105, 0.5);
+  color: #fff;
+}
+
+.theme-serbian-orthodox .reader-nav-btn.primary {
+  background: linear-gradient(135deg, rgba(184, 46, 46, 0.35), rgba(120, 25, 25, 0.45));
+  border-color: rgba(229, 184, 105, 0.5);
+  color: #f5cf82;
+}
