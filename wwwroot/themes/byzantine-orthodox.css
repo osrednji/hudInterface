@@ -1,0 +1,393 @@
+/* ========================================================
+   THEME: BYZANTINE ORTHODOX (ΒΥΖΑΝΤΙΝΟ ΡΩΜΑΙΙΚΟ / CONSTANTINOPLE)
+   Inspiration: Imperial Constantinople, Hagia Sophia golden mosaics,
+   Imperial Porphyry Marble, Chi-Rho ☧ Monogram & Antique Bronze
+   ======================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Marcellus&display=swap');
+
+.theme-byzantine-orthodox {
+  font-family: "Cinzel", "Marcellus", "Georgia", "Palatino Linotype", "Times New Roman", serif;
+  color: #fbf5ea;
+}
+
+/* Glass HUD Shell with Imperial Porphyry & Radiant Mosaic Gold Tesserae */
+.theme-byzantine-orthodox .hud-container {
+  background: rgba(20, 8, 18, 0.88);
+  backdrop-filter: blur(34px) saturate(130%);
+  -webkit-backdrop-filter: blur(34px) saturate(130%);
+  border: 1px solid rgba(245, 197, 66, 0.38);
+  box-shadow: 
+    0 30px 90px rgba(0, 0, 0, 0.9),
+    0 0 45px rgba(138, 24, 74, 0.22),
+    inset 0 0 1px 1px rgba(245, 197, 66, 0.22);
+}
+
+/* Hagia Sophia Dome Medallion & Chi-Rho Watermark */
+.theme-byzantine-orthodox .ambient-visual {
+  position: absolute;
+  right: -60px;
+  bottom: -60px;
+  width: 530px;
+  height: 530px;
+  border-radius: 50%;
+  border: 2px dashed rgba(245, 197, 66, 0.12);
+  box-shadow: 
+    0 0 90px rgba(245, 197, 66, 0.08),
+    inset 0 0 70px rgba(138, 24, 74, 0.12);
+  background: radial-gradient(circle, rgba(245, 197, 66, 0.06) 0%, rgba(138, 24, 74, 0.06) 45%, transparent 75%);
+  pointer-events: none;
+}
+
+.theme-byzantine-orthodox .ambient-visual::before {
+  content: "☧";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 270px;
+  color: rgba(245, 197, 66, 0.04);
+  font-family: serif;
+}
+
+.theme-byzantine-orthodox .scanlines {
+  display: none;
+}
+
+/* Header & Brand */
+.theme-byzantine-orthodox .theme-glyph-jp,
+.theme-byzantine-orthodox .theme-glyph-cyber,
+.theme-byzantine-orthodox .theme-glyph-serbian,
+.theme-byzantine-orthodox .theme-glyph-russian { display: none; }
+.theme-byzantine-orthodox .theme-glyph-byzantine { 
+  display: inline-block;
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.theme-byzantine-orthodox .brand-glyph {
+  background: linear-gradient(135deg, rgba(138, 24, 74, 0.45), rgba(47, 107, 91, 0.35));
+  border: 1px solid rgba(245, 197, 66, 0.75);
+  color: #f5c542;
+  box-shadow: 0 0 18px rgba(245, 197, 66, 0.35);
+  text-shadow: 0 0 10px rgba(245, 197, 66, 0.7);
+}
+
+.theme-byzantine-orthodox .brand-title {
+  color: #fbf5ea;
+  letter-spacing: 0.18em;
+  font-weight: 700;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.75);
+}
+
+.theme-byzantine-orthodox .brand-status {
+  color: #f5c542; /* Byzantine Tesserae Gold */
+  letter-spacing: 0.14em;
+  font-weight: 700;
+}
+
+/* Navigation buttons */
+.theme-byzantine-orthodox .nav-kanji,
+.theme-byzantine-orthodox .nav-cyber { display: none; }
+.theme-byzantine-orthodox .nav-byzantine {
+  display: inline-block;
+  font-size: 0.75rem;
+  color: #f5c542;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+}
+
+.theme-byzantine-orthodox .nav-btn {
+  font-family: inherit;
+  color: rgba(251, 245, 234, 0.7);
+  border-radius: 6px;
+  border: 1px solid transparent;
+}
+
+.theme-byzantine-orthodox .nav-btn:hover {
+  background: rgba(245, 197, 66, 0.12);
+  border-color: rgba(245, 197, 66, 0.3);
+  color: #fff;
+}
+
+.theme-byzantine-orthodox .nav-btn.active {
+  background: linear-gradient(135deg, rgba(138, 24, 74, 0.48), rgba(90, 12, 48, 0.6));
+  border: 1px solid rgba(245, 197, 66, 0.7);
+  color: #fff;
+  box-shadow: 0 4px 20px rgba(138, 24, 74, 0.38), 0 0 14px rgba(245, 197, 66, 0.28);
+}
+
+.theme-byzantine-orthodox .nav-key {
+  background: rgba(245, 197, 66, 0.18);
+  color: #ffd866;
+  border: 1px solid rgba(245, 197, 66, 0.35);
+}
+
+.theme-byzantine-orthodox .theme-switch-pill {
+  background: linear-gradient(135deg, rgba(138, 24, 74, 0.3), rgba(47, 107, 91, 0.3));
+  border: 1px solid rgba(245, 197, 66, 0.5);
+  color: #ffd866;
+  box-shadow: 0 0 14px rgba(245, 197, 66, 0.2);
+}
+
+.theme-byzantine-orthodox .action-btn {
+  border-color: rgba(245, 197, 66, 0.25);
+  color: #eee4d2;
+}
+
+.theme-byzantine-orthodox .action-btn:hover {
+  background: rgba(138, 24, 74, 0.3);
+  border-color: rgba(245, 197, 66, 0.5);
+  color: #fff;
+}
+
+/* Search Bar */
+.theme-byzantine-orthodox .search-bar-wrap {
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(245, 197, 66, 0.22);
+  border-bottom: 2px solid rgba(138, 24, 74, 0.75);
+}
+
+.theme-byzantine-orthodox .search-bar-wrap:focus-within {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(245, 197, 66, 0.55);
+  border-bottom-color: #f5c542;
+  box-shadow: 0 8px 30px rgba(138, 24, 74, 0.3), 0 0 20px rgba(245, 197, 66, 0.22);
+}
+
+.theme-byzantine-orthodox .search-icon svg {
+  stroke: #f5c542;
+}
+
+.theme-byzantine-orthodox .search-input {
+  font-family: inherit;
+  color: #fbf5ea;
+}
+
+.theme-byzantine-orthodox .tab-action-hint {
+  background: rgba(138, 24, 74, 0.32);
+  border: 1px solid rgba(245, 197, 66, 0.4);
+  color: #ffd866;
+}
+
+.theme-byzantine-orthodox .indexer-badge {
+  background: rgba(245, 197, 66, 0.18);
+  color: #ffd866;
+  border: 1px solid rgba(245, 197, 66, 0.35);
+}
+
+/* Result Cards */
+.theme-byzantine-orthodox .result-card {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(245, 197, 66, 0.14);
+  border-radius: 8px;
+}
+
+.theme-byzantine-orthodox .result-card:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(245, 197, 66, 0.5);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.65), 0 0 16px rgba(138, 24, 74, 0.22);
+  transform: translateY(-1px);
+}
+
+.theme-byzantine-orthodox .file-ext-badge {
+  background: linear-gradient(135deg, rgba(138, 24, 74, 0.38), rgba(90, 12, 48, 0.5));
+  color: #ff9ec6;
+  border: 1px solid rgba(138, 24, 74, 0.55);
+}
+
+.theme-byzantine-orthodox .file-name {
+  color: #fbf5ea;
+}
+
+.theme-byzantine-orthodox .excerpt-line {
+  background: rgba(0, 0, 0, 0.38);
+  border-left: 2px solid #f5c542;
+}
+
+.theme-byzantine-orthodox mark.highlight {
+  background: rgba(245, 197, 66, 0.35);
+  color: #ffffff;
+  border-bottom: 1px solid #f5c542;
+}
+
+/* System Stats */
+.theme-byzantine-orthodox .stat-card,
+.theme-byzantine-orthodox .stat-panel {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(245, 197, 66, 0.18);
+}
+
+.theme-byzantine-orthodox .card-val {
+  color: #ffd866;
+}
+
+.theme-byzantine-orthodox .bar-fill {
+  background: linear-gradient(90deg, #8a184a, #f5c542, #2f6b5b);
+}
+
+.theme-byzantine-orthodox .drive-item,
+.theme-byzantine-orthodox .process-item {
+  background: rgba(0, 0, 0, 0.26);
+  border-left: 2px solid rgba(245, 197, 66, 0.35);
+}
+
+/* Notes Layout */
+.theme-byzantine-orthodox .notes-sidebar {
+  background: rgba(0, 0, 0, 0.26);
+  border: 1px solid rgba(245, 197, 66, 0.15);
+}
+
+.theme-byzantine-orthodox .note-item-card {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid transparent;
+}
+
+.theme-byzantine-orthodox .note-item-card:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(245, 197, 66, 0.25);
+}
+
+.theme-byzantine-orthodox .note-item-card.active {
+  background: rgba(138, 24, 74, 0.32);
+  border-color: rgba(245, 197, 66, 0.55);
+  box-shadow: 0 2px 12px rgba(138, 24, 74, 0.25);
+}
+
+.theme-byzantine-orthodox .notes-editor-pane {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(245, 197, 66, 0.15);
+}
+
+.theme-byzantine-orthodox .note-title-input {
+  border-bottom: 1px solid rgba(245, 197, 66, 0.4);
+  padding-bottom: 4px;
+}
+
+.theme-byzantine-orthodox .save-badge {
+  background: rgba(245, 197, 66, 0.2);
+  color: #ffd866;
+  border: 1px solid rgba(245, 197, 66, 0.35);
+}
+
+/* Context Menu */
+.theme-byzantine-orthodox .hud-context-menu {
+  background: rgba(20, 8, 22, 0.96);
+  backdrop-filter: blur(32px);
+  border: 1px solid rgba(245, 197, 66, 0.42);
+  box-shadow: 0 16px 52px rgba(0, 0, 0, 0.9), 0 0 30px rgba(138, 24, 74, 0.22);
+  color: #fbf5ea;
+}
+
+.theme-byzantine-orthodox .ctx-item:hover {
+  background: linear-gradient(90deg, rgba(138, 24, 74, 0.38), rgba(245, 197, 66, 0.22));
+  color: #fff;
+}
+
+.theme-byzantine-orthodox .ctx-divider {
+  background: rgba(245, 197, 66, 0.2);
+}
+
+.theme-byzantine-orthodox .ctx-check {
+  color: #ffd866;
+  text-shadow: 0 0 8px rgba(245, 197, 66, 0.6);
+}
+
+/* Psalter Byzantine Orthodox Aesthetic */
+.theme-byzantine-orthodox .psalter-layer-bar {
+  border-bottom: 1px solid rgba(245, 197, 66, 0.3);
+  background: rgba(16, 7, 18, 0.86);
+}
+
+.theme-byzantine-orthodox .psalter-brand-badge {
+  color: #ffd866;
+  text-shadow: 0 0 12px rgba(245, 197, 66, 0.45);
+}
+
+.theme-byzantine-orthodox .layer-pill.active {
+  background: linear-gradient(135deg, rgba(138, 24, 74, 0.5), rgba(90, 12, 48, 0.6));
+  color: #fff;
+  border: 1px solid rgba(245, 197, 66, 0.7);
+  box-shadow: 0 2px 14px rgba(138, 24, 74, 0.4), 0 0 10px rgba(245, 197, 66, 0.3);
+}
+
+.theme-byzantine-orthodox .katizma-card,
+.theme-byzantine-orthodox .psalm-card {
+  border-color: rgba(245, 197, 66, 0.18);
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.theme-byzantine-orthodox .katizma-card:hover,
+.theme-byzantine-orthodox .psalm-card:hover {
+  border-color: rgba(245, 197, 66, 0.55);
+  background: rgba(245, 197, 66, 0.08);
+  box-shadow: 0 4px 22px rgba(0, 0, 0, 0.68), 0 0 16px rgba(138, 24, 74, 0.25);
+}
+
+.theme-byzantine-orthodox .katizma-card.selected,
+.theme-byzantine-orthodox .psalm-card.selected {
+  border-color: rgba(245, 197, 66, 0.8);
+  background: linear-gradient(135deg, rgba(138, 24, 74, 0.32), rgba(245, 197, 66, 0.14));
+  box-shadow: 0 6px 26px rgba(0, 0, 0, 0.78), 0 0 20px rgba(245, 197, 66, 0.35);
+}
+
+.theme-byzantine-orthodox .katizma-card-num,
+.theme-byzantine-orthodox .psalm-card-num {
+  background: rgba(245, 197, 66, 0.2);
+  color: #ffd866;
+  border: 1px solid rgba(245, 197, 66, 0.32);
+}
+
+.theme-byzantine-orthodox .katizma-badge {
+  background: rgba(138, 24, 74, 0.35);
+  color: #ffd866;
+  border: 1px solid rgba(245, 197, 66, 0.42);
+}
+
+.theme-byzantine-orthodox .btn-back-layer:hover,
+.theme-byzantine-orthodox .layer-nav-arrow:hover {
+  background: rgba(138, 24, 74, 0.35);
+  border-color: rgba(245, 197, 66, 0.6);
+  color: #fff;
+}
+
+.theme-byzantine-orthodox .psalm-title {
+  color: #ffffff;
+  font-family: "Cinzel", "Marcellus", "Georgia", serif;
+  text-shadow: 0 2px 16px rgba(245, 197, 66, 0.35);
+}
+
+.theme-byzantine-orthodox .psalm-subtitle {
+  color: #ded1be;
+  font-style: italic;
+}
+
+.theme-byzantine-orthodox .ornament-symbol {
+  color: #f5c542;
+  text-shadow: 0 0 16px rgba(245, 197, 66, 0.7);
+}
+
+.theme-byzantine-orthodox .ornament-line {
+  background: linear-gradient(90deg, transparent, rgba(245, 197, 66, 0.65), transparent);
+}
+
+.theme-byzantine-orthodox .verse-num {
+  color: #f5c542;
+  font-weight: 700;
+}
+
+.theme-byzantine-orthodox .reader-nav-btn {
+  border-color: rgba(245, 197, 66, 0.3);
+}
+
+.theme-byzantine-orthodox .reader-nav-btn:hover {
+  background: rgba(138, 24, 74, 0.38);
+  border-color: rgba(245, 197, 66, 0.6);
+  color: #fff;
+}
+
+.theme-byzantine-orthodox .reader-nav-btn.primary {
+  background: linear-gradient(135deg, rgba(138, 24, 74, 0.5), rgba(245, 197, 66, 0.28));
+  border-color: rgba(245, 197, 66, 0.7);
+  color: #ffd866;
+}

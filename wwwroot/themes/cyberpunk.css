@@ -1,0 +1,376 @@
+/* ========================================================
+   THEME: CYBERPUNK NEON (サイバーパンク HUD / SCI-FI HOLOGRAM)
+   ======================================================== */
+
+.theme-cyberpunk {
+  font-family: "JetBrains Mono", "Share Tech Mono", "Cascadia Code", "Consolas", monospace;
+  color: #d1f7ff;
+}
+
+/* Glass HUD Shell with Holographic Neon Glow */
+.theme-cyberpunk .hud-container {
+  background: rgba(6, 12, 24, 0.84);
+  backdrop-filter: blur(34px);
+  -webkit-backdrop-filter: blur(34px);
+  border: 1px solid rgba(0, 243, 255, 0.35);
+  box-shadow: 0 0 35px rgba(0, 243, 255, 0.15), 0 30px 80px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(0, 243, 255, 0.05);
+}
+
+/* Subtle Animated Scanlines */
+.theme-cyberpunk .scanlines {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+  background-size: 100% 3px, 6px 100%;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.theme-cyberpunk .ambient-visual {
+  position: absolute;
+  top: -100px;
+  right: -100px;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(0, 243, 255, 0.08) 0%, rgba(255, 0, 85, 0.04) 50%, transparent 70%);
+  pointer-events: none;
+}
+
+/* Header & Brand */
+.theme-cyberpunk .theme-glyph-jp { display: none; }
+.theme-cyberpunk .theme-glyph-cyber {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+}
+
+.theme-cyberpunk .brand-glyph {
+  width: auto;
+  padding: 4px 10px;
+  background: rgba(0, 243, 255, 0.12);
+  border: 1px solid #00f3ff;
+  color: #00f3ff;
+  text-shadow: 0 0 8px rgba(0, 243, 255, 0.6);
+  border-radius: 4px;
+}
+
+.theme-cyberpunk .brand-title {
+  color: #00f3ff;
+  letter-spacing: 0.16em;
+  text-shadow: 0 0 10px rgba(0, 243, 255, 0.4);
+}
+
+.theme-cyberpunk .brand-status {
+  color: #ff0055;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  text-shadow: 0 0 6px rgba(255, 0, 85, 0.5);
+}
+
+/* Navigation buttons */
+.theme-cyberpunk .nav-kanji { display: none; }
+.theme-cyberpunk .nav-cyber {
+  display: inline-block;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.theme-cyberpunk .nav-btn {
+  font-family: inherit;
+  color: rgba(209, 247, 255, 0.65);
+  border-radius: 4px;
+}
+
+.theme-cyberpunk .nav-btn:hover {
+  background: rgba(0, 243, 255, 0.1);
+  color: #00f3ff;
+}
+
+.theme-cyberpunk .nav-btn.active {
+  background: rgba(0, 243, 255, 0.2);
+  border: 1px solid #00f3ff;
+  color: #00f3ff;
+  box-shadow: 0 0 16px rgba(0, 243, 255, 0.35);
+}
+
+.theme-cyberpunk .nav-key {
+  background: rgba(0, 243, 255, 0.18);
+  color: #00f3ff;
+  border-radius: 2px;
+}
+
+.theme-cyberpunk .theme-switch-pill {
+  background: rgba(255, 0, 85, 0.12);
+  border: 1px solid rgba(255, 0, 85, 0.4);
+  color: #ff0055;
+  border-radius: 4px;
+  text-shadow: 0 0 6px rgba(255, 0, 85, 0.4);
+}
+
+.theme-cyberpunk .action-btn {
+  border-color: rgba(0, 243, 255, 0.3);
+  color: #00f3ff;
+  border-radius: 4px;
+}
+
+.theme-cyberpunk .action-btn:hover {
+  background: rgba(0, 243, 255, 0.2);
+  box-shadow: 0 0 12px rgba(0, 243, 255, 0.3);
+}
+
+/* Search Bar */
+.theme-cyberpunk .search-bar-wrap {
+  background: rgba(0, 243, 255, 0.04);
+  border: 1px solid rgba(0, 243, 255, 0.25);
+  border-radius: 4px;
+  position: relative;
+}
+
+.theme-cyberpunk .search-bar-wrap::after {
+  content: "SYS//SEARCH";
+  position: absolute;
+  top: -8px;
+  right: 18px;
+  font-size: 0.6rem;
+  background: #060c18;
+  padding: 0 6px;
+  color: #00f3ff;
+  letter-spacing: 0.1em;
+}
+
+.theme-cyberpunk .search-bar-wrap:focus-within {
+  background: rgba(0, 243, 255, 0.08);
+  border-color: #00f3ff;
+  box-shadow: 0 0 20px rgba(0, 243, 255, 0.25);
+}
+
+.theme-cyberpunk .search-icon svg {
+  stroke: #00f3ff;
+}
+
+.theme-cyberpunk .search-input {
+  font-family: inherit;
+  color: #00f3ff;
+}
+
+.theme-cyberpunk .indexer-badge {
+  background: rgba(255, 0, 85, 0.15);
+  color: #ff0055;
+  border: 1px solid rgba(255, 0, 85, 0.4);
+  border-radius: 2px;
+}
+
+.theme-cyberpunk .tab-action-hint {
+  background: rgba(0, 243, 255, 0.18);
+  color: #00f3ff;
+  border: 1px solid #00f3ff;
+  box-shadow: 0 0 10px rgba(0, 243, 255, 0.35);
+  border-radius: 2px;
+}
+
+/* Result Cards */
+.theme-cyberpunk .result-card {
+  background: rgba(7, 16, 32, 0.6);
+  border: 1px solid rgba(0, 243, 255, 0.18);
+  border-radius: 4px;
+}
+
+.theme-cyberpunk .result-card:hover {
+  background: rgba(0, 243, 255, 0.09);
+  border-color: #00f3ff;
+  box-shadow: 0 0 14px rgba(0, 243, 255, 0.2);
+}
+
+.theme-cyberpunk .file-ext-badge {
+  background: rgba(0, 243, 255, 0.15);
+  color: #00f3ff;
+  border: 1px solid rgba(0, 243, 255, 0.4);
+  border-radius: 2px;
+}
+
+.theme-cyberpunk .file-name {
+  color: #fff;
+}
+
+.theme-cyberpunk .excerpt-line {
+  background: rgba(2, 6, 14, 0.7);
+  border-left: 2px solid #00f3ff;
+  border-radius: 2px;
+}
+
+.theme-cyberpunk mark.highlight {
+  background: rgba(255, 0, 85, 0.4);
+  color: #ff85aa;
+  border-bottom: 1px solid #ff0055;
+  text-shadow: 0 0 6px rgba(255, 0, 85, 0.6);
+}
+
+/* System Stats */
+.theme-cyberpunk .stat-card,
+.theme-cyberpunk .stat-panel {
+  background: rgba(7, 16, 32, 0.6);
+  border: 1px solid rgba(0, 243, 255, 0.2);
+  border-radius: 4px;
+}
+
+.theme-cyberpunk .card-val {
+  color: #00f3ff;
+  text-shadow: 0 0 12px rgba(0, 243, 255, 0.5);
+}
+
+.theme-cyberpunk .bar-fill {
+  background: linear-gradient(90deg, #00f3ff, #ff0055);
+  box-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+}
+
+.theme-cyberpunk .drive-item,
+.theme-cyberpunk .process-item {
+  background: rgba(2, 6, 14, 0.6);
+  border-radius: 2px;
+}
+
+/* Notes Layout */
+.theme-cyberpunk .notes-sidebar {
+  background: rgba(3, 8, 18, 0.6);
+  border: 1px solid rgba(0, 243, 255, 0.2);
+  border-radius: 4px;
+}
+
+.theme-cyberpunk .note-item-card {
+  background: rgba(0, 243, 255, 0.04);
+  border: 1px solid transparent;
+  border-radius: 2px;
+}
+
+.theme-cyberpunk .note-item-card:hover {
+  background: rgba(0, 243, 255, 0.1);
+}
+
+.theme-cyberpunk .note-item-card.active {
+  background: rgba(255, 0, 85, 0.16);
+  border-color: #ff0055;
+  box-shadow: 0 0 10px rgba(255, 0, 85, 0.25);
+}
+
+.theme-cyberpunk .notes-editor-pane {
+  background: rgba(7, 16, 32, 0.6);
+  border: 1px solid rgba(0, 243, 255, 0.2);
+  border-radius: 4px;
+}
+
+.theme-cyberpunk .note-title-input {
+  border-bottom: 1px solid rgba(0, 243, 255, 0.35);
+  padding-bottom: 4px;
+  color: #00f3ff;
+}
+
+.theme-cyberpunk .save-badge {
+  background: rgba(0, 243, 255, 0.15);
+  color: #00f3ff;
+  border: 1px solid rgba(0, 243, 255, 0.3);
+}
+
+/* Context Menu */
+.theme-cyberpunk .hud-context-menu {
+  background: rgba(5, 10, 20, 0.95);
+  backdrop-filter: blur(28px);
+  border: 1px solid #00f3ff;
+  box-shadow: 0 0 25px rgba(0, 243, 255, 0.3);
+  color: #d1f7ff;
+  border-radius: 4px;
+}
+
+.theme-cyberpunk .ctx-item:hover {
+  background: rgba(0, 243, 255, 0.2);
+  color: #00f3ff;
+}
+
+.theme-cyberpunk .ctx-divider {
+  background: rgba(0, 243, 255, 0.2);
+}
+
+.theme-cyberpunk .ctx-check {
+  color: #00f3ff;
+  text-shadow: 0 0 8px #00f3ff;
+}
+
+/* Psalter Cyberpunk Styling */
+.theme-cyberpunk .psalter-layer-bar {
+  border-bottom-color: rgba(0, 243, 255, 0.2);
+  background: rgba(3, 8, 18, 0.85);
+}
+
+.theme-cyberpunk .layer-pill.active {
+  background: rgba(0, 243, 255, 0.25);
+  color: #00f3ff;
+  border: 1px solid #00f3ff;
+  text-shadow: 0 0 8px #00f3ff;
+}
+
+.theme-cyberpunk .katizma-card.selected,
+.theme-cyberpunk .psalm-card.selected {
+  border-color: #00f3ff;
+  background: rgba(0, 243, 255, 0.12);
+  box-shadow: 0 0 20px rgba(0, 243, 255, 0.35);
+}
+
+.theme-cyberpunk .katizma-card-num,
+.theme-cyberpunk .psalm-card-num {
+  background: rgba(0, 243, 255, 0.15);
+  color: #00f3ff;
+  border: 1px solid rgba(0, 243, 255, 0.3);
+}
+
+.theme-cyberpunk .katizma-card:hover,
+.theme-cyberpunk .psalm-card:hover {
+  border-color: rgba(0, 243, 255, 0.4);
+}
+
+.theme-cyberpunk .btn-back-layer:hover,
+.theme-cyberpunk .layer-nav-arrow:hover {
+  background: rgba(0, 243, 255, 0.2);
+  border-color: #00f3ff;
+  color: #00f3ff;
+}
+
+.theme-cyberpunk .katizma-badge {
+  background: rgba(0, 243, 255, 0.15);
+  color: #00f3ff;
+  border: 1px solid rgba(0, 243, 255, 0.35);
+  text-shadow: 0 0 6px rgba(0, 243, 255, 0.4);
+}
+
+.theme-cyberpunk .psalm-title {
+  color: #00f3ff;
+  text-shadow: 0 0 12px rgba(0, 243, 255, 0.5);
+}
+
+.theme-cyberpunk .psalm-subtitle {
+  color: #d1f7ff;
+  opacity: 0.8;
+}
+
+.theme-cyberpunk .ornament-symbol {
+  color: #ff0055;
+  text-shadow: 0 0 10px #ff0055;
+}
+
+.theme-cyberpunk .ornament-line {
+  background: linear-gradient(90deg, transparent, #00f3ff, transparent);
+}
+
+.theme-cyberpunk .verse-num {
+  color: #ff0055;
+  text-shadow: 0 0 5px rgba(255, 0, 85, 0.5);
+}
+
+.theme-cyberpunk .reader-nav-btn:hover {
+  background: rgba(0, 243, 255, 0.2);
+  border-color: #00f3ff;
+  color: #00f3ff;
+}

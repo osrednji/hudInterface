@@ -1,0 +1,310 @@
+/* ========================================================
+   THEME: JAPANESE MINIMALIST (和風 WASHI / SUMI-E)
+   ======================================================== */
+
+.theme-japanese {
+  font-family: "Noto Serif JP", "Shippori Mincho", "Yu Mincho", "Georgia", serif;
+  color: #edeae2;
+}
+
+/* Glass HUD Shell */
+.theme-japanese .hud-container {
+  background: rgba(18, 20, 26, 0.78);
+  backdrop-filter: blur(32px) saturate(135%);
+  -webkit-backdrop-filter: blur(32px) saturate(135%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7), inset 0 0 1px 1px rgba(255, 255, 255, 0.06);
+}
+
+/* Enso Circular Brush Watermark */
+.theme-japanese .ambient-visual {
+  position: absolute;
+  right: -80px;
+  bottom: -80px;
+  width: 480px;
+  height: 480px;
+  border-radius: 50%;
+  border: 16px solid rgba(229, 184, 105, 0.04);
+  border-top-color: transparent;
+  transform: rotate(35deg);
+  pointer-events: none;
+  filter: blur(2px);
+}
+
+.theme-japanese .scanlines {
+  display: none; /* No scanlines in Japan theme */
+}
+
+/* Header & Brand */
+.theme-japanese .theme-glyph-cyber { display: none; }
+.theme-japanese .theme-glyph-jp { display: inline-block; }
+
+.theme-japanese .brand-glyph {
+  background: rgba(211, 56, 56, 0.18);
+  border: 1px solid rgba(211, 56, 56, 0.45);
+  color: #e74c3c; /* Shu-iro Crimson */
+  font-family: serif;
+}
+
+.theme-japanese .brand-title {
+  color: #edeae2;
+  letter-spacing: 0.18em;
+  font-weight: 600;
+}
+
+.theme-japanese .brand-status {
+  color: #e5b869; /* Kin-cha Gold */
+  letter-spacing: 0.12em;
+}
+
+/* Navigation buttons */
+.theme-japanese .nav-cyber { display: none; }
+.theme-japanese .nav-kanji {
+  display: inline-block;
+  font-size: 0.85rem;
+  color: #e5b869;
+}
+
+.theme-japanese .nav-btn {
+  font-family: inherit;
+  color: rgba(237, 234, 226, 0.65);
+}
+
+.theme-japanese .nav-btn:hover {
+  background: rgba(229, 184, 105, 0.08);
+  color: #edeae2;
+}
+
+.theme-japanese .nav-btn.active {
+  background: rgba(211, 56, 56, 0.22);
+  border: 1px solid rgba(211, 56, 56, 0.4);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(211, 56, 56, 0.18);
+}
+
+.theme-japanese .nav-key {
+  background: rgba(255, 255, 255, 0.08);
+  color: #d6d3ca;
+}
+
+.theme-japanese .theme-switch-pill {
+  background: rgba(229, 184, 105, 0.1);
+  border: 1px solid rgba(229, 184, 105, 0.25);
+  color: #e5b869;
+}
+
+.theme-japanese .action-btn {
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #d6d3ca;
+}
+
+.theme-japanese .action-btn:hover {
+  background: rgba(211, 56, 56, 0.15);
+  border-color: rgba(211, 56, 56, 0.35);
+  color: #fff;
+}
+
+/* Search Bar */
+.theme-japanese .search-bar-wrap {
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 2px solid rgba(211, 56, 56, 0.5);
+}
+
+.theme-japanese .search-bar-wrap:focus-within {
+  background: rgba(255, 255, 255, 0.06);
+  border-bottom-color: #e74c3c;
+  box-shadow: 0 8px 24px rgba(211, 56, 56, 0.12);
+}
+
+.theme-japanese .search-icon svg {
+  stroke: #e5b869;
+}
+
+.theme-japanese .search-input {
+  font-family: inherit;
+  color: #edeae2;
+}
+
+.theme-japanese .indexer-badge {
+  background: rgba(229, 184, 105, 0.15);
+  color: #e5b869;
+  border: 1px solid rgba(229, 184, 105, 0.25);
+}
+
+/* Result Cards */
+.theme-japanese .result-card {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.theme-japanese .result-card:hover {
+  background: rgba(255, 255, 255, 0.055);
+  border-color: rgba(229, 184, 105, 0.35);
+  transform: translateY(-1px);
+}
+
+.theme-japanese .file-ext-badge {
+  background: rgba(211, 56, 56, 0.18);
+  color: #ff7b72;
+  border: 1px solid rgba(211, 56, 56, 0.3);
+}
+
+.theme-japanese .file-name {
+  color: #edeae2;
+}
+
+.theme-japanese .excerpt-line {
+  background: rgba(0, 0, 0, 0.28);
+  border-left: 2px solid rgba(229, 184, 105, 0.45);
+}
+
+.theme-japanese mark.highlight {
+  background: rgba(229, 184, 105, 0.3);
+  color: #ffe6a3;
+  border-bottom: 1px solid #e5b869;
+}
+
+/* System Stats */
+.theme-japanese .stat-card,
+.theme-japanese .stat-panel {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.theme-japanese .card-val {
+  color: #edeae2;
+}
+
+.theme-japanese .bar-fill {
+  background: linear-gradient(90deg, #d33838, #e5b869);
+}
+
+.theme-japanese .drive-item,
+.theme-japanese .process-item {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+/* Notes Layout */
+.theme-japanese .notes-sidebar {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.theme-japanese .note-item-card {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid transparent;
+}
+
+.theme-japanese .note-item-card:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.theme-japanese .note-item-card.active {
+  background: rgba(211, 56, 56, 0.18);
+  border-color: rgba(211, 56, 56, 0.4);
+}
+
+.theme-japanese .notes-editor-pane {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.theme-japanese .note-title-input {
+  border-bottom: 1px solid rgba(229, 184, 105, 0.3);
+  padding-bottom: 4px;
+}
+
+.theme-japanese .save-badge {
+  background: rgba(229, 184, 105, 0.18);
+  color: #e5b869;
+}
+
+/* Context Menu */
+.theme-japanese .hud-context-menu {
+  background: rgba(18, 20, 26, 0.94);
+  backdrop-filter: blur(28px);
+  border: 1px solid rgba(229, 184, 105, 0.25);
+  color: #edeae2;
+}
+
+.theme-japanese .ctx-item:hover {
+  background: rgba(211, 56, 56, 0.22);
+  color: #fff;
+}
+
+.theme-japanese .ctx-divider {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.theme-japanese .ctx-check {
+  color: #e5b869;
+}
+
+/* Psalter Japanese Styling */
+.theme-japanese .psalter-layer-bar {
+  border-bottom-color: rgba(229, 184, 105, 0.12);
+  background: rgba(14, 16, 22, 0.7);
+}
+
+.theme-japanese .layer-pill.active {
+  background: rgba(211, 56, 56, 0.28);
+  color: #fff;
+  border: 1px solid rgba(211, 56, 56, 0.5);
+}
+
+.theme-japanese .katizma-card.selected,
+.theme-japanese .psalm-card.selected {
+  border-color: rgba(229, 184, 105, 0.45);
+  background: rgba(229, 184, 105, 0.08);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 12px rgba(229, 184, 105, 0.2);
+}
+
+.theme-japanese .katizma-card-num,
+.theme-japanese .psalm-card-num {
+  background: rgba(229, 184, 105, 0.15);
+  color: #e5b869;
+}
+
+.theme-japanese .katizma-card:hover,
+.theme-japanese .psalm-card:hover {
+  border-color: rgba(229, 184, 105, 0.25);
+}
+
+.theme-japanese .katizma-badge {
+  background: rgba(229, 184, 105, 0.15);
+  color: #e5b869;
+  border: 1px solid rgba(229, 184, 105, 0.25);
+}
+
+.theme-japanese .btn-back-layer:hover,
+.theme-japanese .layer-nav-arrow:hover {
+  background: rgba(211, 56, 56, 0.22);
+  border-color: rgba(211, 56, 56, 0.4);
+}
+
+.theme-japanese .psalm-title {
+  color: #f7f4ec;
+  font-family: "Noto Serif JP", "Shippori Mincho", "Georgia", serif;
+}
+
+.theme-japanese .psalm-subtitle {
+  color: #d8d4c9;
+}
+
+.theme-japanese .ornament-symbol {
+  color: #e5b869;
+}
+
+.theme-japanese .ornament-line {
+  background: linear-gradient(90deg, transparent, rgba(229, 184, 105, 0.4), transparent);
+}
+
+.theme-japanese .verse-num {
+  color: #e5b869;
+}
+
+.theme-japanese .reader-nav-btn:hover {
+  background: rgba(211, 56, 56, 0.25);
+  border-color: rgba(211, 56, 56, 0.5);
+}
