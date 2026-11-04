@@ -14,6 +14,7 @@ public class AppSettings
     public int LastPsalmNumber { get; set; } = 1;
     public int LastKatizmaNumber { get; set; } = 1;
     public string LastPsalterLevel { get; set; } = "katizma";
+    public int LastPsalmScrollPos { get; set; } = 0;
 
     private static readonly string SettingsFolder = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),

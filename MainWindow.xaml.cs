@@ -209,7 +209,8 @@ public partial class MainWindow : Window
                         indexStatus = _indexerService.CurrentStatus,
                         lastPsalmNumber = _settings.LastPsalmNumber,
                         lastKatizmaNumber = _settings.LastKatizmaNumber,
-                        lastPsalterLevel = _settings.LastPsalterLevel
+                        lastPsalterLevel = _settings.LastPsalterLevel,
+                        lastPsalmScrollPos = _settings.LastPsalmScrollPos
                     };
                     SendResponse(requestId, initData);
                     break;
@@ -218,6 +219,7 @@ public partial class MainWindow : Window
                     if (root.TryGetProperty("psalmNumber", out var pn)) _settings.LastPsalmNumber = pn.GetInt32();
                     if (root.TryGetProperty("katizmaNumber", out var kn)) _settings.LastKatizmaNumber = kn.GetInt32();
                     if (root.TryGetProperty("level", out var lv)) _settings.LastPsalterLevel = lv.GetString() ?? "katizma";
+                    if (root.TryGetProperty("scrollPos", out var sp)) _settings.LastPsalmScrollPos = sp.GetInt32();
                     _settings.Save();
                     SendResponse(requestId, new { success = true });
                     break;
@@ -382,6 +384,36 @@ public partial class MainWindow : Window
         contextMenu.Items.Add(new WinForms.ToolStripSeparator());
 
         var themeMenu = new WinForms.ToolStripMenuItem("Themes");
+        themeMenu.DropDownItems.Add("☦ Српски (Тамни)", null, (s, e) =>
+        {
+            _settings.Theme = "serbian-orthodox";
+            _settings.Save();
+            PostMessageToWeb("theme_changed", "serbian-orthodox");
+        });
+        themeMenu.DropDownItems.Add("📜 Српски (Пергамент)", null, (s, e) =>
+        {
+            _settings.Theme = "serbian-parchment";
+            _settings.Save();
+            PostMessageToWeb("theme_changed", "serbian-parchment");
+        });
+        themeMenu.DropDownItems.Add("🇷🇸 Застава (Тробојка)", null, (s, e) =>
+        {
+            _settings.Theme = "zastava";
+            _settings.Save();
+            PostMessageToWeb("theme_changed", "zastava");
+        });
+        themeMenu.DropDownItems.Add("☦ Русский", null, (s, e) =>
+        {
+            _settings.Theme = "russian-orthodox";
+            _settings.Save();
+            PostMessageToWeb("theme_changed", "russian-orthodox");
+        });
+        themeMenu.DropDownItems.Add("☧ Βυζαντινό", null, (s, e) =>
+        {
+            _settings.Theme = "byzantine-orthodox";
+            _settings.Save();
+            PostMessageToWeb("theme_changed", "byzantine-orthodox");
+        });
         themeMenu.DropDownItems.Add("🌸 Japanese Minimalist", null, (s, e) =>
         {
             _settings.Theme = "japanese";
