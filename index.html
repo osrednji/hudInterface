@@ -12,6 +12,16 @@
 </head>
 <body class="theme-japanese">
   <div id="hud-root" class="hud-container">
+
+    <!-- Window Resize Handles (Edges and Corners) -->
+    <div class="resize-handle resize-top" data-dir="top"></div>
+    <div class="resize-handle resize-bottom" data-dir="bottom"></div>
+    <div class="resize-handle resize-left" data-dir="left"></div>
+    <div class="resize-handle resize-right" data-dir="right"></div>
+    <div class="resize-handle resize-top-left" data-dir="top-left"></div>
+    <div class="resize-handle resize-top-right" data-dir="top-right"></div>
+    <div class="resize-handle resize-bottom-left" data-dir="bottom-left"></div>
+    <div class="resize-handle resize-bottom-right" data-dir="bottom-right"></div>
     
     <!-- Ambient Background Layer (Japan Enso / Cyber Grid / Orthodox Halo) -->
     <div class="hud-ambient">
@@ -303,6 +313,7 @@
               <article class="psalm-article full-width">
                 <h1 class="psalm-title" id="reader-psalm-title">Псалам 1.</h1>
                 <p class="psalm-subtitle" id="reader-psalm-subtitle">(Псалам Давидов, не натписан у Јевреја)</p>
+                <div class="reader-instruction-container" id="reader-instruction-container"></div>
                 <div class="psalm-ornament">
                   <span class="ornament-line"></span>
                   <span class="ornament-symbol">✤</span>
@@ -341,6 +352,13 @@
       </div>
       <div class="footer-right">
         <span id="footer-indexer-label">Indexer ready</span>
+        <div class="resize-grip" data-dir="bottom-right" title="Resize HUD">
+          <svg viewBox="0 0 12 12" width="12" height="12">
+            <line x1="10" y1="2" x2="2" y2="10" stroke="currentColor" stroke-width="1.5" />
+            <line x1="10" y1="6" x2="6" y2="10" stroke="currentColor" stroke-width="1.5" />
+            <line x1="10" y1="10" x2="10" y2="10" stroke="currentColor" stroke-width="1.5" />
+          </svg>
+        </div>
       </div>
     </footer>
 

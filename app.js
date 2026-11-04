@@ -26,6 +26,7 @@
 
   // Psalter State (3-Tier Layer Architecture: Katizmas -> Psalms -> Single Psalm)
   let psalterData = null;
+  let psalmInstructions = null;
   let currentKatizmaNumber = 1;
   let currentPsalmNumber = 1;
   let psalterLayer = 'single'; // 'katizmas', 'psalms', or 'single'
@@ -51,12 +52,14 @@
   const footerIndexerLabel = document.getElementById('footer-indexer-label');
   const hudStatusIndicator = document.getElementById('hud-status-indicator');
 
-  // Search Elements (Global on top of all tabs)
+  // Search Elements
+  const globalSearchWrap = document.getElementById('global-search-wrap');
   const searchInput = document.getElementById('search-input');
   const searchCounter = document.getElementById('search-counter');
   const indexerStatus = document.getElementById('indexer-status');
   const tabActionHint = document.getElementById('tab-action-hint');
   const searchResultsContainer = document.getElementById('search-results-container');
+  const readerInstructionContainer = document.getElementById('reader-instruction-container');
 
   // Stats Elements
   const statsSystemInfo = document.getElementById('stats-system-info');
@@ -271,6 +274,11 @@
       statsPollInterval = null;
     }
 
+    // Search bar is visible ONLY on the Search tab
+    if (globalSearchWrap) {
+      globalSearchWrap.style.display = (targetId === 'search') ? 'flex' : 'none';
+    }
+
     if (targetId === 'search') {
       setTimeout(() => {
         if (searchInput) {
@@ -414,22 +422,31 @@
       }
     }
 
-    // 4. Single key navigation: 's', 'd', 'n' when not typing in any input/textarea
-    const tag = (document.activeElement && document.activeElement.tagName) || '';
-    const isTyping = tag === 'INPUT' || tag === 'TEXTAREA' || document.activeElement?.isContentEditable;
+    // 4. Typing on ANY tab immediately switches to Search tab and starts searching
+    const activeEl = document.activeElement;
+    const tag = (activeEl && activeEl.tagName) || '';
+    const isTyping = tag === 'INPUT' || tag === 'TEXTAREA' || activeEl?.isContentEditable;
 
-    if (!isTyping && !e.ctrlKey && !e.metaKey && !e.altKey) {
-      const key = e.key.toLowerCase();
-      if (key === 's') {
-        e.preventDefault();
-        switchModule('search');
-      } else if (key === 'd') {
-        e.preventDefault();
-        switchModule('stats');
-      } else if (key === 'n') {
-        e.preventDefault();
-        switchModule('notes');
+    if (!isTyping && !e.ctrlKey && !e.metaKey && !e.altKey && e.key.length === 1) {
+      e.preventDefault();
+      switchModule('search');
+      if (searchInput) {
+        searchInput.value = e.key;
+        searchInput.focus();
+        updateTabHint(e.key);
+        clearTimeout(searchDebounceTimer);
+        searchDebounceTimer = setTimeout(() => {
+          performSearch(e.key);
+        }, 120);
       }
+      return;
+    }
+
+    if (!isTyping && e.key === 'Backspace' && activeModuleId !== 'search') {
+      e.preventDefault();
+      switchModule('search');
+      if (searchInput) searchInput.focus();
+      return;
     }
   });
 
@@ -937,6 +954,16 @@
         data = await resp.json();
       }
 
+      if (!psalmInstructions) {
+        try {
+          const respInst = await fetch('data/psalm_instructions.json');
+          psalmInstructions = await respInst.json();
+          logToHost(`Loaded psalm instructions for ${Object.keys(psalmInstructions).length} psalms`);
+        } catch (e) {
+          logToHost(`Could not load psalm instructions: ${e}`, 'WARN');
+        }
+      }
+
       if (data && data.katizmas && data.katizmas.length > 0) {
         psalterData = data;
         logToHost(`Psalter loaded: ${data.katizmas.length} katizmas, ${data.totalPsalms || 151} psalms`);
@@ -1078,14 +1105,20 @@
     let html = '';
     for (const p of psalms) {
       const pNum = p.number || p.Number || p.id || p.Id;
-      const pTitle = p.title || p.Title || `Псалам ${pNum}`;
       const firstVerse = p.firstVerse || p.FirstVerse || (p.lines && p.lines[0]) || '';
       const isSelected = pNum === currentPsalmNumber;
+      const instObj = psalmInstructions ? psalmInstructions[String(pNum)] : null;
+      const instText = instObj ? instObj.instruction : '';
 
       html += `
         <div class="psalm-card ${isSelected ? 'selected' : ''}" data-psalm="${pNum}">
           <div class="psalm-card-num">Псалам ${pNum}</div>
-          <div class="psalm-card-title">${escapeHtml(pTitle)}</div>
+          ${instText ? `
+            <div class="psalm-card-instruction">
+              <span class="inst-icon">🕊️</span>
+              <span class="inst-text">${escapeHtml(instText)}</span>
+            </div>
+          ` : ''}
           ${firstVerse ? `<div class="psalm-card-snippet">${escapeHtml(firstVerse)}</div>` : ''}
         </div>
       `;
@@ -1096,7 +1129,7 @@
     psalmsGridContainer.querySelectorAll('.psalm-card').forEach((card) => {
       card.addEventListener('click', () => {
         const pNum = parseInt(card.dataset.psalm, 10);
-        selectPsalm(pNum);
+        selectPsalm(pNum, false);
         setPsalterLayer('single', true);
       });
     });
@@ -1132,6 +1165,28 @@
       readerPsalmSubtitle.style.display = sub ? 'block' : 'none';
     }
 
+    if (readerInstructionContainer) {
+      const instObj = psalmInstructions ? psalmInstructions[String(currentPsalmNumber)] : null;
+      const instText = instObj ? instObj.instruction : '';
+      if (instText) {
+        readerInstructionContainer.innerHTML = `
+          <div class="reader-instruction-banner">
+            <div class="instruction-badge-tag">
+              <span class="instruction-cross">☦</span>
+              <span>Упутство Св. Пајсија Светогорца</span>
+            </div>
+            <div class="instruction-body">
+              ${escapeHtml(instText)}
+            </div>
+          </div>
+        `;
+        readerInstructionContainer.style.display = 'block';
+      } else {
+        readerInstructionContainer.innerHTML = '';
+        readerInstructionContainer.style.display = 'none';
+      }
+    }
+
     if (readerPsalmText) {
       const rawLines = psalm.lines || psalm.Lines || (psalm.content || psalm.Content ? (psalm.content || psalm.Content).split('\n') : []);
       let versesHtml = '';
@@ -1165,13 +1220,16 @@
     }
 
     if (psalterReaderScroll) {
-      requestAnimationFrame(() => {
-        const targetScroll = restoreScroll
-          ? (psalmScrollPositions[currentPsalmNumber] !== undefined ? psalmScrollPositions[currentPsalmNumber] : currentPsalmScrollPos)
-          : 0;
-        psalterReaderScroll.scrollTop = targetScroll;
-        logToHost(`Restored psalm ${currentPsalmNumber} scroll to ${targetScroll} (restore=${restoreScroll})`);
-      });
+      psalterReaderScroll.scrollTop = 0; // Immediate reset
+      if (restoreScroll) {
+        const targetScroll = psalmScrollPositions[currentPsalmNumber] || 0;
+        requestAnimationFrame(() => {
+          if (psalterReaderScroll) {
+            psalterReaderScroll.scrollTop = targetScroll;
+            logToHost(`Restored psalm ${currentPsalmNumber} scroll to ${targetScroll}`);
+          }
+        });
+      }
     }
 
     if (btnPrevPsalm) btnPrevPsalm.disabled = currentPsalmNumber <= 1;
@@ -1195,7 +1253,7 @@
     persistPsalterState();
   }
 
-  function selectPsalm(psalmNum) {
+  function selectPsalm(psalmNum, resetScroll = true) {
     if (!psalterData) return;
     const katizmas = psalterData.katizmas || [];
     let foundPsalm = null;
@@ -1213,8 +1271,24 @@
 
     if (!foundPsalm || !foundKatizma) return;
 
-    currentPsalmNumber = psalmNum;
-    currentKatizmaNumber = foundKatizma.number || foundKatizma.Number;
+    if (psalmNum !== currentPsalmNumber) {
+      // 1. Save scroll position of the OLD psalm before changing psalm number!
+      if (psalterReaderScroll && psalterLayer === 'single') {
+        psalmScrollPositions[currentPsalmNumber] = Math.round(psalterReaderScroll.scrollTop);
+      }
+      // 2. Change to new psalm
+      currentPsalmNumber = psalmNum;
+      currentKatizmaNumber = foundKatizma.number || foundKatizma.Number;
+      // 3. Reset scroll position for the new psalm when navigating with buttons
+      if (resetScroll) {
+        psalmScrollPositions[psalmNum] = 0;
+        currentPsalmScrollPos = 0;
+        if (psalterReaderScroll) {
+          psalterReaderScroll.scrollTop = 0;
+        }
+      }
+    }
+
     persistPsalterState();
   }
 
@@ -1260,8 +1334,8 @@
       }
     } else if (psalterLayer === 'single') {
       if (currentPsalmNumber > 1) {
-        selectPsalm(currentPsalmNumber - 1);
-        displayCurrentPsalm();
+        selectPsalm(currentPsalmNumber - 1, true);
+        displayCurrentPsalm(false);
       }
     }
   }
@@ -1277,13 +1351,13 @@
       }
     } else if (psalterLayer === 'psalms') {
       if (currentPsalmNumber < 151) {
-        selectPsalm(currentPsalmNumber + 1);
+        selectPsalm(currentPsalmNumber + 1, false);
         renderPsalmsGrid();
       }
     } else if (psalterLayer === 'single') {
       if (currentPsalmNumber < 151) {
-        selectPsalm(currentPsalmNumber + 1);
-        displayCurrentPsalm();
+        selectPsalm(currentPsalmNumber + 1, true);
+        displayCurrentPsalm(false);
       }
     }
   }
@@ -1293,8 +1367,8 @@
     logToHost(`psalterOnSpaceKey in layer ${psalterLayer}`);
     if (psalterLayer === 'single') {
       if (currentPsalmNumber < 151) {
-        selectPsalm(currentPsalmNumber + 1);
-        displayCurrentPsalm();
+        selectPsalm(currentPsalmNumber + 1, true);
+        displayCurrentPsalm(false);
       }
     } else if (psalterLayer === 'psalms') {
       setPsalterLayer('single');
@@ -1324,6 +1398,16 @@
   if (btnBackToPsalms) btnBackToPsalms.addEventListener('click', () => setPsalterLayer('psalms'));
   if (btnPrevPsalm) btnPrevPsalm.addEventListener('click', psalterTraverseLeft);
   if (btnNextPsalm) btnNextPsalm.addEventListener('click', psalterTraverseRight);
+
+  // Window Resize Handles
+  document.querySelectorAll('.resize-handle, .resize-grip').forEach((el) => {
+    el.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const dir = el.dataset.dir || 'bottom-right';
+      callHost('resize_window', { direction: dir });
+    });
+  });
 
   // Continuously record scroll position while user is reading/scrolling
   if (psalterReaderScroll) {
