@@ -4,13 +4,14 @@
         xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
         Title="hudInteface"
         Height="720" Width="1060"
+        MinWidth="820" MinHeight="520"
         WindowStartupLocation="CenterScreen"
         WindowStyle="None"
         AllowsTransparency="True"
         Background="#01000000"
         Topmost="True"
         ShowInTaskbar="False"
-        ResizeMode="NoResize"
+        ResizeMode="CanResize"
         Focusable="True">
     <Grid Background="#01000000" Focusable="True">
         <wv2:WebView2 x:Name="webView" Focusable="True" />

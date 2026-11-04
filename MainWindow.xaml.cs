@@ -56,7 +56,22 @@ public partial class MainWindow : Window
     [DllImport("user32.dll")]
     private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
+    [DllImport("user32.dll")]
+    private static extern bool ReleaseCapture();
+
+    [DllImport("user32.dll")]
+    private static extern IntPtr SendMessage(IntPtr hWnd, int Msg, IntPtr wParam, IntPtr lParam);
+
     private const int SW_SHOW = 5;
+    private const int WM_NCLBUTTONDOWN = 0xA1;
+    private const int HTLEFT = 10;
+    private const int HTRIGHT = 11;
+    private const int HTTOP = 12;
+    private const int HTTOPLEFT = 13;
+    private const int HTTOPRIGHT = 14;
+    private const int HTBOTTOM = 15;
+    private const int HTBOTTOMLEFT = 16;
+    private const int HTBOTTOMRIGHT = 17;
 
     public void ForceForeground()
     {
@@ -97,6 +112,19 @@ public partial class MainWindow : Window
         KeyboardNavigation.SetDirectionalNavigation(this, KeyboardNavigationMode.None);
 
         _settings = AppSettings.Load();
+        if (_settings.WindowWidth >= 800) Width = _settings.WindowWidth;
+        if (_settings.WindowHeight >= 500) Height = _settings.WindowHeight;
+
+        SizeChanged += (s, e) =>
+        {
+            if (_settings != null && WindowState == WindowState.Normal)
+            {
+                _settings.WindowWidth = Width;
+                _settings.WindowHeight = Height;
+                _settings.Save();
+            }
+        };
+
         _moduleManager = new ModuleManager(_settings);
 
         _indexerService = new FileIndexerService();
@@ -252,6 +280,25 @@ public partial class MainWindow : Window
 
                 case "drag_window":
                     DragMove();
+                    break;
+
+                case "resize_window":
+                    var dir = root.TryGetProperty("direction", out var dp) ? dp.GetString() : "bottom-right";
+                    int ht = dir switch
+                    {
+                        "left" => HTLEFT,
+                        "right" => HTRIGHT,
+                        "top" => HTTOP,
+                        "top-left" => HTTOPLEFT,
+                        "top-right" => HTTOPRIGHT,
+                        "bottom" => HTBOTTOM,
+                        "bottom-left" => HTBOTTOMLEFT,
+                        "bottom-right" => HTBOTTOMRIGHT,
+                        _ => HTBOTTOMRIGHT
+                    };
+                    var winHwnd = new WindowInteropHelper(this).Handle;
+                    ReleaseCapture();
+                    SendMessage(winHwnd, WM_NCLBUTTONDOWN, (IntPtr)ht, IntPtr.Zero);
                     break;
 
                 case "exit_app":

@@ -506,3 +506,25 @@
   color: #1E242B;
   border-color: #C6363C;
 }
+
+/* Saint Paisios Instruction overrides for Light Parchment Theme */
+.theme-serbian-parchment .psalm-card-instruction {
+  background: rgba(198, 54, 60, 0.07);
+  border-left-color: #C6363C;
+  color: #1E242B;
+}
+
+.theme-serbian-parchment .reader-instruction-banner {
+  background: rgba(198, 54, 60, 0.06);
+  border-color: rgba(198, 54, 60, 0.25);
+  border-left: 4px solid #C6363C;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+}
+
+.theme-serbian-parchment .instruction-badge-tag {
+  color: #C6363C;
+}
+
+.theme-serbian-parchment .instruction-body {
+  color: #1E242B;
+}

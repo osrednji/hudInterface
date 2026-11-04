@@ -16,6 +16,10 @@ public class AppSettings
     public string LastPsalterLevel { get; set; } = "katizma";
     public int LastPsalmScrollPos { get; set; } = 0;
 
+    // Window Dimensions Persistence
+    public double WindowWidth { get; set; } = 1060;
+    public double WindowHeight { get; set; } = 720;
+
     private static readonly string SettingsFolder = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
         "hudInteface"
