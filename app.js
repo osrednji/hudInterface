@@ -9,6 +9,7 @@
   const THEMES = [
     { id: 'serbian-orthodox', name: 'Српски (Тамни) ☦' },
     { id: 'serbian-parchment', name: 'Српски (Пергамент) 📜' },
+    { id: 'zastava', name: 'Застава 🇷🇸' },
     { id: 'russian-orthodox', name: 'Русский ☦' },
     { id: 'byzantine-orthodox', name: 'Βυζάντιο ☧' },
     { id: 'japanese', name: 'Japan 🌸' },
@@ -28,6 +29,8 @@
   let currentKatizmaNumber = 1;
   let currentPsalmNumber = 1;
   let psalterLayer = 'single'; // 'katizmas', 'psalms', or 'single'
+  let currentPsalmScrollPos = 0;
+  let psalmScrollPositions = {};
 
   // --- DOM Elements ---
   const hudRoot = document.getElementById('hud-root');
@@ -40,6 +43,7 @@
   const contextMenu = document.getElementById('hud-context-menu');
   const checkSerbian = document.getElementById('check-serbian-orthodox');
   const checkSerbianParchment = document.getElementById('check-serbian-parchment');
+  const checkZastava = document.getElementById('check-zastava');
   const checkRussian = document.getElementById('check-russian-orthodox');
   const checkByzantine = document.getElementById('check-byzantine-orthodox');
   const checkJapanese = document.getElementById('check-japanese');
@@ -195,6 +199,8 @@
         case 'hud_visibility':
           if (msg.data && msg.data.visible) {
             onHudOpened(msg.data.targetModule);
+          } else {
+            onHudClosed();
           }
           break;
       }
@@ -214,6 +220,7 @@
 
     if (checkSerbian) checkSerbian.textContent = currentTheme === 'serbian-orthodox' ? '✓' : '';
     if (checkSerbianParchment) checkSerbianParchment.textContent = currentTheme === 'serbian-parchment' ? '✓' : '';
+    if (checkZastava) checkZastava.textContent = currentTheme === 'zastava' ? '✓' : '';
     if (checkRussian) checkRussian.textContent = currentTheme === 'russian-orthodox' ? '✓' : '';
     if (checkByzantine) checkByzantine.textContent = currentTheme === 'byzantine-orthodox' ? '✓' : '';
     if (checkJapanese) checkJapanese.textContent = currentTheme === 'japanese' ? '✓' : '';
@@ -236,6 +243,17 @@
 
   function switchModule(targetId) {
     if (!targetId) return;
+
+    // If leaving psalter reader, save current scroll position
+    if (activeModuleId === 'psalter' && targetId !== 'psalter') {
+      if (psalterReaderScroll && psalterLayer === 'single') {
+        const pos = Math.round(psalterReaderScroll.scrollTop);
+        currentPsalmScrollPos = pos;
+        psalmScrollPositions[currentPsalmNumber] = pos;
+        persistPsalterState();
+      }
+    }
+
     activeModuleId = targetId;
     logToHost(`Switching module to: ${targetId}`);
 
@@ -259,6 +277,8 @@
           searchInput.focus();
           if (searchInput.value.trim().length > 0) {
             performSearch(searchInput.value.trim());
+          } else {
+            renderEmptySearchState();
           }
         }
       }, 50);
@@ -286,14 +306,44 @@
     if (preferredModule) {
       switchModule(preferredModule);
     } else {
-      switchModule('search');
-    }
-    setTimeout(() => {
-      if (searchInput) {
-        searchInput.focus();
-        searchInput.select();
+      if (activeModuleId === 'psalter' && psalterLayer === 'single') {
+        // Restore scroll on reopening HUD on psalter
+        requestAnimationFrame(() => {
+          if (psalterReaderScroll) {
+            const targetScroll = psalmScrollPositions[currentPsalmNumber] !== undefined
+              ? psalmScrollPositions[currentPsalmNumber]
+              : currentPsalmScrollPos;
+            psalterReaderScroll.scrollTop = targetScroll;
+            logToHost(`onHudOpened restored scroll to ${targetScroll}`);
+          }
+        });
+      } else {
+        switchModule(activeModuleId || 'search');
       }
-    }, 50);
+    }
+
+    if (activeModuleId === 'search') {
+      setTimeout(() => {
+        if (searchInput) {
+          searchInput.focus();
+          if (searchInput.value.trim().length > 0) {
+            searchInput.select();
+          } else {
+            renderEmptySearchState();
+          }
+        }
+      }, 50);
+    }
+  }
+
+  function onHudClosed() {
+    logToHost('onHudClosed called');
+    if (activeModuleId === 'psalter' && psalterReaderScroll && psalterLayer === 'single') {
+      const pos = Math.round(psalterReaderScroll.scrollTop);
+      currentPsalmScrollPos = pos;
+      psalmScrollPositions[currentPsalmNumber] = pos;
+      persistPsalterState();
+    }
   }
 
   window.focusHudSearch = function () {
@@ -408,6 +458,9 @@
   }
 
   function handleCommandTabOrEnter(inputVal) {
+    clearTimeout(searchDebounceTimer);
+    renderEmptySearchState();
+
     const raw = inputVal.trim().toLowerCase();
     if (raw === 'note' || raw === 'notes' || raw.startsWith('not') || raw === 'n') {
       searchInput.value = '';
@@ -494,14 +547,21 @@
   });
 
   async function performSearch(query) {
-    if (!query) {
+    const trimmed = (query || '').trim();
+    if (!trimmed) {
       renderEmptySearchState();
       return;
     }
 
     searchCounter.textContent = 'Searching...';
-    const results = await callModule('search', 'search', { query });
-    renderSearchResults(results || [], query);
+    const results = await callModule('search', 'search', { query: trimmed });
+
+    // Ensure search input hasn't been cleared or changed while searching
+    if (!searchInput.value.trim() || searchInput.value.trim().toLowerCase() !== trimmed.toLowerCase()) {
+      return;
+    }
+
+    renderSearchResults(results || [], trimmed);
   }
 
   function renderSearchResults(results, query) {
@@ -864,7 +924,7 @@
   async function loadPsalter() {
     logToHost(`loadPsalter() called, currentPsalm=${currentPsalmNumber}, currentKatizma=${currentKatizmaNumber}, layer=${psalterLayer}`);
     if (psalterData) {
-      setPsalterLayer(psalterLayer);
+      setPsalterLayer(psalterLayer, true);
       return;
     }
 
@@ -880,7 +940,7 @@
       if (data && data.katizmas && data.katizmas.length > 0) {
         psalterData = data;
         logToHost(`Psalter loaded: ${data.katizmas.length} katizmas, ${data.totalPsalms || 151} psalms`);
-        setPsalterLayer(psalterLayer);
+        setPsalterLayer(psalterLayer, true);
       } else {
         logToHost('Psalter data failed to load or empty', 'WARN');
       }
@@ -891,24 +951,37 @@
 
   function persistPsalterState() {
     try {
+      if (psalterReaderScroll && psalterLayer === 'single') {
+        currentPsalmScrollPos = Math.round(psalterReaderScroll.scrollTop);
+        psalmScrollPositions[currentPsalmNumber] = currentPsalmScrollPos;
+      }
       localStorage.setItem('hud_last_psalm_num', String(currentPsalmNumber));
       localStorage.setItem('hud_last_katizma_num', String(currentKatizmaNumber));
       localStorage.setItem('hud_last_psalter_level', psalterLayer);
+      localStorage.setItem('hud_last_psalm_scroll', String(currentPsalmScrollPos));
     } catch (e) {}
 
     callHost('save_psalter_state', {
       psalmNumber: currentPsalmNumber,
       katizmaNumber: currentKatizmaNumber,
-      level: psalterLayer
+      level: psalterLayer,
+      scrollPos: currentPsalmScrollPos
     });
   }
 
-  function setPsalterLayer(layer) {
+  function setPsalterLayer(layer, restoreScroll = false) {
     if (layer !== 'katizmas' && layer !== 'psalms' && layer !== 'single') {
       layer = 'single';
     }
+
+    // If leaving single psalm layer, record current scroll
+    if (psalterLayer === 'single' && layer !== 'single' && psalterReaderScroll) {
+      currentPsalmScrollPos = Math.round(psalterReaderScroll.scrollTop);
+      psalmScrollPositions[currentPsalmNumber] = currentPsalmScrollPos;
+    }
+
     psalterLayer = layer;
-    logToHost(`setPsalterLayer: ${layer}`);
+    logToHost(`setPsalterLayer: ${layer}, restoreScroll=${restoreScroll}`);
 
     // 1. View visibility
     if (layerKatizmasView) layerKatizmasView.classList.toggle('active', layer === 'katizmas');
@@ -942,7 +1015,7 @@
     } else if (layer === 'psalms') {
       renderPsalmsGrid();
     } else if (layer === 'single') {
-      displayCurrentPsalm();
+      displayCurrentPsalm(restoreScroll);
     }
 
     persistPsalterState();
@@ -1024,7 +1097,7 @@
       card.addEventListener('click', () => {
         const pNum = parseInt(card.dataset.psalm, 10);
         selectPsalm(pNum);
-        setPsalterLayer('single');
+        setPsalterLayer('single', true);
       });
     });
 
@@ -1034,7 +1107,7 @@
     }, 40);
   }
 
-  function displayCurrentPsalm() {
+  function displayCurrentPsalm(restoreScroll = false) {
     if (!psalterData) return;
     const katizmas = psalterData.katizmas || [];
     const currentKatizma = katizmas.find((k) => (k.number || k.Number) === currentKatizmaNumber);
@@ -1092,7 +1165,13 @@
     }
 
     if (psalterReaderScroll) {
-      psalterReaderScroll.scrollTop = 0;
+      requestAnimationFrame(() => {
+        const targetScroll = restoreScroll
+          ? (psalmScrollPositions[currentPsalmNumber] !== undefined ? psalmScrollPositions[currentPsalmNumber] : currentPsalmScrollPos)
+          : 0;
+        psalterReaderScroll.scrollTop = targetScroll;
+        logToHost(`Restored psalm ${currentPsalmNumber} scroll to ${targetScroll} (restore=${restoreScroll})`);
+      });
     }
 
     if (btnPrevPsalm) btnPrevPsalm.disabled = currentPsalmNumber <= 1;
@@ -1238,13 +1317,24 @@
   if (bcPsalms) bcPsalms.addEventListener('click', () => setPsalterLayer('psalms'));
   if (pillLayerKatizmas) pillLayerKatizmas.addEventListener('click', () => setPsalterLayer('katizmas'));
   if (pillLayerPsalms) pillLayerPsalms.addEventListener('click', () => setPsalterLayer('psalms'));
-  if (pillLayerSingle) pillLayerSingle.addEventListener('click', () => setPsalterLayer('single'));
+  if (pillLayerSingle) pillLayerSingle.addEventListener('click', () => setPsalterLayer('single', true));
   if (btnLayerUp) btnLayerUp.addEventListener('click', psalterGoUpLayer);
   if (btnLayerDown) btnLayerDown.addEventListener('click', psalterGoDownLayer);
   if (btnBackToKatizmas) btnBackToKatizmas.addEventListener('click', () => setPsalterLayer('katizmas'));
   if (btnBackToPsalms) btnBackToPsalms.addEventListener('click', () => setPsalterLayer('psalms'));
   if (btnPrevPsalm) btnPrevPsalm.addEventListener('click', psalterTraverseLeft);
   if (btnNextPsalm) btnNextPsalm.addEventListener('click', psalterTraverseRight);
+
+  // Continuously record scroll position while user is reading/scrolling
+  if (psalterReaderScroll) {
+    psalterReaderScroll.addEventListener('scroll', () => {
+      if (psalterLayer === 'single') {
+        const pos = Math.round(psalterReaderScroll.scrollTop);
+        currentPsalmScrollPos = pos;
+        psalmScrollPositions[currentPsalmNumber] = pos;
+      }
+    }, { passive: true });
+  }
 
   // ========================================================
   // Right-Click Context Menu Implementation
@@ -1317,6 +1407,12 @@
   // ========================================================
 
   function saveAndHideHud() {
+    if (activeModuleId === 'psalter' && psalterReaderScroll && psalterLayer === 'single') {
+      const pos = Math.round(psalterReaderScroll.scrollTop);
+      currentPsalmScrollPos = pos;
+      psalmScrollPositions[currentPsalmNumber] = pos;
+      persistPsalterState();
+    }
     saveActiveNoteImmediate();
     callHost('hide_hud');
   }
@@ -1360,6 +1456,11 @@
       if (kNum) currentKatizmaNumber = parseInt(kNum, 10);
       const level = initData.lastPsalterLevel || initData.LastPsalterLevel;
       if (level) psalterLayer = level;
+      const scrollPos = initData.lastPsalmScrollPos ?? initData.LastPsalmScrollPos;
+      if (scrollPos !== undefined && scrollPos !== null) {
+        currentPsalmScrollPos = parseInt(scrollPos, 10) || 0;
+        psalmScrollPositions[currentPsalmNumber] = currentPsalmScrollPos;
+      }
     }
 
     // LocalStorage fallback
@@ -1376,10 +1477,16 @@
       if (localL) {
         psalterLayer = localL;
       }
+      const localS = localStorage.getItem('hud_last_psalm_scroll');
+      if (localS && !currentPsalmScrollPos) {
+        currentPsalmScrollPos = parseInt(localS, 10) || 0;
+        psalmScrollPositions[currentPsalmNumber] = currentPsalmScrollPos;
+      }
     } catch (e) {}
 
-    logToHost(`Initial psalter state restored: psalm=${currentPsalmNumber}, katizma=${currentKatizmaNumber}, layer=${psalterLayer}`);
+    logToHost(`Initial psalter state restored: psalm=${currentPsalmNumber}, katizma=${currentKatizmaNumber}, layer=${psalterLayer}, scroll=${currentPsalmScrollPos}`);
 
+    renderEmptySearchState();
     switchModule('search');
     logToHost('Frontend init() completed.');
   }

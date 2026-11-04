@@ -1,0 +1,496 @@
+/* ========================================================
+   THEME: ZASTAVA (БОЈЕ СРПСКЕ ЗАСТАВЕ - ТРОБОЈКА)
+   Аутентична палета српске националне тробојке:
+   - Црвена (Flag Red):    #C6363C
+   - Плава (Royal Blue):   #0C4076
+   - Бела (Pure White):    #FFFFFF
+   - Златна (Crest Gold):  #D4AF37
+   - Угаљ (Dark Charcoal): #12161E
+   ======================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Marcellus&display=swap');
+
+.theme-zastava {
+  font-family: "Cinzel", "Marcellus", "Georgia", "Palatino Linotype", "Times New Roman", serif;
+  color: #FFFFFF;
+}
+
+/* Serbian Flag Tricolor Ribbon across Top and Bottom */
+.theme-zastava .pirot-ribbon {
+  display: block;
+  height: 9px;
+  width: 100%;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, 
+    #C6363C 0%, #C6363C 33.3%, 
+    #0C4076 33.3%, #0C4076 66.6%, 
+    #FFFFFF 66.6%, #FFFFFF 100%
+  );
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.theme-zastava .pirot-ribbon-bottom {
+  background: linear-gradient(180deg, 
+    #FFFFFF 0%, #FFFFFF 33.3%, 
+    #0C4076 33.3%, #0C4076 66.6%, 
+    #C6363C 66.6%, #C6363C 100%
+  );
+}
+
+/* Glass HUD Shell with Tricolor Border Accent */
+.theme-zastava .hud-container {
+  background: rgba(18, 22, 30, 0.90);
+  backdrop-filter: blur(36px) saturate(140%);
+  -webkit-backdrop-filter: blur(36px) saturate(140%);
+  border: 1.5px solid rgba(212, 175, 55, 0.5);
+  box-shadow: 
+    0 30px 90px rgba(0, 0, 0, 0.88),
+    0 0 45px rgba(12, 64, 118, 0.35),
+    0 0 25px rgba(198, 54, 60, 0.25),
+    inset 0 0 1px 1px rgba(255, 255, 255, 0.2);
+}
+
+/* Ambient Visual Watermark: Serbian Double-Headed Eagle & Crown Crest */
+.theme-zastava .ambient-visual {
+  position: absolute;
+  right: -50px;
+  bottom: -50px;
+  width: 550px;
+  height: 550px;
+  border-radius: 50%;
+  border: 2px dashed rgba(212, 175, 55, 0.2);
+  box-shadow: 
+    0 0 90px rgba(12, 64, 118, 0.2),
+    inset 0 0 70px rgba(198, 54, 60, 0.15);
+  background: radial-gradient(circle, 
+    rgba(255, 255, 255, 0.05) 0%, 
+    rgba(12, 64, 118, 0.08) 40%, 
+    rgba(198, 54, 60, 0.06) 70%, 
+    transparent 85%
+  );
+  pointer-events: none;
+}
+
+.theme-zastava .ambient-visual::before {
+  content: "🇷🇸";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 240px;
+  opacity: 0.08;
+  filter: grayscale(20%);
+}
+
+.theme-zastava .scanlines {
+  display: none;
+}
+
+/* Header & Heraldic Tricolor Crest */
+.theme-zastava .theme-glyph-jp,
+.theme-zastava .theme-glyph-cyber,
+.theme-zastava .theme-glyph-russian,
+.theme-zastava .theme-glyph-byzantine { display: none; }
+.theme-zastava .theme-glyph-serbian { 
+  display: inline-block;
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.theme-zastava .brand-glyph {
+  background: linear-gradient(180deg, #C6363C 33%, #0C4076 33%, #0C4076 66%, #FFFFFF 66%);
+  border: 2px solid #D4AF37;
+  color: #12161E;
+  border-radius: 6px 6px 14px 14px;
+  box-shadow: 0 4px 14px rgba(198, 54, 60, 0.4), 0 0 10px rgba(212, 175, 55, 0.35);
+  text-shadow: 0 0 4px #FFFFFF;
+}
+
+.theme-zastava .brand-title {
+  color: #FFFFFF;
+  letter-spacing: 0.18em;
+  font-weight: 800;
+  text-shadow: 0 0 10px rgba(198, 54, 60, 0.5), 0 2px 6px rgba(0, 0, 0, 0.8);
+}
+
+.theme-zastava .brand-status {
+  color: #D4AF37;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+}
+
+/* Navigation buttons */
+.theme-zastava .nav-kanji,
+.theme-zastava .nav-cyber,
+.theme-zastava .nav-russian,
+.theme-zastava .nav-byzantine { display: none; }
+.theme-zastava .nav-serbian {
+  display: inline-block;
+  font-size: 0.74rem;
+  color: #D4AF37;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+}
+
+.theme-zastava .nav-btn {
+  font-family: inherit;
+  color: rgba(255, 255, 255, 0.8);
+  border-radius: 8px;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.theme-zastava .nav-btn:hover {
+  background: rgba(12, 64, 118, 0.4);
+  border-color: rgba(212, 175, 55, 0.4);
+  color: #FFFFFF;
+}
+
+.theme-zastava .nav-btn.active {
+  background: linear-gradient(135deg, #0C4076 0%, #173863 50%, #872327 100%);
+  border: 1.5px solid #D4AF37;
+  color: #FFFFFF;
+  box-shadow: 0 4px 18px rgba(12, 64, 118, 0.55), 0 0 12px rgba(212, 175, 55, 0.35);
+}
+
+.theme-zastava .nav-key {
+  background: rgba(198, 54, 60, 0.35);
+  color: #FFFFFF;
+  border: 1px solid rgba(212, 175, 55, 0.5);
+}
+
+.theme-zastava .theme-switch-pill {
+  background: linear-gradient(135deg, rgba(198, 54, 60, 0.4), rgba(12, 64, 118, 0.4));
+  border: 1.5px solid #D4AF37;
+  color: #FFFFFF;
+  font-weight: 700;
+  box-shadow: 0 0 12px rgba(212, 175, 55, 0.3);
+}
+
+.theme-zastava .action-btn {
+  border-color: rgba(212, 175, 55, 0.35);
+  color: #FFFFFF;
+}
+
+.theme-zastava .action-btn:hover {
+  background: #C6363C;
+  border-color: #D4AF37;
+  color: #FFFFFF;
+  box-shadow: 0 0 14px rgba(198, 54, 60, 0.5);
+}
+
+/* Global Search Bar with Tricolor Underline */
+.theme-zastava .search-bar-wrap {
+  background: rgba(18, 22, 30, 0.75);
+  border: 1.5px solid rgba(212, 175, 55, 0.4);
+  border-bottom: 3px solid transparent;
+  border-image: linear-gradient(90deg, #C6363C 0%, #C6363C 33.3%, #0C4076 33.3%, #0C4076 66.6%, #FFFFFF 66.6%, #FFFFFF 100%) 1;
+  border-radius: 12px;
+}
+
+.theme-zastava .search-bar-wrap:focus-within {
+  background: rgba(18, 22, 30, 0.95);
+  border-color: #D4AF37;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.65),
+    0 0 20px rgba(12, 64, 118, 0.35),
+    0 0 12px rgba(198, 54, 60, 0.35);
+}
+
+.theme-zastava .search-icon svg {
+  stroke: #D4AF37;
+}
+
+.theme-zastava .search-input {
+  font-family: inherit;
+  color: #FFFFFF;
+}
+
+.theme-zastava .tab-action-hint {
+  background: rgba(12, 64, 118, 0.55);
+  border: 1px solid #D4AF37;
+  color: #FFFFFF;
+  border-radius: 6px;
+}
+
+.theme-zastava .indexer-badge {
+  background: rgba(212, 175, 55, 0.22);
+  color: #D4AF37;
+  border: 1px solid rgba(212, 175, 55, 0.45);
+}
+
+/* Search Result Cards */
+.theme-zastava .result-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-left: 3.5px solid #0C4076;
+  border-radius: 10px;
+}
+
+.theme-zastava .result-card:hover {
+  background: rgba(12, 64, 118, 0.22);
+  border-color: #D4AF37;
+  border-left-color: #C6363C;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.7), 0 0 16px rgba(212, 175, 55, 0.25);
+  transform: translateY(-1px);
+}
+
+.theme-zastava .file-ext-badge {
+  background: #C6363C;
+  color: #FFFFFF;
+  border: 1px solid #D4AF37;
+  font-weight: 700;
+}
+
+.theme-zastava .file-name {
+  color: #FFFFFF;
+  font-weight: 600;
+}
+
+.theme-zastava .excerpt-line {
+  background: rgba(0, 0, 0, 0.45);
+  border-left: 3px solid #D4AF37;
+}
+
+.theme-zastava mark.highlight {
+  background: rgba(212, 175, 55, 0.4);
+  color: #FFFFFF;
+  border-bottom: 2px solid #D4AF37;
+}
+
+/* System Stats */
+.theme-zastava .stat-card,
+.theme-zastava .stat-panel {
+  background: rgba(18, 22, 30, 0.6);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  border-radius: 10px;
+}
+
+.theme-zastava .card-val {
+  color: #FFFFFF;
+  font-weight: 800;
+  text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+}
+
+.theme-zastava .bar-fill {
+  background: linear-gradient(90deg, #C6363C 0%, #0C4076 50%, #FFFFFF 100%);
+}
+
+.theme-zastava .drive-item,
+.theme-zastava .process-item {
+  background: rgba(0, 0, 0, 0.32);
+  border-left: 3px solid #0C4076;
+}
+
+/* Notes Layout */
+.theme-zastava .notes-sidebar {
+  background: rgba(14, 18, 24, 0.65);
+  border: 1px solid rgba(212, 175, 55, 0.22);
+  border-radius: 10px;
+}
+
+.theme-zastava .note-item-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid transparent;
+  border-radius: 8px;
+}
+
+.theme-zastava .note-item-card:hover {
+  background: rgba(12, 64, 118, 0.25);
+  border-color: rgba(212, 175, 55, 0.35);
+}
+
+.theme-zastava .note-item-card.active {
+  background: linear-gradient(135deg, rgba(12, 64, 118, 0.55), rgba(198, 54, 60, 0.4));
+  border-color: #D4AF37;
+  box-shadow: 0 2px 14px rgba(12, 64, 118, 0.4);
+}
+
+.theme-zastava .notes-editor-pane {
+  background: rgba(18, 22, 30, 0.55);
+  border: 1px solid rgba(212, 175, 55, 0.22);
+  border-radius: 10px;
+}
+
+.theme-zastava .note-title-input {
+  color: #FFFFFF;
+  border-bottom: 2px solid rgba(212, 175, 55, 0.45);
+  padding-bottom: 4px;
+}
+
+.theme-zastava .save-badge {
+  background: rgba(12, 64, 118, 0.35);
+  color: #FFFFFF;
+  border: 1px solid #D4AF37;
+}
+
+.theme-zastava .btn-delete-note:hover {
+  background: #C6363C;
+  border-color: #D4AF37;
+  color: #FFFFFF;
+}
+
+/* Context Menu */
+.theme-zastava .hud-context-menu {
+  background: rgba(18, 22, 30, 0.98);
+  backdrop-filter: blur(36px);
+  border: 1.5px solid #D4AF37;
+  box-shadow: 0 16px 52px rgba(0, 0, 0, 0.95), 0 0 32px rgba(12, 64, 118, 0.3);
+  color: #FFFFFF;
+}
+
+.theme-zastava .ctx-item:hover {
+  background: linear-gradient(90deg, rgba(198, 54, 60, 0.4), rgba(12, 64, 118, 0.45));
+  color: #FFFFFF;
+}
+
+.theme-zastava .ctx-divider {
+  background: rgba(212, 175, 55, 0.3);
+}
+
+.theme-zastava .ctx-check {
+  color: #D4AF37;
+  text-shadow: 0 0 8px rgba(212, 175, 55, 0.7);
+}
+
+/* ========================================================
+   Psalter Zastava Aesthetic
+   ======================================================== */
+
+.theme-zastava .psalter-layer-bar {
+  border-bottom: 1.5px solid rgba(212, 175, 55, 0.4);
+  background: rgba(16, 20, 28, 0.88);
+}
+
+.theme-zastava .psalter-brand-badge {
+  color: #D4AF37;
+  text-shadow: 0 0 14px rgba(212, 175, 55, 0.5);
+}
+
+.theme-zastava .layer-pill.active {
+  background: linear-gradient(135deg, #0C4076 0%, #C6363C 100%);
+  color: #FFFFFF;
+  border: 1.5px solid #D4AF37;
+  box-shadow: 0 2px 14px rgba(12, 64, 118, 0.45), 0 0 10px rgba(212, 175, 55, 0.35);
+}
+
+/* Katizma & Psalm Cards */
+.theme-zastava .katizma-card,
+.theme-zastava .psalm-card {
+  border: 1.5px solid rgba(212, 175, 55, 0.25);
+  background: rgba(16, 20, 28, 0.7);
+  border-radius: 12px;
+}
+
+.theme-zastava .katizma-card:hover,
+.theme-zastava .psalm-card:hover {
+  border-color: #D4AF37;
+  background: rgba(12, 64, 118, 0.25);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.75), 0 0 16px rgba(212, 175, 55, 0.25);
+}
+
+/* Active Selected Card: Deep Blue to Red Gradient */
+.theme-zastava .katizma-card.selected,
+.theme-zastava .psalm-card.selected {
+  border: 2px solid #D4AF37;
+  background: linear-gradient(135deg, #0C4076 0%, #153866 50%, #7e242a 85%, #C6363C 100%);
+  box-shadow: 
+    0 8px 30px rgba(0, 0, 0, 0.85),
+    0 0 24px rgba(212, 175, 55, 0.45),
+    0 0 14px rgba(12, 64, 118, 0.5);
+}
+
+.theme-zastava .katizma-card-num,
+.theme-zastava .psalm-card-num {
+  background: #C6363C;
+  color: #FFFFFF;
+  border: 1px solid #D4AF37;
+  font-weight: 800;
+  border-radius: 4px;
+}
+
+.theme-zastava .katizma-card-title,
+.theme-zastava .psalm-card-title {
+  color: #FFFFFF;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.theme-zastava .katizma-card.selected .katizma-card-count {
+  color: #D4AF37;
+}
+
+.theme-zastava .katizma-badge {
+  background: #0C4076;
+  color: #FFFFFF;
+  border: 1px solid #D4AF37;
+  font-weight: 700;
+}
+
+.theme-zastava .psalm-range-badge {
+  color: #D4AF37;
+}
+
+.theme-zastava .btn-back-layer:hover,
+.theme-zastava .layer-nav-arrow:hover {
+  background: #0C4076;
+  border-color: #D4AF37;
+  color: #FFFFFF;
+}
+
+.theme-zastava .psalm-title {
+  color: #FFFFFF;
+  font-family: "Cinzel", "Marcellus", "Georgia", serif;
+  text-shadow: 0 2px 20px rgba(212, 175, 55, 0.4);
+}
+
+.theme-zastava .psalm-subtitle {
+  color: #D4AF37;
+  font-style: italic;
+  font-weight: 500;
+}
+
+.theme-zastava .ornament-symbol {
+  color: #D4AF37;
+  text-shadow: 0 0 16px rgba(212, 175, 55, 0.85);
+}
+
+.theme-zastava .ornament-line {
+  background: linear-gradient(90deg, transparent, #D4AF37, transparent);
+}
+
+.theme-zastava .verse-num {
+  color: #D4AF37;
+  font-weight: 800;
+}
+
+.theme-zastava .verse-text {
+  color: #FFFFFF;
+}
+
+.theme-zastava .reader-nav-btn {
+  border-color: rgba(212, 175, 55, 0.4);
+  background: rgba(18, 22, 30, 0.65);
+  color: #FFFFFF;
+}
+
+.theme-zastava .reader-nav-btn:hover {
+  background: #0C4076;
+  border-color: #D4AF37;
+  color: #FFFFFF;
+}
+
+.theme-zastava .reader-nav-btn.primary {
+  background: #C6363C;
+  border: 1.5px solid #D4AF37;
+  color: #FFFFFF;
+  font-weight: 800;
+  box-shadow: 0 2px 14px rgba(198, 54, 60, 0.5);
+}
+
+.theme-zastava .reader-nav-btn.primary:hover {
+  background: #D4AF37;
+  color: #12161E;
+  border-color: #C6363C;
+  box-shadow: 0 2px 16px rgba(212, 175, 55, 0.6);
+}
