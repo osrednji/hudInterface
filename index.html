@@ -302,6 +302,7 @@
                 <button class="btn-back-layer" id="btn-back-to-psalms">▲ Псалми ове Катизме (↑)</button>
                 <span class="katizma-badge" id="reader-katizma-badge">Катизма 1</span>
                 <span class="psalm-range-badge" id="reader-range-badge">Пс. 1–8</span>
+                <button class="btn-preface-link" id="btn-preface-link" title="Отвори/затвори молитве пре читања Псалтира">☦ Молитве пре Псалтира</button>
               </div>
               <div class="reader-header-right">
                 <button class="reader-nav-btn" id="btn-prev-psalm" title="Претходни псалам (←)">◀ Претходни (←)</button>
@@ -311,10 +312,13 @@
 
             <div class="psalter-reader-body" id="psalter-reader-scroll">
               <article class="psalm-article full-width">
+                <!-- Uniform Collapsible Pre-Psalter Prayers Banner -->
+                <div class="preface-prayers-container" id="preface-prayers-banner"></div>
+
                 <h1 class="psalm-title" id="reader-psalm-title">Псалам 1.</h1>
                 <p class="psalm-subtitle" id="reader-psalm-subtitle">(Псалам Давидов, не натписан у Јевреја)</p>
                 <div class="reader-instruction-container" id="reader-instruction-container"></div>
-                <div class="psalm-ornament">
+                <div class="psalm-ornament" id="reader-psalm-ornament">
                   <span class="ornament-line"></span>
                   <span class="ornament-symbol">✤</span>
                   <span class="ornament-line"></span>
@@ -322,6 +326,9 @@
                 <div class="psalm-text-content full-width" id="reader-psalm-text">
                   <!-- Verse paragraphs dynamically rendered here -->
                 </div>
+
+                <!-- Uniform Post-Katizma Prayer Banner (on the last psalm of katizma) -->
+                <div class="post-katizma-container" id="post-katizma-banner"></div>
               </article>
             </div>
 
@@ -449,6 +456,8 @@
   </div>
 
   <script src="data/psalm_instructions.js"></script>
+  <script src="data/katizma_prayers.js"></script>
+  <script src="data/psalter_preface.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
