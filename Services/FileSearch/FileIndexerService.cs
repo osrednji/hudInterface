@@ -104,7 +104,6 @@ public class FileIndexerService
             TryAdd(Path.Combine(userProfile, "Repository"));
         }
 
-        TryAdd(@"c:\Users\HP\Repository");
 
         return dirs;
     }

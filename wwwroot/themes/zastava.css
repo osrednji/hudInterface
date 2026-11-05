@@ -494,3 +494,30 @@
   border-color: #C6363C;
   box-shadow: 0 2px 16px rgba(212, 175, 55, 0.6);
 }
+
+/* Saint Paisios Psalm Instructions */
+.theme-zastava .psalm-card-instruction {
+  background: rgba(12, 64, 118, 0.35);
+  border-left: 3px solid #D4AF37;
+  color: #FAF6F0;
+}
+
+.theme-zastava .psalm-card.selected .psalm-card-instruction {
+  background: rgba(0, 0, 0, 0.35);
+  border-left-color: #D4AF37;
+  color: #FAF6F0;
+}
+
+.theme-zastava .reader-instruction-banner {
+  background: rgba(12, 64, 118, 0.4);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  border-left: 4px solid #C6363C;
+}
+
+.theme-zastava .instruction-badge-tag {
+  color: #D4AF37;
+}
+
+.theme-zastava .instruction-body {
+  color: #FAF6F0;
+}

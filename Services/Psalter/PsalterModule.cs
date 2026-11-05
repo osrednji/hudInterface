@@ -35,6 +35,13 @@ public class PsalterModule : IHudModule
             case "raw_json":
                 return Task.FromResult<object?>(_psalterService.GetPsalterJson());
 
+            case "get_instructions":
+            case "instructions":
+                return Task.FromResult<object?>(_psalterService.GetInstructionsData());
+
+            case "raw_instructions":
+                return Task.FromResult<object?>(_psalterService.GetInstructionsJson());
+
             default:
                 return Task.FromResult<object?>(null);
         }

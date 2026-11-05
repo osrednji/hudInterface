@@ -479,3 +479,30 @@
   border-color: #D4AF37;
   box-shadow: 0 2px 14px rgba(198, 54, 60, 0.6);
 }
+
+/* Saint Paisios Psalm Instructions */
+.theme-serbian-orthodox .psalm-card-instruction {
+  background: rgba(12, 64, 118, 0.35);
+  border-left: 3px solid #D4AF37;
+  color: #FAF6F0;
+}
+
+.theme-serbian-orthodox .psalm-card.selected .psalm-card-instruction {
+  background: rgba(0, 0, 0, 0.35);
+  border-left-color: #D4AF37;
+  color: #FAF6F0;
+}
+
+.theme-serbian-orthodox .reader-instruction-banner {
+  background: rgba(12, 64, 118, 0.4);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  border-left: 4px solid #C6363C;
+}
+
+.theme-serbian-orthodox .instruction-badge-tag {
+  color: #D4AF37;
+}
+
+.theme-serbian-orthodox .instruction-body {
+  color: #FAF6F0;
+}

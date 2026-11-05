@@ -26,7 +26,7 @@
 
   // Psalter State (3-Tier Layer Architecture: Katizmas -> Psalms -> Single Psalm)
   let psalterData = null;
-  let psalmInstructions = null;
+  let psalmInstructions = (typeof window !== "undefined" && window.PSALM_INSTRUCTIONS) ? window.PSALM_INSTRUCTIONS : null;
   let currentKatizmaNumber = 1;
   let currentPsalmNumber = 1;
   let psalterLayer = 'single'; // 'katizmas', 'psalms', or 'single'
@@ -938,8 +938,35 @@
   // Module 4: Psalter (Свети Псалтир) - 3-Tier Full-Width Layer Architecture
   // ========================================================
 
+  async function ensurePsalmInstructions() {
+    if (!psalmInstructions && typeof window !== 'undefined' && window.PSALM_INSTRUCTIONS) {
+      psalmInstructions = window.PSALM_INSTRUCTIONS;
+    }
+    if (!psalmInstructions) {
+      try {
+        const hostInst = await callModule('psalter', 'get_instructions');
+        if (hostInst && typeof hostInst === 'object' && Object.keys(hostInst).length > 0) {
+          psalmInstructions = hostInst;
+          logToHost(`Loaded psalm instructions via host module for ${Object.keys(psalmInstructions).length} psalms`);
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+    if (!psalmInstructions) {
+      try {
+        const respInst = await fetch('data/psalm_instructions.json');
+        psalmInstructions = await respInst.json();
+        logToHost(`Loaded psalm instructions via fetch for ${Object.keys(psalmInstructions).length} psalms`);
+      } catch (e) {
+        logToHost(`Could not load psalm instructions: ${e}`, 'WARN');
+      }
+    }
+  }
+
   async function loadPsalter() {
     logToHost(`loadPsalter() called, currentPsalm=${currentPsalmNumber}, currentKatizma=${currentKatizmaNumber}, layer=${psalterLayer}`);
+    await ensurePsalmInstructions();
     if (psalterData) {
       setPsalterLayer(psalterLayer, true);
       return;
@@ -952,6 +979,22 @@
         // 2. Fallback to data/psalter.json
         const resp = await fetch('data/psalter.json');
         data = await resp.json();
+      }
+
+      if (!psalmInstructions && typeof window !== 'undefined' && window.PSALM_INSTRUCTIONS) {
+        psalmInstructions = window.PSALM_INSTRUCTIONS;
+      }
+
+      if (!psalmInstructions) {
+        try {
+          const hostInst = await callModule('psalter', 'get_instructions');
+          if (hostInst && typeof hostInst === 'object' && Object.keys(hostInst).length > 0) {
+            psalmInstructions = hostInst;
+            logToHost(`Loaded psalm instructions via host module for ${Object.keys(psalmInstructions).length} psalms`);
+          }
+        } catch (e) {
+          // ignore host module failure
+        }
       }
 
       if (!psalmInstructions) {
