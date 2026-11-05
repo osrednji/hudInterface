@@ -1396,3 +1396,332 @@ mark.highlight {
   color: #FAF6F0;
   font-style: italic;
 }
+
+
+/* ========================================================
+   Uniform Liturgical Banners (Pre-Psalter & Post-Katizma)
+   ======================================================== */
+.liturgical-banner {
+  margin: 12px auto 20px auto;
+  max-width: 860px;
+  border-radius: 10px;
+  background: rgba(18, 22, 32, 0.75);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.liturgical-banner:hover {
+  border-color: rgba(212, 175, 55, 0.5);
+}
+
+.liturgical-banner-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px;
+  background: linear-gradient(90deg, rgba(212, 175, 55, 0.12) 0%, rgba(12, 64, 118, 0.15) 100%);
+  border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+  cursor: pointer;
+  user-select: none;
+}
+
+.liturgical-banner-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: #C6363C;
+  color: #FFFFFF;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  flex-shrink: 0;
+  border: 1px solid rgba(212, 175, 55, 0.5);
+}
+
+.liturgical-cross {
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+.liturgical-banner-title-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
+}
+
+.liturgical-banner-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #D4AF37;
+  text-transform: uppercase;
+}
+
+.liturgical-banner-sub {
+  font-size: 0.76rem;
+  color: rgba(240, 240, 240, 0.7);
+  font-style: italic;
+}
+
+.liturgical-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.btn-toggle-liturgical,
+.btn-open-prayer-full {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  background: rgba(212, 175, 55, 0.1);
+  color: #FAF6F0;
+  transition: all 0.15s ease;
+}
+
+.btn-toggle-liturgical:hover,
+.btn-open-prayer-full:hover {
+  background: rgba(212, 175, 55, 0.25);
+  border-color: #D4AF37;
+  color: #FFFFFF;
+}
+
+.btn-open-prayer-full {
+  background: linear-gradient(135deg, #0C4076 0%, #C6363C 100%);
+  border-color: #D4AF37;
+}
+
+.btn-open-prayer-full:hover {
+  filter: brightness(1.15);
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
+}
+
+.nav-key-badge {
+  display: inline-block;
+  padding: 1px 5px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.4);
+  color: #D4AF37;
+  border: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+.liturgical-banner-body {
+  padding: 18px 22px;
+  background: rgba(14, 17, 24, 0.65);
+  text-align: left;
+  line-height: 1.7;
+}
+
+.liturgical-section {
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px dashed rgba(212, 175, 55, 0.2);
+}
+
+.liturgical-section:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.liturgical-heading {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #D4AF37;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.liturgical-text {
+  font-size: 0.96rem;
+  color: #EAE6DF;
+  white-space: pre-line;
+}
+
+.liturgical-rubric {
+  color: #E24B51;
+  font-weight: 700;
+}
+
+.liturgical-gloria {
+  display: inline-block;
+  color: #D4AF37;
+  font-weight: 700;
+  margin-top: 6px;
+}
+
+/* Post Katizma Prayer Dedicated Action Card at the bottom of single view */
+.prayer-nav-action-card {
+  margin: 30px auto 10px auto;
+  max-width: 820px;
+  padding: 16px 20px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(12, 64, 118, 0.35) 0%, rgba(198, 54, 60, 0.25) 100%);
+  border: 1.5px solid #D4AF37;
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.action-card-text {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #FAF6F0;
+}
+
+.action-card-icon {
+  font-size: 1.3rem;
+}
+
+.btn-proceed-next-katizma {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #C6363C 0%, #A8242A 100%);
+  border: 1px solid #D4AF37;
+  color: #FFFFFF;
+  font-size: 0.92rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(198, 54, 60, 0.4);
+  transition: all 0.2s ease;
+}
+
+.btn-proceed-next-katizma:hover {
+  filter: brightness(1.15);
+  box-shadow: 0 6px 20px rgba(198, 54, 60, 0.6), 0 0 15px rgba(212, 175, 55, 0.5);
+  transform: translateY(-1px);
+}
+
+/* Theme overrides for light parchment theme */
+.theme-serbian-parchment .liturgical-banner {
+  background: #FFFFFF;
+  border-color: rgba(198, 54, 60, 0.25);
+  box-shadow: 0 4px 18px rgba(30, 36, 43, 0.08);
+}
+
+.theme-serbian-parchment .liturgical-banner-header {
+  background: linear-gradient(90deg, rgba(212, 175, 55, 0.15) 0%, rgba(198, 54, 60, 0.08) 100%);
+  border-bottom-color: rgba(198, 54, 60, 0.15);
+}
+
+.theme-serbian-parchment .liturgical-banner-title {
+  color: #A8242A;
+}
+
+.theme-serbian-parchment .liturgical-banner-sub {
+  color: #555555;
+}
+
+.theme-serbian-parchment .liturgical-banner-body {
+  background: #FAF6F0;
+  color: #1E242B;
+}
+
+.theme-serbian-parchment .liturgical-text {
+  color: #1E242B;
+}
+
+.theme-serbian-parchment .liturgical-heading {
+  color: #8C2428;
+}
+
+.theme-serbian-parchment .btn-toggle-liturgical {
+  background: #FFFFFF;
+  border-color: rgba(198, 54, 60, 0.3);
+  color: #1E242B;
+}
+
+.theme-serbian-parchment .btn-toggle-liturgical:hover {
+  background: rgba(198, 54, 60, 0.1);
+  color: #A8242A;
+}
+
+.theme-serbian-parchment .prayer-nav-action-card {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(198, 54, 60, 0.1) 100%);
+  border-color: #C6363C;
+}
+
+.theme-serbian-parchment .action-card-text {
+  color: #1E242B;
+}
+
+
+.katizma-prayer-full-sheet {
+  max-width: 840px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.katizma-prayer-full-sheet .liturgical-text {
+  font-family: 'Source Serif Pro', 'Georgia', serif;
+  font-size: 1.08rem;
+  line-height: 1.85;
+  color: #FAF6F0;
+}
+
+.theme-serbian-parchment .katizma-prayer-full-sheet .liturgical-text {
+  color: #1E242B;
+}
+
+
+.btn-preface-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  background: rgba(212, 175, 55, 0.12);
+  border: 1px solid rgba(212, 175, 55, 0.45);
+  color: #D4AF37;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.btn-preface-link:hover {
+  background: rgba(212, 175, 55, 0.25);
+  border-color: #D4AF37;
+  color: #FFFFFF;
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.35);
+}
+
+.theme-serbian-parchment .btn-preface-link {
+  background: #FAF6F0;
+  border-color: #C6363C;
+  color: #C6363C;
+}
+
+.theme-serbian-parchment .btn-preface-link:hover {
+  background: rgba(198, 54, 60, 0.12);
+  color: #8C2428;
+}

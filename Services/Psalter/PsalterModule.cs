@@ -42,6 +42,14 @@ public class PsalterModule : IHudModule
             case "raw_instructions":
                 return Task.FromResult<object?>(_psalterService.GetInstructionsJson());
 
+            case "get_katizma_prayers":
+            case "katizma_prayers":
+                return Task.FromResult<object?>(_psalterService.GetKatizmaPrayersData());
+
+            case "get_preface":
+            case "preface_prayers":
+                return Task.FromResult<object?>(_psalterService.GetPrefacePrayersData());
+
             default:
                 return Task.FromResult<object?>(null);
         }

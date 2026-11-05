@@ -27,6 +27,11 @@
   // Psalter State (3-Tier Layer Architecture: Katizmas -> Psalms -> Single Psalm)
   let psalterData = null;
   let psalmInstructions = (typeof window !== "undefined" && window.PSALM_INSTRUCTIONS) ? window.PSALM_INSTRUCTIONS : null;
+  let katizmaPrayers = (typeof window !== "undefined" && window.KATIZMA_PRAYERS) ? window.KATIZMA_PRAYERS : null;
+  let psalterPreface = (typeof window !== "undefined" && window.PSALTER_PREFACE) ? window.PSALTER_PREFACE : null;
+  let isViewingKatizmaPrayer = false;
+  let prefaceExpanded = false;
+  let postPrayerInlineExpanded = false;
   let currentKatizmaNumber = 1;
   let currentPsalmNumber = 1;
   let psalterLayer = 'single'; // 'katizmas', 'psalms', or 'single'
@@ -105,11 +110,15 @@
   const btnLayerDown = document.getElementById('btn-layer-down');
   const btnBackToKatizmas = document.getElementById('btn-back-to-katizmas');
   const btnBackToPsalms = document.getElementById('btn-back-to-psalms');
+  const btnPrefaceLink = document.getElementById('btn-preface-link');
   const readerKatizmaBadge = document.getElementById('reader-katizma-badge');
   const readerRangeBadge = document.getElementById('reader-range-badge');
   const readerPsalmTitle = document.getElementById('reader-psalm-title');
   const readerPsalmSubtitle = document.getElementById('reader-psalm-subtitle');
   const readerPsalmText = document.getElementById('reader-psalm-text');
+  const prefacePrayersBanner = document.getElementById('preface-prayers-banner');
+  const postKatizmaBanner = document.getElementById('post-katizma-banner');
+  const readerPsalmOrnament = document.getElementById('reader-psalm-ornament');
   const readerPsalmCounter = document.getElementById('reader-psalm-counter');
   const psalterReaderScroll = document.getElementById('psalter-reader-scroll');
   const btnPrevPsalm = document.getElementById('btn-prev-psalm');
@@ -938,7 +947,8 @@
   // Module 4: Psalter (Свети Псалтир) - 3-Tier Full-Width Layer Architecture
   // ========================================================
 
-  async function ensurePsalmInstructions() {
+  async function ensurePsalterResources() {
+    // 1. Instructions
     if (!psalmInstructions && typeof window !== 'undefined' && window.PSALM_INSTRUCTIONS) {
       psalmInstructions = window.PSALM_INSTRUCTIONS;
     }
@@ -949,24 +959,59 @@
           psalmInstructions = hostInst;
           logToHost(`Loaded psalm instructions via host module for ${Object.keys(psalmInstructions).length} psalms`);
         }
-      } catch (e) {
-        // ignore
-      }
+      } catch (e) {}
     }
     if (!psalmInstructions) {
       try {
         const respInst = await fetch('data/psalm_instructions.json');
         psalmInstructions = await respInst.json();
-        logToHost(`Loaded psalm instructions via fetch for ${Object.keys(psalmInstructions).length} psalms`);
-      } catch (e) {
-        logToHost(`Could not load psalm instructions: ${e}`, 'WARN');
-      }
+      } catch (e) {}
+    }
+
+    // 2. Katizma Prayers
+    if (!katizmaPrayers && typeof window !== 'undefined' && window.KATIZMA_PRAYERS) {
+      katizmaPrayers = window.KATIZMA_PRAYERS;
+    }
+    if (!katizmaPrayers) {
+      try {
+        const hostPrayers = await callModule('psalter', 'get_katizma_prayers');
+        if (hostPrayers && typeof hostPrayers === 'object' && Object.keys(hostPrayers).length > 0) {
+          katizmaPrayers = hostPrayers;
+          logToHost(`Loaded katizma prayers via host module for ${Object.keys(katizmaPrayers).length} katizmas`);
+        }
+      } catch (e) {}
+    }
+    if (!katizmaPrayers) {
+      try {
+        const respPrayers = await fetch('data/katizma_prayers.json');
+        katizmaPrayers = await respPrayers.json();
+      } catch (e) {}
+    }
+
+    // 3. Preface Prayers
+    if (!psalterPreface && typeof window !== 'undefined' && window.PSALTER_PREFACE) {
+      psalterPreface = window.PSALTER_PREFACE;
+    }
+    if (!psalterPreface) {
+      try {
+        const hostPref = await callModule('psalter', 'get_preface');
+        if (hostPref && typeof hostPref === 'object') {
+          psalterPreface = hostPref;
+          logToHost(`Loaded preface prayers via host module`);
+        }
+      } catch (e) {}
+    }
+    if (!psalterPreface) {
+      try {
+        const respPref = await fetch('data/psalter_preface.json');
+        psalterPreface = await respPref.json();
+      } catch (e) {}
     }
   }
 
   async function loadPsalter() {
     logToHost(`loadPsalter() called, currentPsalm=${currentPsalmNumber}, currentKatizma=${currentKatizmaNumber}, layer=${psalterLayer}`);
-    await ensurePsalmInstructions();
+    await ensurePsalterResources();
     if (psalterData) {
       setPsalterLayer(psalterLayer, true);
       return;
@@ -1183,8 +1228,299 @@
     }, 40);
   }
 
+  const KATIZMA_LAST_PSALMS = {
+    1: 8, 2: 16, 3: 23, 4: 31, 5: 36, 6: 45, 7: 54, 8: 63, 9: 69, 10: 76,
+    11: 84, 12: 90, 13: 100, 14: 104, 15: 108, 16: 117, 17: 118, 18: 133, 19: 142, 20: 151
+  };
+
+  function getLastPsalmOfKatizma(kNum) {
+    if (!psalterData) return KATIZMA_LAST_PSALMS[kNum] || 8;
+    const katizmas = psalterData.katizmas || [];
+    const k = katizmas.find((item) => (item.number || item.Number) === kNum);
+    if (!k) return KATIZMA_LAST_PSALMS[kNum] || 8;
+    const psalms = k.psalms || k.Psalms || [];
+    if (psalms.length === 0) return KATIZMA_LAST_PSALMS[kNum] || 8;
+    const lastP = psalms[psalms.length - 1];
+    return lastP.number || lastP.Number || lastP.id;
+  }
+
+  function getFirstPsalmOfKatizma(kNum) {
+    if (!psalterData) return 1;
+    const katizmas = psalterData.katizmas || [];
+    const k = katizmas.find((item) => (item.number || item.Number) === kNum);
+    if (!k) return 1;
+    const psalms = k.psalms || k.Psalms || [];
+    if (psalms.length === 0) return 1;
+    const firstP = psalms[0];
+    return firstP.number || firstP.Number || firstP.id;
+  }
+
+  function isLastPsalmOfCurrentKatizma() {
+    return currentPsalmNumber === getLastPsalmOfKatizma(currentKatizmaNumber);
+  }
+
+  function formatLiturgicalMarkup(raw) {
+    if (!raw) return '';
+    let escaped = escapeHtml(raw);
+    escaped = escaped.replace(/(Слава:|И сада:)/g, '<span class="liturgical-gloria">$1</span>');
+    escaped = escaped.replace(/(Трисвето;|Пресвета Тројице;|Оче наш;|Трисвето\.|Оче наш\.)/g, '<span class="liturgical-rubric">$1</span>');
+    escaped = escaped.replace(/(Господе помилуј\s*\([^)]+\)|Господе помилуј\s*\d+\s*пута\.?|Господе ломилуј\s*\([^)]+\))/gi, '<span class="liturgical-rubric">$1</span>');
+    escaped = escaped.replace(/(Молитва:\s*|Затим тропари[^\n:]*:?|И ове Тропаре[^\n:]*:?)/gi, '<span class="liturgical-heading">$1</span>');
+    return escaped;
+  }
+
+  function renderPrefacePrayersBanner() {
+    const bannerEl = document.getElementById('preface-prayers-banner') || document.getElementById('preface-prayers-container');
+    if (!bannerEl) return;
+    if (isViewingKatizmaPrayer || !psalterPreface) {
+      bannerEl.innerHTML = '';
+      bannerEl.style.display = 'none';
+      return;
+    }
+
+    bannerEl.style.display = 'block';
+    let bodyHtml = '';
+    const sections = psalterPreface.sections || [];
+    for (const s of sections) {
+      bodyHtml += `
+        <div class="liturgical-section">
+          <div class="liturgical-heading">✤ ${escapeHtml(s.heading)}</div>
+          <div class="liturgical-text">${formatLiturgicalMarkup(s.text)}</div>
+        </div>
+      `;
+    }
+
+    bannerEl.innerHTML = `
+      <div class="liturgical-banner-header" id="btn-toggle-preface">
+        <div class="liturgical-banner-badge">
+          <span class="liturgical-cross">☦</span>
+          <span class="liturgical-badge-text">Устав Светих Отаца</span>
+        </div>
+        <div class="liturgical-banner-title-wrap">
+          <span class="liturgical-banner-title">МОЛИТВЕ ПРЕ ЧИТАЊА ПСАЛТИРА</span>
+          <span class="liturgical-banner-sub">Света Гора Атонска • Да се зна како треба посебно певати Псалтир</span>
+        </div>
+        <div class="liturgical-banner-actions">
+          <button class="btn-toggle-liturgical" id="btn-toggle-preface-btn" type="button">
+            <span class="toggle-text">${prefaceExpanded ? 'Сакриј молитве' : 'Прикажи уводне молитве'}</span>
+            <span class="toggle-icon">${prefaceExpanded ? '▲' : '▼'}</span>
+          </button>
+        </div>
+      </div>
+      <div class="liturgical-banner-body" id="preface-banner-body" style="display: ${prefaceExpanded ? 'block' : 'none'};">
+        ${bodyHtml}
+      </div>
+    `;
+
+    const toggleBtn = bannerEl.querySelector('#btn-toggle-preface');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        prefaceExpanded = !prefaceExpanded;
+        const bodyEl = document.getElementById('preface-banner-body');
+        const textEl = bannerEl.querySelector('.toggle-text');
+        const iconEl = bannerEl.querySelector('.toggle-icon');
+        if (bodyEl) bodyEl.style.display = prefaceExpanded ? 'block' : 'none';
+        if (textEl) textEl.textContent = prefaceExpanded ? 'Сакриј молитве' : 'Прикажи уводне молитве';
+        if (iconEl) iconEl.textContent = prefaceExpanded ? '▲' : '▼';
+      });
+    }
+  }
+
+  function renderPostKatizmaBanner() {
+    const bannerEl = document.getElementById('post-katizma-banner') || document.getElementById('post-katizma-container');
+    if (!bannerEl) return;
+    if (isViewingKatizmaPrayer || !isLastPsalmOfCurrentKatizma()) {
+      bannerEl.innerHTML = '';
+      bannerEl.style.display = 'none';
+      return;
+    }
+
+    const prayerObj = katizmaPrayers ? katizmaPrayers[String(currentKatizmaNumber)] : null;
+    if (!prayerObj) {
+      bannerEl.innerHTML = '';
+      bannerEl.style.display = 'none';
+      return;
+    }
+
+    bannerEl.style.display = 'block';
+    bannerEl.innerHTML = `
+      <div class="liturgical-banner-header" id="btn-toggle-post-prayer-header">
+        <div class="liturgical-banner-badge">
+          <span class="liturgical-cross">☦</span>
+          <span class="liturgical-badge-text">Катизма ${currentKatizmaNumber}</span>
+        </div>
+        <div class="liturgical-banner-title-wrap">
+          <span class="liturgical-banner-title">МОЛИТВЕ ПОСЛЕ ${currentKatizmaNumber}. КАТИЗМЕ</span>
+          <span class="liturgical-banner-sub">Трисвето, тропари, 40х Господе помилуј и завршна молитва</span>
+        </div>
+        <div class="liturgical-banner-actions">
+          <button class="btn-toggle-liturgical" id="btn-toggle-post-prayer-btn" type="button">
+            <span class="toggle-text">${postPrayerInlineExpanded ? 'Сакриј' : 'Прикажи овде'}</span>
+            <span class="toggle-icon">${postPrayerInlineExpanded ? '▲' : '▼'}</span>
+          </button>
+          <button class="btn-open-prayer-full" id="btn-open-post-prayer-full" type="button" title="Отвори молитве на целој страни (→ или Space)">
+            <span>Отвори молитве</span>
+            <span class="nav-key-badge">→ / Space</span>
+          </button>
+        </div>
+      </div>
+      <div class="liturgical-banner-body" id="post-prayer-banner-body" style="display: ${postPrayerInlineExpanded ? 'block' : 'none'};">
+        <div class="liturgical-text">${formatLiturgicalMarkup(prayerObj.fullText)}</div>
+        <div class="prayer-nav-action-card" style="margin-top: 18px;">
+          <div class="action-card-text">
+            <span class="action-card-icon">📖</span>
+            <span>Завршетак ${currentKatizmaNumber}. катизме</span>
+          </div>
+          <button class="btn-proceed-next-katizma" id="btn-inline-proceed" type="button">
+            <span>${currentKatizmaNumber === 20 ? 'Повратак на 1. Катизму (Псалам 1)' : 'Пређи на ' + (currentKatizmaNumber + 1) + '. Катизму'}</span>
+            <span class="nav-key-badge">→ / Space</span>
+          </button>
+        </div>
+      </div>
+    `;
+
+    const toggleBtn = bannerEl.querySelector('#btn-toggle-post-prayer-btn');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        postPrayerInlineExpanded = !postPrayerInlineExpanded;
+        const bodyEl = document.getElementById('post-prayer-banner-body');
+        const textEl = toggleBtn.querySelector('.toggle-text');
+        const iconEl = toggleBtn.querySelector('.toggle-icon');
+        if (bodyEl) bodyEl.style.display = postPrayerInlineExpanded ? 'block' : 'none';
+        if (textEl) textEl.textContent = postPrayerInlineExpanded ? 'Сакриј' : 'Прикажи овде';
+        if (iconEl) iconEl.textContent = postPrayerInlineExpanded ? '▲' : '▼';
+      });
+    }
+
+    const openFullBtn = bannerEl.querySelector('#btn-open-post-prayer-full');
+    if (openFullBtn) {
+      openFullBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        displayKatizmaPrayers(currentKatizmaNumber);
+      });
+    }
+
+    const inlineProceedBtn = bannerEl.querySelector('#btn-inline-proceed');
+    if (inlineProceedBtn) {
+      inlineProceedBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        advanceAfterKatizmaPrayer();
+      });
+    }
+  }
+
+  function displayKatizmaPrayers(katizmaNum) {
+    if (!katizmaPrayers) return;
+    const prayerObj = katizmaPrayers[String(katizmaNum)];
+    if (!prayerObj) return;
+
+    isViewingKatizmaPrayer = true;
+    currentKatizmaNumber = katizmaNum;
+
+    if (bcKatizmas) bcKatizmas.textContent = `Катизме (1–20)`;
+    if (bcPsalms) {
+      bcPsalms.textContent = `Катизма ${katizmaNum}`;
+      bcPsalms.style.display = 'inline-block';
+    }
+    if (bcSep1) bcSep1.style.display = 'inline-block';
+    if (bcSinglePsalm) {
+      bcSinglePsalm.textContent = `Молитве после ${katizmaNum}. катизме`;
+      bcSinglePsalm.style.display = 'inline-block';
+    }
+    if (bcSep2) bcSep2.style.display = 'inline-block';
+
+    if (readerKatizmaBadge) readerKatizmaBadge.textContent = `Катизма ${katizmaNum}`;
+    if (readerRangeBadge) readerRangeBadge.textContent = `Завршне молитве`;
+    if (readerPsalmCounter) readerPsalmCounter.textContent = `Молитве • Катизма ${katizmaNum} / 20`;
+
+    if (prefacePrayersBanner) {
+      bannerEl.innerHTML = '';
+      bannerEl.style.display = 'none';
+    }
+    if (postKatizmaBanner) {
+      bannerEl.innerHTML = '';
+      bannerEl.style.display = 'none';
+    }
+    if (readerInstructionContainer) {
+      readerInstructionContainer.innerHTML = '';
+      readerInstructionContainer.style.display = 'none';
+    }
+    if (readerPsalmOrnament) readerPsalmOrnament.style.display = 'flex';
+
+    if (readerPsalmTitle) readerPsalmTitle.textContent = `МОЛИТВЕ ПОСЛЕ ${katizmaNum}. КАТИЗМЕ`;
+    if (readerPsalmSubtitle) {
+      readerPsalmSubtitle.textContent = prayerObj.header || `После прочитане ${katizmaNum}. катизме говори се:`;
+      readerPsalmSubtitle.style.display = 'block';
+    }
+
+    const lastP = getLastPsalmOfKatizma(katizmaNum);
+    const nextK = katizmaNum === 20 ? 1 : katizmaNum + 1;
+    const nextP = katizmaNum === 20 ? 1 : getFirstPsalmOfKatizma(nextK);
+
+    if (btnPrevPsalm) {
+      btnPrevPsalm.disabled = false;
+      btnPrevPsalm.innerHTML = `◀ Псалам ${lastP} (←)`;
+    }
+    if (btnNextPsalm) {
+      btnNextPsalm.disabled = false;
+      btnNextPsalm.innerHTML = katizmaNum === 20 
+        ? `Прва Катизма (Псалам 1) (→ / Space) ▶` 
+        : `Катизма ${nextK} (Псалам ${nextP}) (→ / Space) ▶`;
+    }
+
+    if (readerPsalmText) {
+      let contentHtml = `
+        <div class="katizma-prayer-full-sheet">
+          <div class="liturgical-text" style="font-size: 1.05rem; line-height: 1.8;">
+            ${formatLiturgicalMarkup(prayerObj.fullText)}
+          </div>
+          <div class="prayer-nav-action-card">
+            <div class="action-card-text">
+              <span class="action-card-icon">📖</span>
+              <span>Завршили сте молитве после ${katizmaNum}. катизме</span>
+            </div>
+            <button class="btn-proceed-next-katizma" id="btn-proceed-next-katizma" type="button">
+              <span>${katizmaNum === 20 ? 'Повратак на 1. Катизму (Псалам 1)' : 'Пређи на ' + nextK + '. Катизму (Псалам ' + nextP + ')'}</span>
+              <span class="nav-key-badge">→ / Space</span>
+            </button>
+          </div>
+        </div>
+      `;
+      readerPsalmText.innerHTML = contentHtml;
+
+      const proceedBtn = readerPsalmText.querySelector('#btn-proceed-next-katizma');
+      if (proceedBtn) {
+        proceedBtn.addEventListener('click', () => {
+          advanceAfterKatizmaPrayer();
+        });
+      }
+    }
+
+    if (psalterReaderScroll) {
+      psalterReaderScroll.scrollTop = 0;
+    }
+  }
+
+  function advanceAfterKatizmaPrayer() {
+    isViewingKatizmaPrayer = false;
+    if (currentKatizmaNumber === 20) {
+      selectKatizma(1);
+      selectPsalm(1, true);
+    } else {
+      const nextK = currentKatizmaNumber + 1;
+      selectKatizma(nextK);
+      const nextP = getFirstPsalmOfKatizma(nextK);
+      selectPsalm(nextP, true);
+    }
+    displayCurrentPsalm(false);
+  }
+
   function displayCurrentPsalm(restoreScroll = false) {
     if (!psalterData) return;
+    isViewingKatizmaPrayer = false;
+
     const katizmas = psalterData.katizmas || [];
     const currentKatizma = katizmas.find((k) => (k.number || k.Number) === currentKatizmaNumber);
     if (!currentKatizma) return;
@@ -1200,6 +1536,12 @@
     if (readerRangeBadge) readerRangeBadge.textContent = kRange;
     if (readerPsalmCounter) readerPsalmCounter.textContent = `${psalm.number || currentPsalmNumber} / 151`;
 
+    if (readerPsalmOrnament) readerPsalmOrnament.style.display = 'flex';
+
+    // 1. Uniform Preface Prayers Banner
+    renderPrefacePrayersBanner();
+
+    // 2. Psalm Titles
     if (readerPsalmTitle) readerPsalmTitle.textContent = psalm.title || psalm.Title || `Псалам ${currentPsalmNumber}.`;
 
     const sub = psalm.subtitle || psalm.Subtitle || '';
@@ -1208,6 +1550,7 @@
       readerPsalmSubtitle.style.display = sub ? 'block' : 'none';
     }
 
+    // 3. St. Paisios Instructions
     if (readerInstructionContainer) {
       const instObj = psalmInstructions ? psalmInstructions[String(currentPsalmNumber)] : null;
       const instText = instObj ? instObj.instruction : '';
@@ -1230,6 +1573,7 @@
       }
     }
 
+    // 4. Psalm Verses
     if (readerPsalmText) {
       const rawLines = psalm.lines || psalm.Lines || (psalm.content || psalm.Content ? (psalm.content || psalm.Content).split('\n') : []);
       let versesHtml = '';
@@ -1262,6 +1606,9 @@
       readerPsalmText.innerHTML = versesHtml;
     }
 
+    // 5. Uniform Post-Katizma Prayer Banner (on the last psalm)
+    renderPostKatizmaBanner();
+
     if (psalterReaderScroll) {
       psalterReaderScroll.scrollTop = 0; // Immediate reset
       if (restoreScroll) {
@@ -1275,8 +1622,20 @@
       }
     }
 
-    if (btnPrevPsalm) btnPrevPsalm.disabled = currentPsalmNumber <= 1;
-    if (btnNextPsalm) btnNextPsalm.disabled = currentPsalmNumber >= 151;
+    if (btnPrevPsalm) {
+      btnPrevPsalm.disabled = currentPsalmNumber <= 1;
+      btnPrevPsalm.innerHTML = `◀ Претходни (←)`;
+    }
+
+    if (btnNextPsalm) {
+      if (isLastPsalmOfCurrentKatizma()) {
+        btnNextPsalm.disabled = false;
+        btnNextPsalm.innerHTML = `Молитве после катизме (→ / Space) ▶`;
+      } else {
+        btnNextPsalm.disabled = currentPsalmNumber >= 151;
+        btnNextPsalm.innerHTML = `Следећи (→ / Space) ▶`;
+      }
+    }
 
     if (bcPsalms) bcPsalms.textContent = `Катизма ${currentKatizmaNumber}`;
     if (bcSinglePsalm) bcSinglePsalm.textContent = `Псалам ${currentPsalmNumber}`;
@@ -1284,6 +1643,7 @@
 
   function selectKatizma(katizmaNum) {
     if (!psalterData) return;
+    isViewingKatizmaPrayer = false;
     const katizmas = psalterData.katizmas || [];
     const k = katizmas.find((item) => (item.number || item.Number) === katizmaNum);
     if (!k) return;
@@ -1298,6 +1658,7 @@
 
   function selectPsalm(psalmNum, resetScroll = true) {
     if (!psalterData) return;
+    isViewingKatizmaPrayer = false;
     const katizmas = psalterData.katizmas || [];
     let foundPsalm = null;
     let foundKatizma = null;
@@ -1340,6 +1701,7 @@
   // Up button: Single Psalm -> Psalms -> Katizmas
   function psalterGoUpLayer() {
     logToHost(`psalterGoUpLayer from ${psalterLayer}`);
+    isViewingKatizmaPrayer = false;
     if (psalterLayer === 'single') {
       setPsalterLayer('psalms');
     } else if (psalterLayer === 'psalms') {
@@ -1376,7 +1738,12 @@
         renderPsalmsGrid();
       }
     } else if (psalterLayer === 'single') {
-      if (currentPsalmNumber > 1) {
+      if (isViewingKatizmaPrayer) {
+        const lastP = getLastPsalmOfKatizma(currentKatizmaNumber);
+        isViewingKatizmaPrayer = false;
+        selectPsalm(lastP, true);
+        displayCurrentPsalm(false);
+      } else if (currentPsalmNumber > 1) {
         selectPsalm(currentPsalmNumber - 1, true);
         displayCurrentPsalm(false);
       }
@@ -1398,7 +1765,11 @@
         renderPsalmsGrid();
       }
     } else if (psalterLayer === 'single') {
-      if (currentPsalmNumber < 151) {
+      if (isViewingKatizmaPrayer) {
+        advanceAfterKatizmaPrayer();
+      } else if (isLastPsalmOfCurrentKatizma()) {
+        displayKatizmaPrayers(currentKatizmaNumber);
+      } else if (currentPsalmNumber < 151) {
         selectPsalm(currentPsalmNumber + 1, true);
         displayCurrentPsalm(false);
       }
@@ -1409,16 +1780,14 @@
     if (!psalterData) return;
     logToHost(`psalterOnSpaceKey in layer ${psalterLayer}`);
     if (psalterLayer === 'single') {
-      if (currentPsalmNumber < 151) {
-        selectPsalm(currentPsalmNumber + 1, true);
-        displayCurrentPsalm(false);
-      }
+      psalterTraverseRight();
     } else if (psalterLayer === 'psalms') {
       setPsalterLayer('single');
     } else if (psalterLayer === 'katizmas') {
       setPsalterLayer('psalms');
     }
   }
+
 
   function psalterOnEnterKey() {
     logToHost(`psalterOnEnterKey in layer ${psalterLayer}`);
@@ -1439,6 +1808,16 @@
   if (btnLayerDown) btnLayerDown.addEventListener('click', psalterGoDownLayer);
   if (btnBackToKatizmas) btnBackToKatizmas.addEventListener('click', () => setPsalterLayer('katizmas'));
   if (btnBackToPsalms) btnBackToPsalms.addEventListener('click', () => setPsalterLayer('psalms'));
+  if (btnPrefaceLink) {
+    btnPrefaceLink.addEventListener('click', (e) => {
+      e.stopPropagation();
+      prefaceExpanded = !prefaceExpanded;
+      renderPrefacePrayersBanner();
+      if (prefaceExpanded && psalterReaderScroll) {
+        psalterReaderScroll.scrollTop = 0;
+      }
+    });
+  }
   if (btnPrevPsalm) btnPrevPsalm.addEventListener('click', psalterTraverseLeft);
   if (btnNextPsalm) btnNextPsalm.addEventListener('click', psalterTraverseRight);
 

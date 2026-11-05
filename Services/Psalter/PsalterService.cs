@@ -134,4 +134,108 @@ public class PsalterService
             return _cachedInstDoc?.RootElement ?? default;
         }
     }
+
+    private JsonDocument? _cachedKatizmaPrayersDoc;
+    private string? _cachedKatizmaPrayersRawJson;
+    private JsonDocument? _cachedPrefaceDoc;
+    private string? _cachedPrefaceRawJson;
+
+    public string GetKatizmaPrayersJson()
+    {
+        lock (_lock)
+        {
+            if (_cachedKatizmaPrayersRawJson != null)
+                return _cachedKatizmaPrayersRawJson;
+
+            string[] candidateRelativePaths =
+            [
+                Path.Combine("wwwroot", "data", "katizma_prayers.json"),
+                Path.Combine("Data", "katizma_prayers.json")
+            ];
+
+            foreach (var relPath in candidateRelativePaths)
+            {
+                string? resolved = ResolveDataFilePath(relPath);
+                if (resolved != null)
+                {
+                    try
+                    {
+                        HudLogger.Log($"Loading Katizma Prayers from: {resolved}");
+                        _cachedKatizmaPrayersRawJson = File.ReadAllText(resolved);
+                        _cachedKatizmaPrayersDoc = JsonDocument.Parse(_cachedKatizmaPrayersRawJson);
+                        return _cachedKatizmaPrayersRawJson;
+                    }
+                    catch (Exception ex)
+                    {
+                        HudLogger.LogError($"Error reading katizma prayers from {resolved}", ex);
+                    }
+                }
+            }
+
+            HudLogger.Log("Katizma prayers JSON not found in standard paths.", "WARN");
+            return "{}";
+        }
+    }
+
+    public JsonElement GetKatizmaPrayersData()
+    {
+        lock (_lock)
+        {
+            if (_cachedKatizmaPrayersDoc == null)
+            {
+                GetKatizmaPrayersJson();
+            }
+            return _cachedKatizmaPrayersDoc?.RootElement ?? default;
+        }
+    }
+
+    public string GetPrefacePrayersJson()
+    {
+        lock (_lock)
+        {
+            if (_cachedPrefaceRawJson != null)
+                return _cachedPrefaceRawJson;
+
+            string[] candidateRelativePaths =
+            [
+                Path.Combine("wwwroot", "data", "psalter_preface.json"),
+                Path.Combine("Data", "psalter_preface.json")
+            ];
+
+            foreach (var relPath in candidateRelativePaths)
+            {
+                string? resolved = ResolveDataFilePath(relPath);
+                if (resolved != null)
+                {
+                    try
+                    {
+                        HudLogger.Log($"Loading Preface Prayers from: {resolved}");
+                        _cachedPrefaceRawJson = File.ReadAllText(resolved);
+                        _cachedPrefaceDoc = JsonDocument.Parse(_cachedPrefaceRawJson);
+                        return _cachedPrefaceRawJson;
+                    }
+                    catch (Exception ex)
+                    {
+                        HudLogger.LogError($"Error reading preface prayers from {resolved}", ex);
+                    }
+                }
+            }
+
+            HudLogger.Log("Preface prayers JSON not found in standard paths.", "WARN");
+            return "{}";
+        }
+    }
+
+    public JsonElement GetPrefacePrayersData()
+    {
+        lock (_lock)
+        {
+            if (_cachedPrefaceDoc == null)
+            {
+                GetPrefacePrayersJson();
+            }
+            return _cachedPrefaceDoc?.RootElement ?? default;
+        }
+    }
+
 }
