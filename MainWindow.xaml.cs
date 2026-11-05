@@ -301,6 +301,23 @@ public partial class MainWindow : Window
                     SendMessage(winHwnd, WM_NCLBUTTONDOWN, (IntPtr)ht, IntPtr.Zero);
                     break;
 
+                case "ensure_window_width":
+                    if (root.TryGetProperty("minWidth", out var mwProp))
+                    {
+                        double minW = mwProp.GetDouble();
+                        if (Width < minW)
+                        {
+                            Width = minW;
+                            if (_settings != null)
+                            {
+                                _settings.WindowWidth = (int)Width;
+                                _settings.Save();
+                            }
+                        }
+                    }
+                    SendResponse(requestId, new { width = Width });
+                    break;
+
                 case "exit_app":
                     await _moduleManager.SaveAllModulesAsync();
                     ExitApplication();

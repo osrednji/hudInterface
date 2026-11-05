@@ -29,6 +29,11 @@
   let psalmInstructions = (typeof window !== "undefined" && window.PSALM_INSTRUCTIONS) ? window.PSALM_INSTRUCTIONS : null;
   let katizmaPrayers = (typeof window !== "undefined" && window.KATIZMA_PRAYERS) ? window.KATIZMA_PRAYERS : null;
   let psalterPreface = (typeof window !== "undefined" && window.PSALTER_PREFACE) ? window.PSALTER_PREFACE : null;
+  let psalmsCsOld = (typeof window !== "undefined" && window.psalmsCsOld) ? window.psalmsCsOld : null;
+  let psalmsCsCyrillic = (typeof window !== "undefined" && window.psalmsCsCyrillic) ? window.psalmsCsCyrillic : null;
+  let currentPsalterLanguage = localStorage.getItem('hud_psalter_language') || 'serbian';
+  let psalterParallelModes = JSON.parse(localStorage.getItem('hud_psalter_parallel') || '[]');
+  let selectedQuoteText = '';
   let isViewingKatizmaPrayer = false;
   let prefaceExpanded = false;
   let postPrayerInlineExpanded = false;
@@ -1007,6 +1012,46 @@
         psalterPreface = await respPref.json();
       } catch (e) {}
     }
+
+    // 4. Old CS Psalms
+    if (!psalmsCsOld && typeof window !== 'undefined' && window.psalmsCsOld) {
+      psalmsCsOld = window.psalmsCsOld;
+    }
+    if (!psalmsCsOld) {
+      try {
+        const hostCsOld = await callModule('psalter', 'get_cs_old');
+        if (hostCsOld && typeof hostCsOld === 'object' && Object.keys(hostCsOld).length > 0) {
+          psalmsCsOld = hostCsOld;
+          logToHost(`Loaded Old CS psalms via host module`);
+        }
+      } catch (e) {}
+    }
+    if (!psalmsCsOld) {
+      try {
+        const respCsOld = await fetch('data/psalms_cs_old.json');
+        psalmsCsOld = await respCsOld.json();
+      } catch (e) {}
+    }
+
+    // 5. Cyrillic CS Psalms
+    if (!psalmsCsCyrillic && typeof window !== 'undefined' && window.psalmsCsCyrillic) {
+      psalmsCsCyrillic = window.psalmsCsCyrillic;
+    }
+    if (!psalmsCsCyrillic) {
+      try {
+        const hostCsCyr = await callModule('psalter', 'get_cs_cyrillic');
+        if (hostCsCyr && typeof hostCsCyr === 'object' && Object.keys(hostCsCyr).length > 0) {
+          psalmsCsCyrillic = hostCsCyr;
+          logToHost(`Loaded Cyrillic CS psalms via host module`);
+        }
+      } catch (e) {}
+    }
+    if (!psalmsCsCyrillic) {
+      try {
+        const respCsCyr = await fetch('data/psalms_cs_cyrillic.json');
+        psalmsCsCyrillic = await respCsCyr.json();
+      } catch (e) {}
+    }
   }
 
   async function loadPsalter() {
@@ -1198,16 +1243,39 @@
       const instObj = psalmInstructions ? psalmInstructions[String(pNum)] : null;
       const instText = instObj ? instObj.instruction : '';
 
+      let cardTitle = `Псалам ${pNum}`;
+      let cardSnippet = firstVerse;
+      let isCsOldCard = false;
+
+      if (currentPsalterLanguage === 'cs_old') {
+        const csOldObj = (psalmsCsOld && psalmsCsOld[String(pNum)]) || (window.psalmsCsOld && window.psalmsCsOld[String(pNum)]) || null;
+        if (csOldObj) {
+          cardTitle = csOldObj.title;
+          if (csOldObj.verses && csOldObj.verses[0]) {
+            cardSnippet = csOldObj.verses[0].text;
+          }
+        }
+        isCsOldCard = true;
+      } else if (currentPsalterLanguage === 'cs_cyrillic') {
+        const csCyrObj = (psalmsCsCyrillic && psalmsCsCyrillic[String(pNum)]) || (window.psalmsCsCyrillic && window.psalmsCsCyrillic[String(pNum)]) || null;
+        if (csCyrObj) {
+          cardTitle = csCyrObj.title;
+          if (csCyrObj.verses && csCyrObj.verses[0]) {
+            cardSnippet = csCyrObj.verses[0].text;
+          }
+        }
+      }
+
       html += `
-        <div class="psalm-card ${isSelected ? 'selected' : ''}" data-psalm="${pNum}">
-          <div class="psalm-card-num">Псалам ${pNum}</div>
+        <div class="psalm-card ${isSelected ? 'selected' : ''} ${isCsOldCard ? 'font-churchslavonic' : ''}" data-psalm="${pNum}">
+          <div class="psalm-card-num">${escapeHtml(cardTitle)}</div>
           ${instText ? `
             <div class="psalm-card-instruction">
               <span class="inst-icon">🕊️</span>
               <span class="inst-text">${escapeHtml(instText)}</span>
             </div>
           ` : ''}
-          ${firstVerse ? `<div class="psalm-card-snippet">${escapeHtml(firstVerse)}</div>` : ''}
+          ${cardSnippet ? `<div class="psalm-card-snippet">${escapeHtml(cardSnippet)}</div>` : ''}
         </div>
       `;
     }
@@ -1436,12 +1504,12 @@
     if (readerPsalmCounter) readerPsalmCounter.textContent = `Молитве • Катизма ${katizmaNum} / 20`;
 
     if (prefacePrayersBanner) {
-      bannerEl.innerHTML = '';
-      bannerEl.style.display = 'none';
+      prefacePrayersBanner.innerHTML = '';
+      prefacePrayersBanner.style.display = 'none';
     }
     if (postKatizmaBanner) {
-      bannerEl.innerHTML = '';
-      bannerEl.style.display = 'none';
+      postKatizmaBanner.innerHTML = '';
+      postKatizmaBanner.style.display = 'none';
     }
     if (readerInstructionContainer) {
       readerInstructionContainer.innerHTML = '';
@@ -1449,7 +1517,10 @@
     }
     if (readerPsalmOrnament) readerPsalmOrnament.style.display = 'flex';
 
-    if (readerPsalmTitle) readerPsalmTitle.textContent = `МОЛИТВЕ ПОСЛЕ ${katizmaNum}. КАТИЗМЕ`;
+    if (readerPsalmTitle) {
+      readerPsalmTitle.classList.remove('font-churchslavonic');
+      readerPsalmTitle.textContent = `МОЛИТВЕ ПОСЛЕ ${katizmaNum}. КАТИЗМЕ`;
+    }
     if (readerPsalmSubtitle) {
       readerPsalmSubtitle.textContent = prayerObj.header || `После прочитане ${katizmaNum}. катизме говори се:`;
       readerPsalmSubtitle.style.display = 'block';
@@ -1471,6 +1542,10 @@
     }
 
     if (readerPsalmText) {
+      readerPsalmText.classList.remove('psalm-parallel-container');
+      readerPsalmText.classList.remove('font-churchslavonic');
+      readerPsalmText.style.removeProperty('--parallel-cols');
+
       let contentHtml = `
         <div class="katizma-prayer-full-sheet">
           <div class="liturgical-text" style="font-size: 1.05rem; line-height: 1.8;">
@@ -1541,13 +1616,49 @@
     // 1. Uniform Preface Prayers Banner
     renderPrefacePrayersBanner();
 
-    // 2. Psalm Titles
-    if (readerPsalmTitle) readerPsalmTitle.textContent = psalm.title || psalm.Title || `Псалам ${currentPsalmNumber}.`;
+    const activeParallel = (psalterParallelModes && psalterParallelModes.length > 0);
 
-    const sub = psalm.subtitle || psalm.Subtitle || '';
-    if (readerPsalmSubtitle) {
-      readerPsalmSubtitle.textContent = sub;
-      readerPsalmSubtitle.style.display = sub ? 'block' : 'none';
+    // 2. Psalm Titles & Formatting
+    if (!activeParallel) {
+      if (currentPsalterLanguage === 'cs_old') {
+        const csOldObj = (psalmsCsOld && psalmsCsOld[String(currentPsalmNumber)]) || (window.psalmsCsOld && window.psalmsCsOld[String(currentPsalmNumber)]) || null;
+        if (readerPsalmTitle) {
+          readerPsalmTitle.classList.add('font-churchslavonic');
+          readerPsalmTitle.textContent = csOldObj ? csOldObj.title : `Ѱало́мъ ${currentPsalmNumber}`;
+        }
+        const sub = csOldObj ? (csOldObj.subtitle || '') : '';
+        if (readerPsalmSubtitle) {
+          readerPsalmSubtitle.textContent = sub;
+          readerPsalmSubtitle.style.display = sub ? 'block' : 'none';
+        }
+      } else if (currentPsalterLanguage === 'cs_cyrillic') {
+        const csCyrObj = (psalmsCsCyrillic && psalmsCsCyrillic[String(currentPsalmNumber)]) || (window.psalmsCsCyrillic && window.psalmsCsCyrillic[String(currentPsalmNumber)]) || null;
+        if (readerPsalmTitle) {
+          readerPsalmTitle.classList.remove('font-churchslavonic');
+          readerPsalmTitle.textContent = csCyrObj ? csCyrObj.title : `Псалом ${currentPsalmNumber}. (${currentPsalmNumber})`;
+        }
+        const sub = csCyrObj ? (csCyrObj.subtitle || '') : '';
+        if (readerPsalmSubtitle) {
+          readerPsalmSubtitle.textContent = sub;
+          readerPsalmSubtitle.style.display = sub ? 'block' : 'none';
+        }
+      } else {
+        if (readerPsalmTitle) {
+          readerPsalmTitle.classList.remove('font-churchslavonic');
+          readerPsalmTitle.textContent = psalm.title || psalm.Title || `Псалам ${currentPsalmNumber}.`;
+        }
+        const sub = psalm.subtitle || psalm.Subtitle || '';
+        if (readerPsalmSubtitle) {
+          readerPsalmSubtitle.textContent = sub;
+          readerPsalmSubtitle.style.display = sub ? 'block' : 'none';
+        }
+      }
+    } else {
+      if (readerPsalmTitle) {
+        readerPsalmTitle.classList.remove('font-churchslavonic');
+        readerPsalmTitle.textContent = `Псалам / Ѱало́мъ ${currentPsalmNumber}`;
+      }
+      if (readerPsalmSubtitle) readerPsalmSubtitle.style.display = 'none';
     }
 
     // 3. St. Paisios Instructions
@@ -1573,37 +1684,86 @@
       }
     }
 
-    // 4. Psalm Verses
+    // 4. Psalm Verses (Single or Parallel Multi-Column View)
     if (readerPsalmText) {
-      const rawLines = psalm.lines || psalm.Lines || (psalm.content || psalm.Content ? (psalm.content || psalm.Content).split('\n') : []);
-      let versesHtml = '';
-      let verseIndex = 1;
+      if (!activeParallel) {
+        readerPsalmText.classList.remove('psalm-parallel-container');
+        readerPsalmText.style.removeProperty('--parallel-cols');
 
-      for (const rawLine of rawLines) {
-        const trimmed = String(rawLine).trim();
-        if (!trimmed) continue;
-        if (/^Пагес:|^Pages:/i.test(trimmed)) continue;
+        let versesList = [];
+        let isCsOld = (currentPsalterLanguage === 'cs_old');
 
-        const numMatch = trimmed.match(/^(\d+)[\.\s]+(.*)$/);
-        let vNum = '';
-        let vText = trimmed;
-        if (numMatch) {
-          vNum = numMatch[1] + '.';
-          vText = numMatch[2];
+        if (isCsOld) {
+          readerPsalmText.classList.add('font-churchslavonic');
+          versesList = getVersesForLang('cs_old', currentPsalmNumber, psalm);
+        } else if (currentPsalterLanguage === 'cs_cyrillic') {
+          readerPsalmText.classList.remove('font-churchslavonic');
+          versesList = getVersesForLang('cs_cyrillic', currentPsalmNumber, psalm);
         } else {
-          vNum = verseIndex + '.';
-          verseIndex++;
+          readerPsalmText.classList.remove('font-churchslavonic');
+          versesList = getVersesForLang('serbian', currentPsalmNumber, psalm);
         }
 
-        versesHtml += `
-          <div class="psalm-verse">
-            <span class="verse-num">${escapeHtml(vNum)}</span>
-            <span class="verse-text">${escapeHtml(vText)}</span>
+        let versesHtml = '';
+        for (const v of versesList) {
+          versesHtml += `
+            <div class="psalm-verse">
+              <span class="verse-num">${escapeHtml(v.num)}</span>
+              <span class="verse-text">${escapeHtml(v.text)}</span>
+            </div>
+          `;
+        }
+        readerPsalmText.innerHTML = versesHtml;
+      } else {
+        readerPsalmText.classList.remove('font-churchslavonic');
+
+        const activeCols = [currentPsalterLanguage, ...psalterParallelModes];
+        const numCols = activeCols.length;
+
+        // Auto-expand window width if too narrow
+        const minW = numCols >= 3 ? 1440 : 1160;
+        if (window.innerWidth < minW) {
+          callHost('ensure_window_width', { minWidth: minW });
+        }
+
+        const colVerses = activeCols.map((col) => getVersesForLang(col, currentPsalmNumber, psalm));
+        const maxV = Math.max(...colVerses.map((v) => v.length));
+
+        let parallelRowsHtml = '';
+        for (let r = 0; r < maxV; r++) {
+          let cellsHtml = '';
+          for (let c = 0; c < activeCols.length; c++) {
+            const colLang = activeCols[c];
+            const v = colVerses[c][r] || { num: '', text: '' };
+            const isCsOld = (colLang === 'cs_old');
+            cellsHtml += `
+              <div class="parallel-cell ${isCsOld ? 'font-churchslavonic' : ''}">
+                <span class="verse-num">${escapeHtml(v.num)}</span>
+                <span class="verse-text">${escapeHtml(v.text)}</span>
+              </div>
+            `;
+          }
+          parallelRowsHtml += `
+            <div class="parallel-row">
+              ${cellsHtml}
+            </div>
+          `;
+        }
+
+        readerPsalmText.innerHTML = `
+          <div class="psalm-parallel-container" style="--parallel-cols: ${numCols};">
+            <div class="parallel-header-row">
+              ${activeCols.map((col) => `
+                <div class="parallel-col-header">
+                  <span>${getColumnTitle(col, currentPsalmNumber)}</span>
+                  <span class="parallel-col-lang-tag">${getColumnTag(col)}</span>
+                </div>
+              `).join('')}
+            </div>
+            ${parallelRowsHtml}
           </div>
         `;
       }
-
-      readerPsalmText.innerHTML = versesHtml;
     }
 
     // 5. Uniform Post-Katizma Prayer Banner (on the last psalm)
@@ -1638,7 +1798,16 @@
     }
 
     if (bcPsalms) bcPsalms.textContent = `Катизма ${currentKatizmaNumber}`;
-    if (bcSinglePsalm) bcSinglePsalm.textContent = `Псалам ${currentPsalmNumber}`;
+    if (bcSinglePsalm) {
+      if (currentPsalterLanguage === 'cs_old') {
+        const csOldObj = (psalmsCsOld && psalmsCsOld[String(currentPsalmNumber)]) || null;
+        bcSinglePsalm.textContent = csOldObj ? csOldObj.title : `Ѱало́мъ ${currentPsalmNumber}`;
+      } else if (currentPsalterLanguage === 'cs_cyrillic') {
+        bcSinglePsalm.textContent = `Псалом ${currentPsalmNumber}`;
+      } else {
+        bcSinglePsalm.textContent = `Псалам ${currentPsalmNumber}`;
+      }
+    }
   }
 
   function selectKatizma(katizmaNum) {
@@ -1859,11 +2028,27 @@
   });
 
   function openContextMenu(x, y) {
+    // 1. Check if user selected text in psalm
+    const sel = window.getSelection().toString().trim();
+    const ctxSaveCitation = document.getElementById('ctx-save-citation');
+    if (ctxSaveCitation) {
+      if (sel && activeModuleId === 'psalter' && psalterLayer === 'single') {
+        ctxSaveCitation.style.display = 'flex';
+        selectedQuoteText = sel;
+      } else {
+        ctxSaveCitation.style.display = 'none';
+        selectedQuoteText = '';
+      }
+    }
+
+    // 2. Update Psalter options dynamically
+    updateContextMenuPsalterOptions();
+
     contextMenu.style.display = 'flex';
     contextMenu.classList.add('open');
 
-    const menuWidth = contextMenu.offsetWidth || 230;
-    const menuHeight = contextMenu.offsetHeight || 310;
+    const menuWidth = contextMenu.offsetWidth || 250;
+    const menuHeight = contextMenu.offsetHeight || 380;
     const winWidth = window.innerWidth;
     const winHeight = window.innerHeight;
 
@@ -1898,6 +2083,14 @@
       const theme = item.dataset.theme;
       applyTheme(theme);
       callHost('set_theme', { theme });
+    } else if (action === 'set_psalter_lang') {
+      setPsalterLanguage(item.dataset.lang);
+    } else if (action === 'toggle_parallel') {
+      toggleParallelMode(item.dataset.parallel);
+    } else if (action === 'disable_parallel') {
+      disableParallelModes();
+    } else if (action === 'save_citation') {
+      saveCurrentCitation();
     } else if (action === 'reindex') {
       callModule('search', 'reindex');
       indexerStatus.textContent = 'Re-indexing...';
@@ -1907,6 +2100,271 @@
       callHost('exit_app');
     }
   });
+
+  function getVersesForLang(lang, pNum, defaultPsalmObj) {
+    if (lang === 'cs_old') {
+      const obj = (psalmsCsOld && psalmsCsOld[String(pNum)]) || (window.psalmsCsOld && window.psalmsCsOld[String(pNum)]) || null;
+      if (obj && obj.verses && obj.verses.length > 0) return obj.verses;
+    } else if (lang === 'cs_cyrillic') {
+      const obj = (psalmsCsCyrillic && psalmsCsCyrillic[String(pNum)]) || (window.psalmsCsCyrillic && window.psalmsCsCyrillic[String(pNum)]) || null;
+      if (obj && obj.verses && obj.verses.length > 0) return obj.verses;
+    }
+    // Serbian default
+    if (defaultPsalmObj && Array.isArray(defaultPsalmObj.verses) && defaultPsalmObj.verses.length > 0) {
+      return defaultPsalmObj.verses.map((v, i) => {
+        if (typeof v === 'object' && v.num && v.text) return v;
+        const s = String(v).trim();
+        const m = s.match(/^(\d+)[\.\s]+(.*)$/);
+        return m ? { num: m[1] + '.', text: m[2] } : { num: (i + 1) + '.', text: s };
+      });
+    }
+    const rawLines = defaultPsalmObj ? (defaultPsalmObj.lines || defaultPsalmObj.Lines || (defaultPsalmObj.content || defaultPsalmObj.Content ? (defaultPsalmObj.content || defaultPsalmObj.Content).split('\n') : [])) : [];
+    const list = [];
+    let idx = 1;
+    for (const rawLine of rawLines) {
+      const trimmed = String(rawLine).trim();
+      if (!trimmed || /^Пагес:|^Pages:/i.test(trimmed)) continue;
+      const numMatch = trimmed.match(/^(\d+)[\.\s]+(.*)$/);
+      if (numMatch) {
+        list.push({ num: numMatch[1] + '.', text: numMatch[2] });
+      } else {
+        list.push({ num: idx + '.', text: trimmed });
+        idx++;
+      }
+    }
+    return list;
+  }
+
+  function getColumnTitle(col, pNum) {
+    if (col === 'cs_old') {
+      const csOldObj = (psalmsCsOld && psalmsCsOld[String(pNum)]) || (window.psalmsCsOld && window.psalmsCsOld[String(pNum)]) || null;
+      return csOldObj ? csOldObj.title : `Ѱало́мъ ${pNum}`;
+    } else if (col === 'cs_cyrillic') {
+      return `Псалом ${pNum}. (${pNum})`;
+    } else {
+      return `Псалам ${pNum}.`;
+    }
+  }
+
+  function getColumnTag(col) {
+    if (col === 'cs_old') return 'Црквенословенски';
+    if (col === 'cs_cyrillic') return 'Црквенослов. ћирилица';
+    return 'Српски превод';
+  }
+
+  function setPsalterLanguage(lang) {
+    if (!lang) return;
+    currentPsalterLanguage = lang;
+    localStorage.setItem('hud_psalter_language', currentPsalterLanguage);
+
+    psalterParallelModes = psalterParallelModes.filter((m) => m !== lang);
+    localStorage.setItem('hud_psalter_parallel', JSON.stringify(psalterParallelModes));
+
+    if (activeModuleId === 'psalter') {
+      if (psalterLayer === 'single') {
+        if (isViewingKatizmaPrayer) {
+          displayKatizmaPrayers(currentKatizmaNumber);
+        } else {
+          displayCurrentPsalm(true);
+        }
+      } else if (psalterLayer === 'psalms') {
+        renderPsalmsGrid();
+      }
+    }
+    showToast(`Језик Псалтира: ${getColumnTag(lang)}`);
+  }
+
+  function toggleParallelMode(mode) {
+    if (!mode) return;
+    const idx = psalterParallelModes.indexOf(mode);
+    if (idx >= 0) {
+      psalterParallelModes.splice(idx, 1);
+    } else {
+      psalterParallelModes.push(mode);
+    }
+    localStorage.setItem('hud_psalter_parallel', JSON.stringify(psalterParallelModes));
+
+    if (psalterParallelModes.length > 0) {
+      const minW = psalterParallelModes.length >= 2 ? 1440 : 1160;
+      if (window.innerWidth < minW) {
+        callHost('ensure_window_width', { minWidth: minW });
+      }
+    }
+
+    if (activeModuleId === 'psalter' && psalterLayer === 'single') {
+      if (isViewingKatizmaPrayer) {
+        displayKatizmaPrayers(currentKatizmaNumber);
+      } else {
+        displayCurrentPsalm(true);
+      }
+    }
+  }
+
+  function disableParallelModes() {
+    psalterParallelModes = [];
+    localStorage.setItem('hud_psalter_parallel', JSON.stringify(psalterParallelModes));
+    if (activeModuleId === 'psalter' && psalterLayer === 'single') {
+      if (isViewingKatizmaPrayer) {
+        displayKatizmaPrayers(currentKatizmaNumber);
+      } else {
+        displayCurrentPsalm(true);
+      }
+    }
+    showToast('Упоредни приказ искључен');
+  }
+
+  function showToast(msg, duration = 3000) {
+    const toast = document.getElementById('hud-toast');
+    if (!toast) return;
+    toast.textContent = msg;
+    toast.classList.add('visible');
+    clearTimeout(toast._timer);
+    toast._timer = setTimeout(() => {
+      toast.classList.remove('visible');
+    }, duration);
+  }
+
+  async function saveCurrentCitation() {
+    const textToSave = selectedQuoteText || window.getSelection().toString().trim();
+    if (!textToSave) {
+      showToast('Молимо прво означите текст за цитат.');
+      return;
+    }
+
+    const pNum = currentPsalmNumber || 1;
+    const citationFormatted = `"${textToSave}" Ps: ${pNum}`;
+
+    try {
+      if (!allNotes || allNotes.length === 0) {
+        const data = await callModule('notes', 'get_all');
+        if (data) {
+          allNotes = data.notes || data.Notes || [];
+        }
+      }
+
+      let trackedId = localStorage.getItem('hud_beleske_quote_note_id');
+      let targetNote = null;
+
+      if (trackedId) {
+        targetNote = allNotes.find((n) => (n.id || n.Id) === trackedId);
+      }
+
+      if (!targetNote) {
+        targetNote = allNotes.find((n) => {
+          const t = (n.title || n.Title || '').trim().toLowerCase();
+          return t === 'белешке' || t === 'beleske';
+        });
+        if (targetNote) {
+          trackedId = targetNote.id || targetNote.Id;
+          localStorage.setItem('hud_beleske_quote_note_id', trackedId);
+        }
+      }
+
+      if (targetNote) {
+        const currContent = (targetNote.content || targetNote.Content || '').trim();
+        const newContent = currContent ? `${currContent}\n\n${citationFormatted}` : citationFormatted;
+        const noteId = targetNote.id || targetNote.Id;
+        const noteTitle = targetNote.title || targetNote.Title || 'Белешке';
+
+        targetNote.content = newContent;
+        targetNote.updatedAt = new Date().toISOString();
+
+        await callModule('notes', 'update', {
+          id: noteId,
+          title: noteTitle,
+          content: newContent,
+          immediateSave: true
+        });
+
+        if (activeNote && (activeNote.id || activeNote.Id) === noteId) {
+          if (noteContentInput) {
+            noteContentInput.value = newContent;
+            updateWordCount(newContent);
+          }
+        }
+        showToast(`📌 Цитат сачуван у "${noteTitle}"!`);
+      } else {
+        const created = await callModule('notes', 'create', {
+          title: 'Белешке',
+          content: citationFormatted
+        });
+        if (created) {
+          const newId = created.id || created.Id;
+          localStorage.setItem('hud_beleske_quote_note_id', newId);
+          allNotes.unshift(created);
+          renderNotesSidebar();
+          showToast(`📌 Цитат сачуван у нову белешку "Белешке"!`);
+        }
+      }
+    } catch (err) {
+      logToHost(`Error saving citation: ${err.message}`, 'ERROR');
+      showToast('Грешка при чувању цитата.');
+    }
+  }
+
+  function updateContextMenuPsalterOptions() {
+    const isPsalter = (activeModuleId === 'psalter');
+    document.querySelectorAll('.ctx-psalter-only').forEach((el) => {
+      el.style.display = isPsalter ? 'flex' : 'none';
+    });
+
+    if (!isPsalter) return;
+
+    const checkSerb = document.getElementById('check-lang-serbian');
+    const checkOld = document.getElementById('check-lang-cs-old');
+    const checkCyr = document.getElementById('check-lang-cs-cyrillic');
+    if (checkSerb) checkSerb.textContent = (currentPsalterLanguage === 'serbian') ? '✓' : '';
+    if (checkOld) checkOld.textContent = (currentPsalterLanguage === 'cs_old') ? '✓' : '';
+    if (checkCyr) checkCyr.textContent = (currentPsalterLanguage === 'cs_cyrillic') ? '✓' : '';
+
+    const opt1 = document.getElementById('ctx-parallel-opt1');
+    const text1 = document.getElementById('ctx-parallel-text1');
+    const check1 = document.getElementById('check-parallel-opt1');
+
+    const opt2 = document.getElementById('ctx-parallel-opt2');
+    const text2 = document.getElementById('ctx-parallel-text2');
+    const check2 = document.getElementById('check-parallel-opt2');
+
+    const disableOpt = document.getElementById('ctx-disable-parallel');
+
+    let mode1Key = '';
+    let mode1Label = '';
+    let mode2Key = '';
+    let mode2Label = '';
+
+    if (currentPsalterLanguage === 'serbian') {
+      mode1Key = 'cs_old';
+      mode1Label = 'Упоредно: Црквенословенски';
+      mode2Key = 'cs_cyrillic';
+      mode2Label = 'Упоредно: Црквенословенски ћирилично';
+    } else if (currentPsalterLanguage === 'cs_old') {
+      mode1Key = 'serbian';
+      mode1Label = 'Упоредно: Српски';
+      mode2Key = 'cs_cyrillic';
+      mode2Label = 'Упоредно: Црквенословенски ћирилично';
+    } else if (currentPsalterLanguage === 'cs_cyrillic') {
+      mode1Key = 'serbian';
+      mode1Label = 'Упоредно: Српски';
+      mode2Key = 'cs_old';
+      mode2Label = 'Упоредно: Црквенословенски';
+    }
+
+    if (opt1 && text1 && check1) {
+      opt1.dataset.parallel = mode1Key;
+      text1.textContent = mode1Label;
+      check1.textContent = psalterParallelModes.includes(mode1Key) ? '✓' : '';
+    }
+
+    if (opt2 && text2 && check2) {
+      opt2.dataset.parallel = mode2Key;
+      text2.textContent = mode2Label;
+      check2.textContent = psalterParallelModes.includes(mode2Key) ? '✓' : '';
+    }
+
+    if (disableOpt) {
+      disableOpt.style.display = (psalterParallelModes.length > 0) ? 'flex' : 'none';
+    }
+  }
 
   // ========================================================
   // HUD Actions & Init

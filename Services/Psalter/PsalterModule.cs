@@ -50,6 +50,14 @@ public class PsalterModule : IHudModule
             case "preface_prayers":
                 return Task.FromResult<object?>(_psalterService.GetPrefacePrayersData());
 
+            case "get_cs_old":
+            case "cs_old":
+                return Task.FromResult<object?>(_psalterService.GetPsalmsCsOldData());
+
+            case "get_cs_cyrillic":
+            case "cs_cyrillic":
+                return Task.FromResult<object?>(_psalterService.GetPsalmsCsCyrillicData());
+
             default:
                 return Task.FromResult<object?>(null);
         }

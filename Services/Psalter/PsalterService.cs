@@ -238,4 +238,107 @@ public class PsalterService
         }
     }
 
+    private JsonDocument? _cachedCsOldDoc;
+    private string? _cachedCsOldRawJson;
+    private JsonDocument? _cachedCsCyrillicDoc;
+    private string? _cachedCsCyrillicRawJson;
+
+    public string GetPsalmsCsOldJson()
+    {
+        lock (_lock)
+        {
+            if (_cachedCsOldRawJson != null)
+                return _cachedCsOldRawJson;
+
+            string[] candidateRelativePaths =
+            [
+                Path.Combine("wwwroot", "data", "psalms_cs_old.json"),
+                Path.Combine("Data", "psalms_cs_old.json")
+            ];
+
+            foreach (var relPath in candidateRelativePaths)
+            {
+                string? resolved = ResolveDataFilePath(relPath);
+                if (resolved != null)
+                {
+                    try
+                    {
+                        HudLogger.Log($"Loading Old Church Slavonic Psalms from: {resolved}");
+                        _cachedCsOldRawJson = File.ReadAllText(resolved);
+                        _cachedCsOldDoc = JsonDocument.Parse(_cachedCsOldRawJson);
+                        return _cachedCsOldRawJson;
+                    }
+                    catch (Exception ex)
+                    {
+                        HudLogger.LogError($"Error reading Old CS psalms from {resolved}", ex);
+                    }
+                }
+            }
+
+            HudLogger.Log("Old CS psalms JSON not found in standard paths.", "WARN");
+            return "{}";
+        }
+    }
+
+    public JsonElement GetPsalmsCsOldData()
+    {
+        lock (_lock)
+        {
+            if (_cachedCsOldDoc == null)
+            {
+                GetPsalmsCsOldJson();
+            }
+            return _cachedCsOldDoc?.RootElement ?? default;
+        }
+    }
+
+    public string GetPsalmsCsCyrillicJson()
+    {
+        lock (_lock)
+        {
+            if (_cachedCsCyrillicRawJson != null)
+                return _cachedCsCyrillicRawJson;
+
+            string[] candidateRelativePaths =
+            [
+                Path.Combine("wwwroot", "data", "psalms_cs_cyrillic.json"),
+                Path.Combine("Data", "psalms_cs_cyrillic.json")
+            ];
+
+            foreach (var relPath in candidateRelativePaths)
+            {
+                string? resolved = ResolveDataFilePath(relPath);
+                if (resolved != null)
+                {
+                    try
+                    {
+                        HudLogger.Log($"Loading Cyrillic Church Slavonic Psalms from: {resolved}");
+                        _cachedCsCyrillicRawJson = File.ReadAllText(resolved);
+                        _cachedCsCyrillicDoc = JsonDocument.Parse(_cachedCsCyrillicRawJson);
+                        return _cachedCsCyrillicRawJson;
+                    }
+                    catch (Exception ex)
+                    {
+                        HudLogger.LogError($"Error reading Cyrillic CS psalms from {resolved}", ex);
+                    }
+                }
+            }
+
+            HudLogger.Log("Cyrillic CS psalms JSON not found in standard paths.", "WARN");
+            return "{}";
+        }
+    }
+
+    public JsonElement GetPsalmsCsCyrillicData()
+    {
+        lock (_lock)
+        {
+            if (_cachedCsCyrillicDoc == null)
+            {
+                GetPsalmsCsCyrillicJson();
+            }
+            return _cachedCsCyrillicDoc?.RootElement ?? default;
+        }
+    }
+
 }

@@ -397,6 +397,50 @@
         <span class="ctx-shortcut">psalm⇥</span>
       </div>
 
+      <!-- Citation saving item (only visible when text selected in psalm) -->
+      <div class="ctx-item" id="ctx-save-citation" data-action="save_citation" style="display:none; color: #D4AF37;">
+        <span class="ctx-icon">📌</span>
+        <span class="ctx-text">Сачувај цитат</span>
+        <span class="ctx-shortcut">Белешке</span>
+      </div>
+
+      <div class="ctx-divider ctx-psalter-only" id="ctx-psalter-divider"></div>
+
+      <!-- Psalter language options -->
+      <div class="ctx-label ctx-psalter-only" id="ctx-lang-label">ПСАЛТИР: ЈЕЗИК И ПИСМО</div>
+      <div class="ctx-item ctx-psalter-only" data-action="set_psalter_lang" data-lang="serbian">
+        <span class="ctx-icon">🇷🇸</span>
+        <span class="ctx-text">Српски (Вук / Даничић)</span>
+        <span class="ctx-check" id="check-lang-serbian">✓</span>
+      </div>
+      <div class="ctx-item ctx-psalter-only" data-action="set_psalter_lang" data-lang="cs_old">
+        <span class="ctx-icon">☦</span>
+        <span class="ctx-text">Црквенословенски (стара слова)</span>
+        <span class="ctx-check" id="check-lang-cs-old"></span>
+      </div>
+      <div class="ctx-item ctx-psalter-only" data-action="set_psalter_lang" data-lang="cs_cyrillic">
+        <span class="ctx-icon">☦</span>
+        <span class="ctx-text">Црквенословенски (ћирилица)</span>
+        <span class="ctx-check" id="check-lang-cs-cyrillic"></span>
+      </div>
+
+      <!-- Parallel view dynamic options -->
+      <div class="ctx-label ctx-psalter-only" id="ctx-parallel-label">УПОРЕДНИ ПРИКАЗ</div>
+      <div class="ctx-item ctx-psalter-only" id="ctx-parallel-opt1" data-action="toggle_parallel" data-parallel="">
+        <span class="ctx-icon">☵</span>
+        <span class="ctx-text" id="ctx-parallel-text1">Упоредно: Црквенословенски</span>
+        <span class="ctx-check" id="check-parallel-opt1"></span>
+      </div>
+      <div class="ctx-item ctx-psalter-only" id="ctx-parallel-opt2" data-action="toggle_parallel" data-parallel="">
+        <span class="ctx-icon">☵</span>
+        <span class="ctx-text" id="ctx-parallel-text2">Упоредно: Црквенословенски ћирилично</span>
+        <span class="ctx-check" id="check-parallel-opt2"></span>
+      </div>
+      <div class="ctx-item ctx-psalter-only" id="ctx-disable-parallel" data-action="disable_parallel" style="display:none; opacity: 0.75;">
+        <span class="ctx-icon">✕</span>
+        <span class="ctx-text">Искључи упоредни приказ</span>
+      </div>
+
       <div class="ctx-divider"></div>
 
       <div class="ctx-label">AESTHETIC TEMPLATE</div>
@@ -458,6 +502,9 @@
   <script src="data/psalm_instructions.js"></script>
   <script src="data/katizma_prayers.js"></script>
   <script src="data/psalter_preface.js"></script>
+  <script src="data/psalms_cs_old.js"></script>
+  <script src="data/psalms_cs_cyrillic.js"></script>
   <script src="app.js"></script>
+  <div id="hud-toast" class="hud-toast"></div>
 </body>
 </html>
