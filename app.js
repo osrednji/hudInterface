@@ -31,6 +31,7 @@
   let psalterPreface = (typeof window !== "undefined" && window.PSALTER_PREFACE) ? window.PSALTER_PREFACE : null;
   let psalmsCsOld = (typeof window !== "undefined" && window.psalmsCsOld) ? window.psalmsCsOld : null;
   let psalmsCsCyrillic = (typeof window !== "undefined" && window.psalmsCsCyrillic) ? window.psalmsCsCyrillic : null;
+  let psalmAlignments = (typeof window !== "undefined" && window.psalmAlignments) ? window.psalmAlignments : null;
   let currentPsalterLanguage = localStorage.getItem('hud_psalter_language') || 'serbian';
   let psalterParallelModes = JSON.parse(localStorage.getItem('hud_psalter_parallel') || '[]');
   let selectedQuoteText = '';
@@ -1052,6 +1053,17 @@
         psalmsCsCyrillic = await respCsCyr.json();
       } catch (e) {}
     }
+
+    // 6. Psalm Alignments
+    if (!psalmAlignments && typeof window !== 'undefined' && window.psalmAlignments) {
+      psalmAlignments = window.psalmAlignments;
+    }
+    if (!psalmAlignments) {
+      try {
+        const respAlign = await fetch('data/psalm_alignments.json');
+        psalmAlignments = await respAlign.json();
+      } catch (e) {}
+    }
   }
 
   async function loadPsalter() {
@@ -1658,7 +1670,11 @@
         readerPsalmTitle.classList.remove('font-churchslavonic');
         readerPsalmTitle.textContent = `Псалам / Ѱало́мъ ${currentPsalmNumber}`;
       }
-      if (readerPsalmSubtitle) readerPsalmSubtitle.style.display = 'none';
+      if (readerPsalmSubtitle) {
+        const sub = psalm.subtitle || psalm.Subtitle || '';
+        readerPsalmSubtitle.textContent = sub;
+        readerPsalmSubtitle.style.display = sub ? 'block' : 'none';
+      }
     }
 
     // 3. St. Paisios Instructions
@@ -1727,27 +1743,64 @@
         }
 
         const colVerses = activeCols.map((col) => getVersesForLang(col, currentPsalmNumber, psalm));
-        const maxV = Math.max(...colVerses.map((v) => v.length));
+        const alignments = (psalmAlignments && psalmAlignments[String(currentPsalmNumber)]) || (window.psalmAlignments && window.psalmAlignments[String(currentPsalmNumber)]) || 'default';
 
         let parallelRowsHtml = '';
-        for (let r = 0; r < maxV; r++) {
-          let cellsHtml = '';
-          for (let c = 0; c < activeCols.length; c++) {
-            const colLang = activeCols[c];
-            const v = colVerses[c][r] || { num: '', text: '' };
-            const isCsOld = (colLang === 'cs_old');
-            cellsHtml += `
-              <div class="parallel-cell ${isCsOld ? 'font-churchslavonic' : ''}">
-                <span class="verse-num">${escapeHtml(v.num)}</span>
-                <span class="verse-text">${escapeHtml(v.text)}</span>
+        if (Array.isArray(alignments)) {
+          // Customized semantic mapping for split psalms
+          for (let r = 0; r < alignments.length; r++) {
+            const rowMap = alignments[r]; // [s_idx, c_idx, o_idx]
+            let cellsHtml = '';
+            for (let c = 0; c < activeCols.length; c++) {
+              const colLang = activeCols[c];
+              let cellData = 0;
+              if (colLang === 'serbian') cellData = rowMap[0];
+              else if (colLang === 'cs_cyrillic') cellData = rowMap[1];
+              else if (colLang === 'cs_old') cellData = rowMap[2];
+
+              let v = { num: '', text: '' };
+              if (typeof cellData === 'number') {
+                v = colVerses[c][cellData] || { num: '', text: '' };
+              } else if (cellData && typeof cellData === 'object') {
+                v = cellData;
+              }
+
+              const isCsOld = (colLang === 'cs_old');
+              cellsHtml += `
+                <div class="parallel-cell ${isCsOld ? 'font-churchslavonic' : ''}">
+                  <span class="verse-num">${escapeHtml(v.num)}</span>
+                  <span class="verse-text">${escapeHtml(v.text)}</span>
+                </div>
+              `;
+            }
+            parallelRowsHtml += `
+              <div class="parallel-row">
+                ${cellsHtml}
               </div>
             `;
           }
-          parallelRowsHtml += `
-            <div class="parallel-row">
-              ${cellsHtml}
-            </div>
-          `;
+        } else {
+          // Default 1-to-1 semantic chanted verse alignment
+          const maxV = Math.max(...colVerses.map((v) => v.length));
+          for (let r = 0; r < maxV; r++) {
+            let cellsHtml = '';
+            for (let c = 0; c < activeCols.length; c++) {
+              const colLang = activeCols[c];
+              const v = colVerses[c][r] || { num: '', text: '' };
+              const isCsOld = (colLang === 'cs_old');
+              cellsHtml += `
+                <div class="parallel-cell ${isCsOld ? 'font-churchslavonic' : ''}">
+                  <span class="verse-num">${escapeHtml(v.num)}</span>
+                  <span class="verse-text">${escapeHtml(v.text)}</span>
+                </div>
+              `;
+            }
+            parallelRowsHtml += `
+              <div class="parallel-row">
+                ${cellsHtml}
+              </div>
+            `;
+          }
         }
 
         readerPsalmText.innerHTML = `
