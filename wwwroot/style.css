@@ -2478,7 +2478,9 @@ mark.highlight {
     border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
   }
 
-  .reader-shortcut-hint {
+  .reader-shortcut-hint,
+  .footer-separator,
+  .context-tip {
     display: none !important;
   }
 
@@ -2612,4 +2614,56 @@ mark.highlight {
 #post-katizma-banner,
 .post-katizma-container {
   display: none !important;
+}
+
+
+/* Unified Single Footer Styling */
+.hud-footer {
+  display: none !important;
+}
+
+.psalter-reader-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 7px 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 0.74rem;
+  opacity: 0.88;
+  background: rgba(0, 0, 0, 0.16);
+  backdrop-filter: blur(8px);
+}
+
+.theme-serbian-parchment .psalter-reader-footer {
+  background: rgba(0, 0, 0, 0.03);
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  color: #554433;
+}
+
+.reader-footer-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.reader-footer-left .footer-separator {
+  opacity: 0.45;
+  margin: 0 4px;
+}
+
+.reader-footer-left .context-tip {
+  opacity: 0.75;
+  font-size: 0.72rem;
+  letter-spacing: 0.03em;
+}
+
+.reader-footer-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
 }
