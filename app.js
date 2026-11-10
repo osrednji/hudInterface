@@ -184,7 +184,40 @@
     }
   }
 
-  function callHost(type, payload = {}) {
+  async function callHost(type, payload = {}) {
+    // 1. Tauri Native IPC bridge
+    if (typeof window !== 'undefined' && window.__TAURI__) {
+      const invoke = (window.__TAURI__.core && window.__TAURI__.core.invoke) || window.__TAURI__.invoke;
+      if (typeof invoke === 'function') {
+        try {
+          if (type === 'get_init_data') return await invoke('get_init_data');
+          if (type === 'save_psalter_state') {
+            return await invoke('save_psalter_state', {
+              psalmNumber: payload.psalmNumber,
+              katizmaNumber: payload.katizmaNumber,
+              level: payload.level,
+              scrollPos: payload.scrollPos
+            });
+          }
+          if (type === 'save_theme') return await invoke('save_theme', { theme: payload.theme });
+          if (type === 'drag_window') return await invoke('drag_window');
+          if (type === 'hide_window') return await invoke('hide_window');
+          if (type === 'module_action') {
+            if (payload.moduleId === 'notes') {
+              if (payload.action === 'get_all') return await invoke('get_notes');
+              if (payload.action === 'save') return await invoke('save_note', { note: payload.params });
+              if (payload.action === 'delete') return await invoke('delete_note', { id: payload.params && payload.params.id });
+            }
+          }
+          return await invoke(type, payload);
+        } catch (err) {
+          console.warn('[Tauri invoke error]', type, err);
+          return null;
+        }
+      }
+    }
+
+    // 2. WebView2 (C#) fallback bridge
     return new Promise((resolve) => {
       const id = 'req_' + Math.random().toString(36).substring(2, 10);
       pendingRequests.set(id, resolve);
@@ -1619,12 +1652,14 @@
   function renderPrefacePrayersBanner() {
     const bannerEl = document.getElementById('preface-prayers-banner') || document.getElementById('preface-prayers-container');
     if (!bannerEl) return;
-    if (isViewingKatizmaPrayer || !psalterPreface) {
+    if (!prefaceExpanded || isViewingKatizmaPrayer || !psalterPreface) {
       bannerEl.innerHTML = '';
       bannerEl.style.display = 'none';
+      if (btnPrefaceLink) btnPrefaceLink.classList.remove('active');
       return;
     }
 
+    if (btnPrefaceLink) btnPrefaceLink.classList.add('active');
     bannerEl.style.display = 'block';
     let bodyHtml = '';
     const sections = psalterPreface.sections || [];
@@ -1648,13 +1683,12 @@
           <span class="liturgical-banner-sub">Света Гора Атонска • Да се зна како треба посебно певати Псалтир</span>
         </div>
         <div class="liturgical-banner-actions">
-          <button class="btn-toggle-liturgical" id="btn-toggle-preface-btn" type="button">
-            <span class="toggle-text">${prefaceExpanded ? 'Сакриј молитве' : 'Прикажи уводне молитве'}</span>
-            <span class="toggle-icon">${prefaceExpanded ? '▲' : '▼'}</span>
+          <button class="btn-toggle-liturgical" id="btn-toggle-preface-btn" type="button" title="Затвори уводне молитве">
+            <span class="toggle-text">✕ Затвори молитве</span>
           </button>
         </div>
       </div>
-      <div class="liturgical-banner-body" id="preface-banner-body" style="display: ${prefaceExpanded ? 'block' : 'none'};">
+      <div class="liturgical-banner-body" id="preface-banner-body" style="display: block;">
         ${bodyHtml}
       </div>
     `;
@@ -1663,13 +1697,8 @@
     if (toggleBtn) {
       toggleBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        prefaceExpanded = !prefaceExpanded;
-        const bodyEl = document.getElementById('preface-banner-body');
-        const textEl = bannerEl.querySelector('.toggle-text');
-        const iconEl = bannerEl.querySelector('.toggle-icon');
-        if (bodyEl) bodyEl.style.display = prefaceExpanded ? 'block' : 'none';
-        if (textEl) textEl.textContent = prefaceExpanded ? 'Сакриј молитве' : 'Прикажи уводне молитве';
-        if (iconEl) iconEl.textContent = prefaceExpanded ? '▲' : '▼';
+        prefaceExpanded = false;
+        renderPrefacePrayersBanner();
       });
     }
   }
