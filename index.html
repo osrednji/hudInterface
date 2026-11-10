@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>hudInteface</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -208,7 +208,7 @@
           <div class="psalter-layer-view" id="layer-psalms-view">
             <div class="layer-view-header">
               <div class="layer-title-group">
-                <button class="btn-back-layer" id="btn-back-to-katizmas">▲ Листа Катизама (↑)</button>
+                <button class="btn-back-layer" id="btn-back-to-katizmas"><span class="btn-back-icon">▲</span> <span class="btn-back-label">Листа Катизама</span> <span class="nav-key-hint">(↑)</span></button>
                 <h2 class="layer-title" id="layer-psalms-title"></h2>
                 <span class="layer-range-badge" id="layer-psalms-range"></span>
               </div>
@@ -223,14 +223,14 @@
           <div class="psalter-layer-view active" id="layer-single-view">
             <div class="psalter-reader-header">
               <div class="reader-header-left">
-                <button class="btn-back-layer" id="btn-return-psalms">▲ Псалми ове Катизме (↑)</button>
+                <button class="btn-back-layer" id="btn-return-psalms"><span class="btn-back-icon">▲</span> <span class="btn-back-label">Псалми</span> <span class="nav-key-hint">(↑)</span></button>
                 <span class="katizma-badge" id="reader-katizma-badge"></span>
                 <span class="psalm-range-badge" id="reader-range-badge"></span>
                 <button class="btn-preface-link" id="btn-preface-link" title="Отвори/затвори молитве пре читања Псалтира">☦ Молитве пре Псалтира</button>
               </div>
               <div class="reader-header-right">
-                <button class="reader-nav-btn" id="btn-prev-psalm" title="Претходни псалам (←)">◀ Претходни (←)</button>
-                <button class="reader-nav-btn primary" id="btn-next-psalm" title="Следећи псалам (→ или Space)">Следећи (→ / Space) ▶</button>
+                <button class="reader-nav-btn" id="btn-prev-psalm" title="Претходни псалам (←)"><span class="nav-btn-icon">◀</span> <span class="nav-btn-text">Претходни</span> <span class="nav-key-hint">(←)</span></button>
+                <button class="reader-nav-btn primary" id="btn-next-psalm" title="Следећи псалам (→ или Space)"><span class="nav-btn-text">Следећи</span> <span class="nav-btn-icon">▶</span> <span class="nav-key-hint">(→ / Space)</span></button>
               </div>
             </div>
 
