@@ -19,7 +19,7 @@
 
 /* Authentic Pirot Kilim Ribbon Pattern */
 .theme-serbian-orthodox .pirot-ribbon {
-  display: block;
+  display: none !important;
   height: 8px;
   width: 100%;
   flex-shrink: 0;

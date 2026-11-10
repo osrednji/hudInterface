@@ -2589,3 +2589,27 @@ mark.highlight {
 }
 
 .brand-status { display: none !important; }
+
+
+/* Hide colorful pirot-ribbon on Serbian themes */
+.theme-serbian-parchment .pirot-ribbon,
+.theme-serbian-orthodox .pirot-ribbon {
+  display: none !important;
+}
+
+/* Remove button [▲ Псалми] globally */
+#btn-return-psalms {
+  display: none !important;
+}
+
+/* Remove [📖 ПСАЛТИР /] from breadcrumb bar */
+.psalter-brand-badge {
+  display: none !important;
+}
+
+/* Remove bottom action cards and post-katizma banner */
+.prayer-nav-action-card,
+#post-katizma-banner,
+.post-katizma-container {
+  display: none !important;
+}

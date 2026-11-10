@@ -30,7 +30,7 @@ pub struct AppSettings {
     pub window_height: f64,
 }
 
-fn default_theme() -> String { "serbian-orthodox".into() }
+fn default_theme() -> String { "serbian-parchment".into() }
 fn default_module() -> String { "psalter".into() }
 fn default_one() -> u32 { 1 }
 fn default_layer() -> String { "single".into() }
