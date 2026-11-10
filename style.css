@@ -75,7 +75,8 @@ html, body {
 
 .theme-glyph-serbian,
 .theme-glyph-russian,
-.theme-glyph-byzantine {
+.theme-glyph-byzantine,
+.theme-glyph-jp {
   display: none;
 }
 
@@ -1891,3 +1892,333 @@ mark.highlight {
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
 }
 
+
+
+/* =========================================================
+   PSALTER INSTANT SEARCH & JUMP OVERLAY (Invisible until typing)
+   ========================================================= */
+.psalter-search-overlay {
+  position: absolute;
+  top: 50px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 99999;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 20px 24px;
+  animation: searchOverlayFadeIn 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes searchOverlayFadeIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.psalter-search-modal {
+  width: 100%;
+  max-width: 860px;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-card, #1c1d22);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.15));
+  border-radius: 12px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7);
+  max-height: calc(100vh - 90px);
+  overflow: hidden;
+}
+
+.psalter-search-box {
+  display: flex;
+  align-items: center;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  gap: 12px;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.search-box-icon {
+  font-size: 1.15rem;
+  opacity: 0.65;
+  user-select: none;
+}
+
+.psalter-search-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--text-main, #eee);
+  font-family: inherit;
+}
+
+.search-box-clear {
+  background: transparent;
+  border: none;
+  color: var(--text-muted, #888);
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+}
+
+.search-box-clear:hover {
+  color: var(--text-main, #fff);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.psalter-search-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 18px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  background: rgba(0, 0, 0, 0.18);
+  border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.06));
+  color: var(--text-muted, #999);
+}
+
+.search-scope-badge {
+  color: var(--primary-accent, #c9933e);
+  text-transform: uppercase;
+}
+
+.psalter-search-results {
+  overflow-y: auto;
+  max-height: 480px;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.psalter-search-results::-webkit-scrollbar {
+  width: 6px;
+}
+.psalter-search-results::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.psalter-search-item {
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  background: rgba(255, 255, 255, 0.02);
+  transition: all 0.12s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.psalter-search-item:hover,
+.psalter-search-item.selected {
+  background: var(--bg-hover, rgba(255, 255, 255, 0.08));
+  border-color: var(--primary-accent, #c9933e);
+}
+
+.search-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--primary-accent, #c9933e);
+}
+
+.search-lang-tag {
+  background: rgba(201, 147, 62, 0.15);
+  color: var(--primary-accent, #c9933e);
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  border: 1px solid rgba(201, 147, 62, 0.25);
+}
+
+.search-item-text {
+  font-size: 0.94rem;
+  line-height: 1.45;
+  color: var(--text-main, #ddd);
+}
+
+.search-item-parallel {
+  margin-top: 4px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.12);
+  border-left: 2px solid var(--primary-accent, #c9933e);
+  font-size: 0.88rem;
+  line-height: 1.4;
+  color: var(--text-muted, #aaa);
+}
+
+.search-parallel-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--primary-accent, #c9933e);
+  margin-bottom: 2px;
+}
+
+.search-highlight {
+  background: rgba(201, 147, 62, 0.35);
+  color: inherit;
+  font-weight: 700;
+  padding: 1px 3px;
+  border-radius: 2px;
+}
+
+.search-jump-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: rgba(201, 147, 62, 0.12);
+  border: 1px solid var(--primary-accent, #c9933e);
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+  transition: all 0.15s ease;
+}
+
+.search-jump-card:hover,
+.search-jump-card.selected {
+  background: rgba(201, 147, 62, 0.22);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.search-jump-icon {
+  font-size: 1.3rem;
+}
+
+.search-jump-label {
+  font-size: 1rem;
+  color: var(--text-main, #fff);
+}
+
+.search-jump-sub {
+  font-size: 0.8rem;
+  color: var(--text-muted, #aaa);
+  margin-left: auto;
+}
+
+.verse-highlight-flash {
+  animation: verseFlash 2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes verseFlash {
+  0% {
+    background-color: rgba(201, 147, 62, 0.45);
+    box-shadow: 0 0 16px rgba(201, 147, 62, 0.5);
+  }
+  100% {
+    background-color: transparent;
+    box-shadow: none;
+  }
+}
+
+/* Serbian Parchment specific theme tweaks */
+.theme-serbian-parchment .psalter-search-overlay {
+  background: rgba(24, 20, 16, 0.45);
+}
+.theme-serbian-parchment .psalter-search-modal {
+  background: #F4EAD8;
+  border-color: #C6363C;
+  color: #1E242B;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+}
+.theme-serbian-parchment .psalter-search-box {
+  background: #EFE4D0;
+  border-bottom-color: rgba(198, 54, 60, 0.2);
+}
+.theme-serbian-parchment .psalter-search-input {
+  color: #1E242B;
+}
+.theme-serbian-parchment .psalter-search-meta {
+  background: #EAE0CB;
+  border-bottom-color: rgba(198, 54, 60, 0.15);
+  color: #635345;
+}
+.theme-serbian-parchment .psalter-search-item {
+  background: rgba(0, 0, 0, 0.02);
+}
+.theme-serbian-parchment .psalter-search-item:hover,
+.theme-serbian-parchment .psalter-search-item.selected {
+  background: rgba(198, 54, 60, 0.08);
+  border-color: #C6363C;
+}
+.theme-serbian-parchment .search-item-text {
+  color: #1E242B;
+}
+.theme-serbian-parchment .search-item-header,
+.theme-serbian-parchment .search-scope-badge,
+.theme-serbian-parchment .search-parallel-label {
+  color: #C6363C;
+}
+.theme-serbian-parchment .search-lang-tag {
+  background: rgba(198, 54, 60, 0.1);
+  color: #C6363C;
+  border-color: rgba(198, 54, 60, 0.25);
+}
+.theme-serbian-parchment .search-item-parallel {
+  background: rgba(0, 0, 0, 0.04);
+  border-left-color: #C6363C;
+  color: #554433;
+}
+.theme-serbian-parchment .search-highlight {
+  background: rgba(198, 54, 60, 0.2);
+  color: #8C1C22;
+}
+.theme-serbian-parchment .search-jump-card {
+  background: rgba(198, 54, 60, 0.08);
+  border-color: #C6363C;
+}
+.theme-serbian-parchment .search-jump-label {
+  color: #1E242B;
+}
+
+
+/* Back to Psalms button in Notes */
+.btn-return-psalms {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: rgba(201, 147, 62, 0.15);
+  border: 1px solid var(--primary-accent, #c9933e);
+  color: var(--primary-accent, #c9933e);
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.btn-return-psalms:hover {
+  background: var(--primary-accent, #c9933e);
+  color: #1a1612;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+}
+
+.theme-serbian-parchment .btn-return-psalms {
+  background: rgba(198, 54, 60, 0.1);
+  border-color: #C6363C;
+  color: #C6363C;
+}
+
+.theme-serbian-parchment .btn-return-psalms:hover {
+  background: #C6363C;
+  color: #FAF6F0;
+}

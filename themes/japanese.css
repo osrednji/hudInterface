@@ -37,9 +37,12 @@
 
 /* Header & Brand */
 .theme-japanese .theme-glyph-cyber { display: none; }
-.theme-japanese .theme-glyph-jp { display: inline-block; }
+.theme-japanese .theme-glyph-jp { display: inline-block; font-size: 0.95rem; font-weight: 700; letter-spacing: 0.05em; line-height: 1; }
 
 .theme-japanese .brand-glyph {
+  width: auto;
+  min-width: 38px;
+  padding: 0 6px;
   background: rgba(211, 56, 56, 0.18);
   border: 1px solid rgba(211, 56, 56, 0.45);
   color: #e74c3c; /* Shu-iro Crimson */

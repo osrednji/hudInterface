@@ -39,171 +39,56 @@
           <span class="theme-glyph-serbian">☦</span>
           <span class="theme-glyph-russian">☦</span>
           <span class="theme-glyph-byzantine">☧</span>
-          <span class="theme-glyph-jp">虚</span>
+          <span class="theme-glyph-jp">詩篇</span>
           <span class="theme-glyph-cyber">HUD//01</span>
         </div>
         <div class="brand-meta">
-          <span class="brand-title">HUD INTERFACE</span>
-          <span class="brand-status" id="hud-status-indicator">READY</span>
+          <span class="brand-title">ПСАЛТИР</span>
+          <span class="brand-status" id="hud-status-indicator">СПРЕМАН</span>
         </div>
       </div>
 
       <!-- Navigation Bar (S, D, N shortcuts) -->
       <nav class="hud-nav" id="module-nav">
-        <button class="nav-btn active" data-module="search" title="File Search (Shortcut: S)">
-          <span class="nav-key">S</span>
-          <span class="nav-kanji">索</span>
-          <span class="nav-cyber">SRCH</span>
-          <span class="nav-serbian">ПОТР</span>
-          <span class="nav-russian">ПОИСК</span>
-          <span class="nav-byzantine">ΖΗΤ</span>
-          <span class="nav-label">Search</span>
+        <button class="nav-btn active" data-module="psalter" title="Псалтир (Пречица: P)">
+          <span class="nav-key">P</span>
+          <span class="nav-label">Псалтир</span>
         </button>
 
-        <button class="nav-btn" data-module="stats" title="System Stats (Shortcut: D)">
-          <span class="nav-key">D</span>
-          <span class="nav-kanji">統</span>
-          <span class="nav-cyber">STAT</span>
-          <span class="nav-serbian">СТАТ</span>
-          <span class="nav-russian">СТАТ</span>
-          <span class="nav-byzantine">ΣΤΑΤ</span>
-          <span class="nav-label">Telemetry</span>
-        </button>
-
-        <button class="nav-btn" data-module="notes" title="Notes Tool (Shortcut: N)">
+        <button class="nav-btn" data-module="notes" title="Белешке (Пречица: N)">
           <span class="nav-key">N</span>
-          <span class="nav-kanji">記</span>
-          <span class="nav-cyber">MEMO</span>
-          <span class="nav-serbian">БЕЛ</span>
-          <span class="nav-russian">ЗАП</span>
-          <span class="nav-byzantine">ΣΗΜ</span>
-          <span class="nav-label">Notes</span>
+          <span class="nav-label">Белешке</span>
         </button>
       </nav>
 
       <!-- Quick Action Badges -->
       <div class="header-actions">
-        <div class="theme-switch-pill" id="quick-theme-toggle" title="Right-click anywhere for Context Menu">
-          <span class="theme-pill-label">Theme</span>
-          <span class="theme-pill-active" id="active-theme-name">Japan</span>
-        </div>
-        <button class="action-btn hide-btn" id="btn-hide-hud" title="Save & Hide (Ctrl+Ctrl or Esc)">
+        <button class="action-btn hide-btn"  id="btn-hide-hud" title="Save & Hide (Ctrl+Ctrl or Esc)">
           <span class="btn-text">Hide</span>
           <kbd class="kbd-badge">Ctrl+Ctrl</kbd>
         </button>
       </div>
     </header>
 
-    <!-- Global Command & Search Bar (Present on Top of ALL Tabs) -->
-    <div class="search-bar-wrap global-search-bar" id="global-search-wrap">
-      <div class="search-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="11" cy="11" r="8"></circle>
-          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-        </svg>
-      </div>
-      <input type="text" id="search-input" class="search-input" placeholder="Search indexed files... (type 'note' ⇥ or 'telemetry' ⇥ to switch tabs)" autocomplete="off" spellcheck="false" />
-      <div id="tab-action-hint" class="tab-action-hint" style="display:none;"></div>
-      <div class="search-info">
-        <span id="search-counter" class="search-counter"></span>
-        <span id="indexer-status" class="indexer-badge">Indexed</span>
+    <!-- Psalter Search & Jump Overlay (Invisible until typing begins) -->
+    <div class="psalter-search-overlay" id="psalter-search-overlay" style="display: none;">
+      <div class="psalter-search-modal" id="psalter-search-modal">
+        <div class="psalter-search-box">
+          <span class="search-box-icon">🔍</span>
+          <input type="text" id="psalter-search-input" class="psalter-search-input" placeholder="Претражи текст Псалтира или укуцај број (нпр. 22, кат 3)..." autocomplete="off" spellcheck="false" />
+          <button class="search-box-clear" id="psalter-search-clear" title="Затвори (Esc)">✕</button>
+        </div>
+        <div class="psalter-search-meta" id="psalter-search-meta" style="display: none;">
+          <span id="psalter-search-scope" class="search-scope-badge"></span>
+          <span id="psalter-search-count" class="search-count-badge"></span>
+        </div>
+        <div class="psalter-search-results" id="psalter-search-results"></div>
       </div>
     </div>
 
     <!-- Main Viewport for Dynamic Modules -->
     <main class="hud-body">
       
-      <!-- ================= MODULE 1: FILE SEARCH RESULTS ONLY ================= -->
-      <section class="module-view active" id="view-search">
-        <div class="search-content-area">
-          <div class="search-results-list" id="search-results-container">
-            <!-- If no search or 0 results: NOTHING is shown -->
-          </div>
-        </div>
-      </section>
-
-      <!-- ================= MODULE 2: SYSTEM STATS ================= -->
-      <section class="module-view" id="view-stats">
-        <div class="stats-header-bar">
-          <div class="stats-title-block">
-            <h2 class="section-title">Hardware Telemetry &amp; Metrics</h2>
-            <span class="section-subtitle" id="stats-system-info">Windows System</span>
-          </div>
-          <div class="stats-uptime-badge">
-            <span class="uptime-label">UPTIME</span>
-            <span class="uptime-val" id="stats-uptime">0h 0m</span>
-          </div>
-        </div>
-
-        <div class="stats-grid">
-          <!-- CPU Card -->
-          <div class="stat-card">
-            <div class="card-top">
-              <span class="card-label">CPU LOAD</span>
-              <span class="card-val" id="cpu-percent">0%</span>
-            </div>
-            <div class="gauge-wrap">
-              <div class="bar-track">
-                <div class="bar-fill" id="cpu-bar" style="width: 0%"></div>
-              </div>
-            </div>
-            <div class="card-foot">
-              <span id="cpu-status-text">Processor Active</span>
-            </div>
-          </div>
-
-          <!-- RAM Card -->
-          <div class="stat-card">
-            <div class="card-top">
-              <span class="card-label">MEMORY LOAD</span>
-              <span class="card-val" id="ram-percent">0%</span>
-            </div>
-            <div class="gauge-wrap">
-              <div class="bar-track">
-                <div class="bar-fill" id="ram-bar" style="width: 0%"></div>
-              </div>
-            </div>
-            <div class="card-foot">
-              <span id="ram-details">0 GB / 0 GB Used</span>
-            </div>
-          </div>
-
-          <!-- Power / Battery Card -->
-          <div class="stat-card">
-            <div class="card-top">
-              <span class="card-label">POWER SUPPLY</span>
-              <span class="card-val" id="power-percent">100%</span>
-            </div>
-            <div class="gauge-wrap">
-              <div class="bar-track">
-                <div class="bar-fill" id="power-bar" style="width: 100%"></div>
-              </div>
-            </div>
-            <div class="card-foot">
-              <span id="power-status-text">AC Connected</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="stats-bottom-row">
-          <!-- Disk Drives -->
-          <div class="stat-panel drives-panel">
-            <h3 class="panel-heading">Storage Volumes</h3>
-            <div class="drives-list" id="drives-container">
-              <!-- Rendered via JS -->
-            </div>
-          </div>
-
-          <!-- Top Processes -->
-          <div class="stat-panel process-panel">
-            <h3 class="panel-heading">Top Active Processes</h3>
-            <div class="process-list" id="processes-container">
-              <!-- Rendered via JS -->
-            </div>
-          </div>
-        </div>
-      </section>
-
       <!-- ================= MODULE 3: NOTES TOOL ================= -->
       <section class="module-view" id="view-notes">
         <div class="notes-layout">
@@ -239,7 +124,7 @@
       </section>
 
       <!-- ================= MODULE 4: PSALTER (HIDDEN / STEALTH TAB) ================= -->
-      <section class="module-view" id="view-psalter">
+      <section class="module-view active" id="view-psalter">
         <div class="psalter-full-container">
           <!-- Layer Navigation Breadcrumb & Toolbar -->
           <div class="psalter-layer-bar">
@@ -299,7 +184,7 @@
           <div class="psalter-layer-view active" id="layer-single-view">
             <div class="psalter-reader-header">
               <div class="reader-header-left">
-                <button class="btn-back-layer" id="btn-back-to-psalms">▲ Псалми ове Катизме (↑)</button>
+                <button class="btn-back-layer" id="btn-return-psalms">▲ Псалми ове Катизме (↑)</button>
                 <span class="katizma-badge" id="reader-katizma-badge">Катизма 1</span>
                 <span class="psalm-range-badge" id="reader-range-badge">Пс. 1–8</span>
                 <button class="btn-preface-link" id="btn-preface-link" title="Отвори/затвори молитве пре читања Псалтира">☦ Молитве пре Псалтира</button>
@@ -334,7 +219,7 @@
 
             <div class="psalter-reader-footer">
               <div class="reader-footer-left">
-                <span class="reader-shortcut-hint">💡 <b>↑</b>: повратак на псалме • <b>← / →</b>: претходни/следећи псалам • <b>Space</b>: следећи псалам</span>
+                <span class="reader-shortcut-hint">💡 <b>↑ / ↓</b>: скроловање • <b>↑</b> (на врху): катизме • <b>← / →</b>: претходни/следећи псалам • <b>Space</b>: следећи псалам</span>
               </div>
               <div class="reader-footer-right">
                 <span class="psalm-counter" id="reader-psalm-counter">1 / 151</span>
@@ -349,10 +234,9 @@
     <!-- HUD Footer Status Bar -->
     <footer class="hud-footer">
       <div class="footer-left">
-        <span class="shortcut-tip"><kbd>S</kbd> Search</span>
-        <span class="shortcut-tip"><kbd>D</kbd> Stats</span>
-        <span class="shortcut-tip"><kbd>N</kbd> Notes</span>
-        <span class="shortcut-tip"><kbd>Esc</kbd> Hide</span>
+        <span class="shortcut-tip"><kbd>P</kbd> Псалтир</span>
+        <span class="shortcut-tip"><kbd>N</kbd> Белешке</span>
+        <span class="shortcut-tip"><kbd>Esc</kbd> Затвори</span>
       </div>
       <div class="footer-center">
         <span class="context-tip">Right-click anywhere for Context Menu</span>
@@ -374,27 +258,17 @@
 
     <!-- ================= CUSTOM RIGHT-CLICK CONTEXT MENU ================= -->
     <div id="hud-context-menu" class="hud-context-menu">
-      <div class="ctx-header">HUD INTERFACE COMMANDS</div>
+      <div class="ctx-header">ПСАЛТИР - МЕНИ</div>
       
-      <div class="ctx-item" data-action="switch_module" data-target="search">
-        <span class="ctx-icon">🔍</span>
-        <span class="ctx-text">File Search</span>
-        <span class="ctx-shortcut">S</span>
-      </div>
-      <div class="ctx-item" data-action="switch_module" data-target="stats">
-        <span class="ctx-icon">📊</span>
-        <span class="ctx-text">System Stats</span>
-        <span class="ctx-shortcut">D</span>
-      </div>
-      <div class="ctx-item" data-action="switch_module" data-target="notes">
-        <span class="ctx-icon">📝</span>
-        <span class="ctx-text">Quick Notes</span>
-        <span class="ctx-shortcut">N</span>
-      </div>
       <div class="ctx-item" data-action="switch_module" data-target="psalter">
         <span class="ctx-icon">📖</span>
         <span class="ctx-text">Свети Псалтир</span>
-        <span class="ctx-shortcut">psalm⇥</span>
+        <span class="ctx-shortcut">P</span>
+      </div>
+      <div class="ctx-item" data-action="switch_module" data-target="notes">
+        <span class="ctx-icon">📝</span>
+        <span class="ctx-text">Белешке</span>
+        <span class="ctx-shortcut">N</span>
       </div>
 
       <!-- Citation saving item (only visible when text selected in psalm) -->
@@ -443,48 +317,41 @@
 
       <div class="ctx-divider"></div>
 
-      <div class="ctx-label">AESTHETIC TEMPLATE</div>
-      <div class="ctx-item" data-action="change_theme" data-theme="serbian-orthodox">
-        <span class="ctx-icon">☦</span>
-        <span class="ctx-text">Serbian Orthodox (Тамни)</span>
-        <span class="ctx-check" id="check-serbian-orthodox"></span>
-      </div>
+      <div class="ctx-header">ТЕМА АПЛИКАЦИЈЕ</div>
       <div class="ctx-item" data-action="change_theme" data-theme="serbian-parchment">
         <span class="ctx-icon">📜</span>
-        <span class="ctx-text">Serbian Parchment (Пергамент)</span>
-        <span class="ctx-check" id="check-serbian-parchment"></span>
+        <span class="ctx-text">Српски (Пергамент)</span>
+        <span class="ctx-check" id="check-serbian-parchment">✓</span>
       </div>
       <div class="ctx-item" data-action="change_theme" data-theme="zastava">
         <span class="ctx-icon">🇷🇸</span>
-        <span class="ctx-text">Zastava (Српска тробојка)</span>
+        <span class="ctx-text">Српска тробојка</span>
         <span class="ctx-check" id="check-zastava"></span>
+      </div>
+      <div class="ctx-item" data-action="change_theme" data-theme="serbian-orthodox">
+        <span class="ctx-icon">☦</span>
+        <span class="ctx-text">Српски Православни (Злато)</span>
+        <span class="ctx-check" id="check-serbian-orthodox"></span>
       </div>
       <div class="ctx-item" data-action="change_theme" data-theme="russian-orthodox">
         <span class="ctx-icon">☦</span>
-        <span class="ctx-text">Russian Orthodox (Русский)</span>
+        <span class="ctx-text">Руски Православни</span>
         <span class="ctx-check" id="check-russian-orthodox"></span>
       </div>
       <div class="ctx-item" data-action="change_theme" data-theme="byzantine-orthodox">
         <span class="ctx-icon">☧</span>
-        <span class="ctx-text">Byzantine Orthodox (Βυζαντινό)</span>
+        <span class="ctx-text">Византијски Православни</span>
         <span class="ctx-check" id="check-byzantine-orthodox"></span>
       </div>
       <div class="ctx-item" data-action="change_theme" data-theme="japanese">
         <span class="ctx-icon">🌸</span>
-        <span class="ctx-text">Japanese Style</span>
-        <span class="ctx-check" id="check-japanese">✓</span>
+        <span class="ctx-text">Јапански стил</span>
+        <span class="ctx-check" id="check-japanese"></span>
       </div>
       <div class="ctx-item" data-action="change_theme" data-theme="cyberpunk">
         <span class="ctx-icon">⚡</span>
-        <span class="ctx-text">Cyberpunk Neon Style</span>
+        <span class="ctx-text">Сајберпанк стил</span>
         <span class="ctx-check" id="check-cyberpunk"></span>
-      </div>
-
-      <div class="ctx-divider"></div>
-
-      <div class="ctx-item" data-action="reindex">
-        <span class="ctx-icon">🔄</span>
-        <span class="ctx-text">Re-Index Files</span>
       </div>
       <div class="ctx-item" data-action="save_and_hide">
         <span class="ctx-icon">💾</span>

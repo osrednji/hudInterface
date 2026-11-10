@@ -16,7 +16,17 @@
     { id: 'cyberpunk', name: 'Cyber ⚡' }
   ];
   let currentTheme = 'serbian-orthodox';
-  let activeModuleId = 'search';
+  let activeModuleId = 'psalter';
+  // Psalter Fast In-Memory Search Index State
+  let psalterSearchIndex = {
+    serbian: [],
+    cs_cyrillic: [],
+    cs_old: [],
+    isReady: false
+  };
+  let activeSearchResults = [];
+  let selectedSearchResultIdx = -1;
+  let isSearchOverlayOpen = false;
   let pendingRequests = new Map();
   let searchDebounceTimer = null;
   let statsPollInterval = null;
@@ -63,29 +73,16 @@
   const footerIndexerLabel = document.getElementById('footer-indexer-label');
   const hudStatusIndicator = document.getElementById('hud-status-indicator');
 
-  // Search Elements
-  const globalSearchWrap = document.getElementById('global-search-wrap');
-  const searchInput = document.getElementById('search-input');
-  const searchCounter = document.getElementById('search-counter');
-  const indexerStatus = document.getElementById('indexer-status');
-  const tabActionHint = document.getElementById('tab-action-hint');
-  const searchResultsContainer = document.getElementById('search-results-container');
+  // Psalter Reader & Search Overlay Elements
   const readerInstructionContainer = document.getElementById('reader-instruction-container');
-
-  // Stats Elements
-  const statsSystemInfo = document.getElementById('stats-system-info');
-  const statsUptime = document.getElementById('stats-uptime');
-  const cpuPercent = document.getElementById('cpu-percent');
-  const cpuBar = document.getElementById('cpu-bar');
-  const cpuStatusText = document.getElementById('cpu-status-text');
-  const ramPercent = document.getElementById('ram-percent');
-  const ramBar = document.getElementById('ram-bar');
-  const ramDetails = document.getElementById('ram-details');
-  const powerPercent = document.getElementById('power-percent');
-  const powerBar = document.getElementById('power-bar');
-  const powerStatusText = document.getElementById('power-status-text');
-  const drivesContainer = document.getElementById('drives-container');
-  const processesContainer = document.getElementById('processes-container');
+  const psalterSearchOverlay = document.getElementById('psalter-search-overlay');
+  const psalterSearchModal = document.getElementById('psalter-search-modal');
+  const psalterSearchInput = document.getElementById('psalter-search-input');
+  const psalterSearchClear = document.getElementById('psalter-search-clear');
+  const psalterSearchMeta = document.getElementById('psalter-search-meta');
+  const psalterSearchScope = document.getElementById('psalter-search-scope');
+  const psalterSearchCount = document.getElementById('psalter-search-count');
+  const psalterSearchResults = document.getElementById('psalter-search-results');
 
   // Notes Elements
   const notesListContainer = document.getElementById('notes-list-container');
@@ -95,6 +92,7 @@
   const noteSaveBadge = document.getElementById('note-save-badge');
   const btnAddNote = document.getElementById('btn-add-note');
   const btnDeleteNote = document.getElementById('btn-delete-note');
+  const btnReturnPsalms = document.getElementById('btn-return-psalms');
 
   // Psalter Elements (3-Tier Full-Width Layer Architecture)
   const layerKatizmasView = document.getElementById('layer-katizmas-view');
@@ -233,16 +231,16 @@
     const validTheme = THEMES.find((t) => t.id === theme) || THEMES[0];
     currentTheme = validTheme.id;
     document.body.className = 'theme-' + currentTheme;
-    themeStylesheet.href = `themes/${currentTheme}.css`;
-    activeThemeName.textContent = validTheme.name;
+    if (themeStylesheet) themeStylesheet.href = `themes/${currentTheme}.css`;
+    if (activeThemeName) activeThemeName.textContent = validTheme.name;
 
-    if (checkSerbian) checkSerbian.textContent = currentTheme === 'serbian-orthodox' ? '✓' : '';
-    if (checkSerbianParchment) checkSerbianParchment.textContent = currentTheme === 'serbian-parchment' ? '✓' : '';
-    if (checkZastava) checkZastava.textContent = currentTheme === 'zastava' ? '✓' : '';
-    if (checkRussian) checkRussian.textContent = currentTheme === 'russian-orthodox' ? '✓' : '';
-    if (checkByzantine) checkByzantine.textContent = currentTheme === 'byzantine-orthodox' ? '✓' : '';
-    if (checkJapanese) checkJapanese.textContent = currentTheme === 'japanese' ? '✓' : '';
-    if (checkCyberpunk) checkCyberpunk.textContent = currentTheme === 'cyberpunk' ? '✓' : '';
+    if (checkSerbian) checkSerbian.textContent = (currentTheme === 'serbian-orthodox') ? '✓' : '';
+    if (checkSerbianParchment) checkSerbianParchment.textContent = (currentTheme === 'serbian-parchment') ? '✓' : '';
+    if (checkZastava) checkZastava.textContent = (currentTheme === 'zastava') ? '✓' : '';
+    if (checkRussian) checkRussian.textContent = (currentTheme === 'russian-orthodox') ? '✓' : '';
+    if (checkByzantine) checkByzantine.textContent = (currentTheme === 'byzantine-orthodox') ? '✓' : '';
+    if (checkJapanese) checkJapanese.textContent = (currentTheme === 'japanese') ? '✓' : '';
+    if (checkCyberpunk) checkCyberpunk.textContent = (currentTheme === 'cyberpunk') ? '✓' : '';
 
     logToHost(`Applied theme: ${currentTheme}`);
   }
@@ -260,7 +258,10 @@
   // ========================================================
 
   function switchModule(targetId) {
-    if (!targetId) return;
+    if (!targetId) targetId = 'psalter';
+    if (targetId !== 'notes' && targetId !== 'psalter') {
+      targetId = 'psalter';
+    }
 
     // If leaving psalter reader, save current scroll position
     if (activeModuleId === 'psalter' && targetId !== 'psalter') {
@@ -284,33 +285,7 @@
       view.classList.toggle('active', match);
     });
 
-    if (targetId !== 'stats' && statsPollInterval) {
-      clearInterval(statsPollInterval);
-      statsPollInterval = null;
-    }
-
-    // Search bar is visible ONLY on the Search tab
-    if (globalSearchWrap) {
-      globalSearchWrap.style.display = (targetId === 'search') ? 'flex' : 'none';
-    }
-
-    if (targetId === 'search') {
-      setTimeout(() => {
-        if (searchInput) {
-          searchInput.focus();
-          if (searchInput.value.trim().length > 0) {
-            performSearch(searchInput.value.trim());
-          } else {
-            renderEmptySearchState();
-          }
-        }
-      }, 50);
-    } else if (targetId === 'stats') {
-      refreshStats();
-      if (!statsPollInterval) {
-        statsPollInterval = setInterval(refreshStats, 2000);
-      }
-    } else if (targetId === 'notes') {
+    if (targetId === 'notes') {
       loadNotes();
       setTimeout(() => {
         if (noteContentInput) {
@@ -318,7 +293,6 @@
         }
       }, 60);
     } else if (targetId === 'psalter') {
-      if (searchInput) searchInput.blur();
       loadPsalter();
     }
   }
@@ -326,36 +300,19 @@
   function onHudOpened(preferredModule) {
     window.focus();
     logToHost(`onHudOpened: preferred=${preferredModule}`);
-    if (preferredModule) {
-      switchModule(preferredModule);
-    } else {
-      if (activeModuleId === 'psalter' && psalterLayer === 'single') {
-        // Restore scroll on reopening HUD on psalter
-        requestAnimationFrame(() => {
-          if (psalterReaderScroll) {
-            const targetScroll = psalmScrollPositions[currentPsalmNumber] !== undefined
-              ? psalmScrollPositions[currentPsalmNumber]
-              : currentPsalmScrollPos;
-            psalterReaderScroll.scrollTop = targetScroll;
-            logToHost(`onHudOpened restored scroll to ${targetScroll}`);
-          }
-        });
-      } else {
-        switchModule(activeModuleId || 'search');
-      }
-    }
+    const mod = (preferredModule === 'notes') ? 'notes' : 'psalter';
+    switchModule(mod);
 
-    if (activeModuleId === 'search') {
-      setTimeout(() => {
-        if (searchInput) {
-          searchInput.focus();
-          if (searchInput.value.trim().length > 0) {
-            searchInput.select();
-          } else {
-            renderEmptySearchState();
-          }
+    if (mod === 'psalter' && psalterLayer === 'single') {
+      requestAnimationFrame(() => {
+        if (psalterReaderScroll) {
+          const targetScroll = psalmScrollPositions[currentPsalmNumber] !== undefined
+            ? psalmScrollPositions[currentPsalmNumber]
+            : currentPsalmScrollPos;
+          psalterReaderScroll.scrollTop = targetScroll;
+          logToHost(`onHudOpened restored scroll to ${targetScroll}`);
         }
-      }, 50);
+      });
     }
   }
 
@@ -371,52 +328,102 @@
 
   window.focusHudSearch = function () {
     window.focus();
-    if (searchInput) {
-      searchInput.focus();
-      searchInput.select();
-    }
   };
 
   // ========================================================
   // Global Keyboard Shortcuts
   // ========================================================
 
-  document.addEventListener('keydown', (e) => {
-    logToHost(`Global Keydown: key=${e.key}, alt=${e.altKey}, ctrl=${e.ctrlKey}, target=${e.target?.tagName}`);
+  // ========================================================
+  // Global Keyboard Shortcuts
+  // ========================================================
 
-    // 1. Esc hides HUD and triggers save
+  document.addEventListener('keydown', (e) => {
+    // 1. Esc key handling
     if (e.key === 'Escape') {
       e.preventDefault();
-      closeContextMenu();
+      if (isSearchOverlayOpen) {
+        closeSearchOverlay();
+        return;
+      }
+      if (contextMenu && contextMenu.classList.contains('open')) {
+        closeContextMenu();
+        return;
+      }
       saveAndHideHud();
       return;
     }
 
-    // 2. Alt + S / D / N or Ctrl + S / D / N
+    // 2. Alt + P / N or Ctrl + P / N to switch between Psalter and Notes
     if ((e.altKey || e.ctrlKey) && !e.shiftKey) {
       const key = e.key.toLowerCase();
-      if (key === 's') { e.preventDefault(); switchModule('search'); return; }
-      if (key === 'd') { e.preventDefault(); switchModule('stats'); return; }
+      if (key === 'p') { e.preventDefault(); switchModule('psalter'); return; }
       if (key === 'n') { e.preventDefault(); switchModule('notes'); return; }
+    }
+
+    // If Search overlay is open, keyboard navigation inside overlay
+    if (isSearchOverlayOpen) {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        moveSearchResultSelection(1);
+        return;
+      }
+      if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        moveSearchResultSelection(-1);
+        return;
+      }
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        selectActiveSearchResult();
+        return;
+      }
+      return;
     }
 
     // 3. Navigation in Psalter module (Arrow keys, Space key, Enter key)
     if (activeModuleId === 'psalter') {
-      const isSearchTyping = document.activeElement === searchInput && searchInput.value.trim().length > 0;
-      if (!isSearchTyping) {
+      const activeEl = document.activeElement;
+      const tag = (activeEl && activeEl.tagName) || '';
+      const isInput = tag === 'INPUT' || tag === 'TEXTAREA' || activeEl?.isContentEditable;
+
+      if (!isInput) {
         if (e.key === ' ' || e.code === 'Space') {
           e.preventDefault();
           psalterOnSpaceKey();
           return;
         }
-        if (e.key === 'ArrowUp') {
-          e.preventDefault();
-          psalterGoUpLayer();
-          return;
-        }
         if (e.key === 'ArrowDown') {
           e.preventDefault();
-          psalterGoDownLayer();
+          if (psalterLayer === 'single') {
+            if (psalterReaderScroll) {
+              psalterReaderScroll.scrollBy({ top: 70, behavior: 'auto' });
+            }
+          } else {
+            psalterGoDownLayer();
+          }
+          return;
+        }
+        if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          if (psalterLayer === 'single') {
+            const curScroll = psalterReaderScroll ? psalterReaderScroll.scrollTop : 0;
+            if (curScroll > 5) {
+              if (psalterReaderScroll) {
+                psalterReaderScroll.scrollBy({ top: -70, behavior: 'auto' });
+              }
+              return;
+            }
+            // User reached the top
+            // If holding the key (e.repeat is true), stay at the top and do not exit
+            if (e.repeat) {
+              return;
+            }
+            // Key was released and pressed again while at the top -> exit to overview
+            psalterGoUpLayer();
+          } else {
+            psalterGoUpLayer();
+          }
           return;
         }
         if (e.key === 'ArrowLeft') {
@@ -437,357 +444,590 @@
       }
     }
 
-    // 4. Typing on ANY tab immediately switches to Search tab and starts searching
+    // 4. Typing any letter or number immediately opens the invisible search overlay
     const activeEl = document.activeElement;
     const tag = (activeEl && activeEl.tagName) || '';
     const isTyping = tag === 'INPUT' || tag === 'TEXTAREA' || activeEl?.isContentEditable;
 
-    if (!isTyping && !e.ctrlKey && !e.metaKey && !e.altKey && e.key.length === 1) {
-      e.preventDefault();
-      switchModule('search');
-      if (searchInput) {
-        searchInput.value = e.key;
-        searchInput.focus();
-        updateTabHint(e.key);
-        clearTimeout(searchDebounceTimer);
-        searchDebounceTimer = setTimeout(() => {
-          performSearch(e.key);
-        }, 120);
-      }
-      return;
-    }
+    // Navigation keys that must NOT trigger search:
+    const navKeys = [
+      'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',
+      'PageUp', 'PageDown', 'Home', 'End',
+      'Tab', 'Escape', 'Enter', ' ', 'Space',
+      'F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12'
+    ];
 
-    if (!isTyping && e.key === 'Backspace' && activeModuleId !== 'search') {
-      e.preventDefault();
-      switchModule('search');
-      if (searchInput) searchInput.focus();
-      return;
+    if (!isTyping && !isSearchOverlayOpen && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      if (!navKeys.includes(e.key) && e.key.length === 1) {
+        e.preventDefault();
+        openSearchOverlay(e.key);
+        return;
+      }
     }
   });
 
   // ========================================================
-  // Search Bar with Tab / Enter Command Completion
+  // Psalter Fast In-Memory Search Index & Search Bar Overlay
   // ========================================================
 
-  function updateTabHint(text) {
-    if (!tabActionHint) return;
-    const clean = text.trim().toLowerCase();
-    if (clean === 'note' || clean === 'notes' || clean === 'n') {
-      tabActionHint.textContent = '⇥ Tab to open Notes';
-      tabActionHint.style.display = 'block';
-    } else if (clean === 'telemetry' || clean === 'stats' || clean === 'tele' || clean === 'd') {
-      tabActionHint.textContent = '⇥ Tab to open Telemetry';
-      tabActionHint.style.display = 'block';
-    } else if (clean === 'search' || clean === 's') {
-      tabActionHint.textContent = '⇥ Tab to open Search';
-      tabActionHint.style.display = 'block';
-    } else if (clean === 'psalm' || clean === 'psalms' || clean === 'psaltir' || clean === 'ps' || clean === 'псалам' || clean === 'псалтир') {
-      tabActionHint.textContent = '⇥ Tab to open Psalter (Псалтир)';
-      tabActionHint.style.display = 'block';
-    } else {
-      tabActionHint.style.display = 'none';
+  function normalizeForSearch(text) {
+    if (!text) return '';
+    let s = String(text).toLowerCase();
+
+    // Transliterate Latin Serbian characters to Cyrillic
+    const latinMap = [
+      ['dž', 'џ'], ['dż', 'џ'], ['lj', 'љ'], ['nj', 'њ'], ['dj', 'ђ'],
+      ['ch', 'ч'], ['sh', 'ш'], ['zh', 'ж'],
+      ['a', 'а'], ['b', 'б'], ['v', 'в'], ['g', 'г'], ['d', 'д'],
+      ['đ', 'ђ'], ['e', 'е'], ['ž', 'ж'], ['z', 'з'], ['i', 'и'],
+      ['j', 'ј'], ['k', 'к'], ['l', 'л'], ['m', 'м'], ['n', 'н'],
+      ['o', 'о'], ['p', 'п'], ['r', 'р'], ['s', 'с'], ['t', 'т'],
+      ['ć', 'ћ'], ['u', 'у'], ['f', 'ф'], ['h', 'х'], ['c', 'ц'],
+      ['č', 'ч'], ['š', 'ш']
+    ];
+    for (let i = 0; i < latinMap.length; i++) {
+      s = s.split(latinMap[i][0]).join(latinMap[i][1]);
     }
+
+    // Strip combining diacritical marks & titlos
+    s = s.normalize('NFD').replace(/[\u0300-\u036f\u0483-\u0489]/g, '');
+
+    // Normalize Church Slavonic letters to standard searchable Cyrillic
+    s = s.replace(/ѡ/g, 'о')
+         .replace(/ѿ/g, 'от')
+         .replace(/ѣ/g, 'е')
+         .replace(/ѧ/g, 'ја')
+         .replace(/ѩ/g, 'ја')
+         .replace(/ѫ/g, 'у')
+         .replace(/Ѭ/g, 'ју')
+         .replace(/ѯ/g, 'кс')
+         .replace(/ѱ/g, 'пс')
+         .replace(/ѳ/g, 'ф')
+         .replace(/ѵ/g, 'и')
+         .replace(/[їі]/g, 'и')
+         .replace(/ꙋ/g, 'у')
+         .replace(/[ъь]/g, '')
+         .replace(/[\.,:;!?'"()\[\]\-\—\–\/]/g, ' ');
+
+    return s.replace(/\s+/g, ' ').trim();
   }
 
-  function handleCommandTabOrEnter(inputVal) {
-    clearTimeout(searchDebounceTimer);
-    renderEmptySearchState();
-
-    const raw = inputVal.trim().toLowerCase();
-    if (raw === 'note' || raw === 'notes' || raw.startsWith('not') || raw === 'n') {
-      searchInput.value = '';
-      updateTabHint('');
-      switchModule('notes');
-      return true;
+  function getActiveSearchLangs() {
+    if (psalterParallelModes && psalterParallelModes.length > 0) {
+      const list = [currentPsalterLanguage || 'serbian'];
+      for (const m of psalterParallelModes) {
+        if (!list.includes(m)) list.push(m);
+      }
+      return list;
     }
-    if (raw === 'telemetry' || raw === 'stats' || raw.startsWith('tele') || raw === 'd') {
-      searchInput.value = '';
-      updateTabHint('');
-      switchModule('stats');
-      return true;
-    }
-    if (raw === 'search' || raw.startsWith('sear') || raw === 's') {
-      searchInput.value = '';
-      updateTabHint('');
-      switchModule('search');
-      return true;
-    }
-    if (raw === 'psalm' || raw === 'psalms' || raw === 'psaltir' || raw === 'ps' || raw.startsWith('psalm') || raw.startsWith('psalt') || raw === 'псалам' || raw === 'псалтир') {
-      searchInput.value = '';
-      updateTabHint('');
-      switchModule('psalter');
-      return true;
-    }
-    return false;
+    return [currentPsalterLanguage || 'serbian'];
   }
 
-  searchInput.addEventListener('input', (e) => {
-    clearTimeout(searchDebounceTimer);
-    const query = e.target.value;
-    const trimmed = query.trim();
+  function getLangDisplayName(lang) {
+    if (lang === 'serbian') return 'Српски';
+    if (lang === 'cs_cyrillic') return 'Црквенословенски ћирилица';
+    if (lang === 'cs_old') return 'Црквенословенски';
+    return lang;
+  }
 
-    updateTabHint(query);
+  function buildPsalterSearchIndex() {
+    if (!psalterData) return;
+    const newIdx = {
+      serbian: [],
+      cs_cyrillic: [],
+      cs_old: [],
+      isReady: false
+    };
 
-    if (!trimmed) {
-      renderEmptySearchState();
-      return;
-    }
-
-    const cleanCmd = trimmed.toLowerCase();
-    const isPendingCmd = cleanCmd === 'note' || cleanCmd === 'notes' || cleanCmd === 'telemetry' || cleanCmd === 'stats' || cleanCmd === 'search' || cleanCmd === 'psalm' || cleanCmd === 'psalms' || cleanCmd === 'psaltir' || cleanCmd === 'ps' || cleanCmd === 'псалам' || cleanCmd === 'псалтир';
-    if (!isPendingCmd && activeModuleId !== 'search') {
-      switchModule('search');
-    }
-
-    searchDebounceTimer = setTimeout(() => {
-      performSearch(trimmed);
-    }, 120);
-  });
-
-  searchInput.addEventListener('keydown', (e) => {
-    logToHost(`searchInput keydown: key=${e.key}, value="${searchInput.value}"`);
-
-    // Tab Completion for 'note<tab>' and 'telemetry<tab>'
-    if (e.key === 'Tab') {
-      const handled = handleCommandTabOrEnter(searchInput.value);
-      if (handled) {
-        e.preventDefault();
-        e.stopPropagation();
-        return;
-      }
-    }
-
-    // Enter can also execute the tab command or open first result
-    if (e.key === 'Enter') {
-      const handled = handleCommandTabOrEnter(searchInput.value);
-      if (handled) {
-        e.preventDefault();
-        e.stopPropagation();
-        return;
-      }
-
-      const firstResult = searchResultsContainer.querySelector('.result-card');
-      if (firstResult) {
-        const path = firstResult.dataset.path;
-        if (e.ctrlKey) {
-          revealFile(path);
-        } else {
-          openFile(path);
+    const katizmas = psalterData.katizmas || [];
+    for (const k of katizmas) {
+      const kNum = k.number || k.Number || 1;
+      const psalms = k.psalms || k.Psalms || [];
+      for (const p of psalms) {
+        const pNum = p.number || p.Number || p.id;
+        const verses = p.verses || p.Verses || [];
+        for (let idx = 0; idx < verses.length; idx++) {
+          const v = verses[idx];
+          newIdx.serbian.push({
+            lang: 'serbian',
+            psalmNumber: pNum,
+            katizmaNumber: kNum,
+            verseIndex: idx,
+            verseNum: v.num || '',
+            text: v.text || '',
+            normalized: normalizeForSearch(v.text)
+          });
         }
       }
     }
-  });
 
-  async function performSearch(query) {
-    const trimmed = (query || '').trim();
-    if (!trimmed) {
-      renderEmptySearchState();
-      return;
+    function findKatizmaForPsalm(pNum) {
+      for (const k of katizmas) {
+        const kNum = k.number || k.Number;
+        const pList = k.psalms || k.Psalms || [];
+        if (pList.some((p) => (p.number || p.Number || p.id) === pNum)) return kNum;
+      }
+      return 1;
     }
 
-    searchCounter.textContent = 'Searching...';
-    const results = await callModule('search', 'search', { query: trimmed });
-
-    // Ensure search input hasn't been cleared or changed while searching
-    if (!searchInput.value.trim() || searchInput.value.trim().toLowerCase() !== trimmed.toLowerCase()) {
-      return;
+    if (psalmsCsCyrillic) {
+      for (const [pKey, pObj] of Object.entries(psalmsCsCyrillic)) {
+        const pNum = parseInt(pKey, 10);
+        if (!pNum || !pObj.verses) continue;
+        const kNum = findKatizmaForPsalm(pNum);
+        for (let idx = 0; idx < pObj.verses.length; idx++) {
+          const v = pObj.verses[idx];
+          newIdx.cs_cyrillic.push({
+            lang: 'cs_cyrillic',
+            psalmNumber: pNum,
+            katizmaNumber: kNum,
+            verseIndex: idx,
+            verseNum: v.num || '',
+            text: v.text || '',
+            normalized: normalizeForSearch(v.text)
+          });
+        }
+      }
     }
 
-    renderSearchResults(results || [], trimmed);
+    if (psalmsCsOld) {
+      for (const [pKey, pObj] of Object.entries(psalmsCsOld)) {
+        const pNum = parseInt(pKey, 10);
+        if (!pNum || !pObj.verses) continue;
+        const kNum = findKatizmaForPsalm(pNum);
+        for (let idx = 0; idx < pObj.verses.length; idx++) {
+          const v = pObj.verses[idx];
+          newIdx.cs_old.push({
+            lang: 'cs_old',
+            psalmNumber: pNum,
+            katizmaNumber: kNum,
+            verseIndex: idx,
+            verseNum: v.num || '',
+            text: v.text || '',
+            normalized: normalizeForSearch(v.text)
+          });
+        }
+      }
+    }
+
+    newIdx.isReady = true;
+    psalterSearchIndex = newIdx;
+    const totalCount = newIdx.serbian.length + newIdx.cs_cyrillic.length + newIdx.cs_old.length;
+    logToHost(`Built in-memory search index with ${totalCount} verses`);
+    if (footerIndexerLabel) footerIndexerLabel.textContent = `Псалтир индексиран (${totalCount} стихова)`;
+    if (hudStatusIndicator) hudStatusIndicator.textContent = 'СПРЕМАН';
   }
 
-  function renderSearchResults(results, query) {
-    // If no search results: NOTHING should be shown
-    if (!results || results.length === 0) {
-      searchCounter.textContent = '0 results';
-      searchResultsContainer.innerHTML = '';
-      return;
-    }
-
-    searchCounter.textContent = `${results.length} result${results.length > 1 ? 's' : ''}`;
-    let html = '';
-
-    for (const item of results) {
-      const fileName = item.fileName || item.FileName || 'Untitled File';
-      const filePath = item.filePath || item.FilePath || '';
-      const directoryPath = item.directoryPath || item.DirectoryPath || '';
-      const rawExt = item.extension || item.Extension || '';
-      const ext = rawExt ? rawExt.replace('.', '').toUpperCase() : 'FILE';
-      const formattedSize = item.formattedSize || item.FormattedSize || '';
-      const lastModified = item.lastModified || item.LastModified || '';
-      const excerpts = item.excerpts || item.Excerpts || [];
-
-      let excerptsHtml = '';
-      if (excerpts && excerpts.length > 0) {
-        excerptsHtml = '<div class="excerpts-box">';
-        for (const ex of excerpts) {
-          const lineNo = ex.lineNumber ?? ex.LineNumber ?? 1;
-          const snippet = ex.snippet ?? ex.Snippet ?? '';
-          const matchStart = ex.matchStart ?? ex.MatchStart ?? 0;
-          const matchLength = ex.matchLength ?? ex.MatchLength ?? 0;
-
-          const highlighted = highlightExcerpt(snippet, matchStart, matchLength);
-          excerptsHtml += `
-            <div class="excerpt-line">
-              <span class="line-no">L${lineNo}</span>
-              <span class="snippet-text">${highlighted}</span>
-            </div>
-          `;
-        }
-        excerptsHtml += '</div>';
+  function openSearchOverlay(initialChar = '') {
+    if (!psalterSearchOverlay) return;
+    isSearchOverlayOpen = true;
+    psalterSearchOverlay.style.display = 'flex';
+    if (psalterSearchInput) {
+      psalterSearchInput.value = initialChar;
+      psalterSearchInput.focus();
+      if (initialChar) {
+        executePsalterSearch(initialChar);
+      } else {
+        renderSearchInitialPrompt();
       }
+    }
+  }
 
-      html += `
-        <div class="result-card" data-path="${escapeHtml(filePath)}">
-          <div class="result-card-top">
-            <div class="file-info-group">
-              <span class="file-ext-badge">${escapeHtml(ext)}</span>
-              <span class="file-name">${escapeHtml(fileName)}</span>
-            </div>
-            <div class="file-meta">
-              <span>${escapeHtml(formattedSize)}</span>
-              <span>${escapeHtml(lastModified)}</span>
-            </div>
-          </div>
-          <div class="file-path">${escapeHtml(directoryPath)}</div>
-          ${excerptsHtml}
+  function closeSearchOverlay() {
+    if (!psalterSearchOverlay) return;
+    isSearchOverlayOpen = false;
+    psalterSearchOverlay.style.display = 'none';
+    if (psalterSearchInput) psalterSearchInput.value = '';
+    activeSearchResults = [];
+    selectedSearchResultIdx = -1;
+    if (psalterSearchMeta) psalterSearchMeta.style.display = 'none';
+    if (psalterSearchResults) psalterSearchResults.innerHTML = '';
+  }
+
+  if (psalterSearchClear) {
+    psalterSearchClear.addEventListener('click', () => {
+      closeSearchOverlay();
+    });
+  }
+
+  if (psalterSearchOverlay) {
+    psalterSearchOverlay.addEventListener('click', (e) => {
+      if (e.target === psalterSearchOverlay) {
+        closeSearchOverlay();
+      }
+    });
+  }
+
+  if (psalterSearchInput) {
+    psalterSearchInput.addEventListener('input', (e) => {
+      const val = e.target.value;
+      if (!val || !val.trim()) {
+        closeSearchOverlay();
+        return;
+      }
+      clearTimeout(searchDebounceTimer);
+      searchDebounceTimer = setTimeout(() => {
+        executePsalterSearch(val.trim());
+      }, 70);
+    });
+
+    psalterSearchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Backspace' && psalterSearchInput.value === '') {
+        e.preventDefault();
+        closeSearchOverlay();
+        return;
+      }
+    });
+  }
+
+  function renderSearchInitialPrompt() {
+    if (psalterSearchMeta) psalterSearchMeta.style.display = 'none';
+    if (psalterSearchResults) {
+      psalterSearchResults.innerHTML = `
+        <div class="search-empty-state">
+          Укуцајте реч, број псалма (нпр. <b>22</b> или <b>псалам 47</b>) или катизме (нпр. <b>кат 3</b>)...
         </div>
       `;
     }
+  }
 
-    searchResultsContainer.innerHTML = html;
+  function getParallelVerseFor(psalmNumber, verseIndex, fromLang, toLang) {
+    const psalmObj = (psalterData && psalterData.katizmas)
+      ? psalterData.katizmas.flatMap((k) => k.psalms || []).find((p) => (p.number || p.Number || p.id) === psalmNumber)
+      : null;
+    const toVerses = getVersesForLang(toLang, psalmNumber, psalmObj);
+    if (!toVerses || toVerses.length === 0) return null;
 
-    searchResultsContainer.querySelectorAll('.result-card').forEach((card) => {
-      card.addEventListener('click', (e) => {
-        const path = card.dataset.path;
-        if (e.ctrlKey) {
-          revealFile(path);
-        } else {
-          openFile(path);
+    const aligns = (psalmAlignments && psalmAlignments[String(psalmNumber)])
+      || (window.psalmAlignments && window.psalmAlignments[String(psalmNumber)])
+      || 'default';
+
+    if (Array.isArray(aligns)) {
+      // Find row matching fromLang and verseIndex
+      for (let r = 0; r < aligns.length; r++) {
+        const row = aligns[r];
+        let matched = false;
+        if (fromLang === 'serbian' && row[0] === verseIndex) matched = true;
+        else if (fromLang === 'cs_cyrillic' && row[1] === verseIndex) matched = true;
+        else if (fromLang === 'cs_old' && row[2] === verseIndex) matched = true;
+
+        if (matched) {
+          let targetData = null;
+          if (toLang === 'serbian') targetData = row[0];
+          else if (toLang === 'cs_cyrillic') targetData = row[1];
+          else if (toLang === 'cs_old') targetData = row[2];
+
+          if (typeof targetData === 'number') {
+            return toVerses[targetData] || null;
+          } else if (targetData && typeof targetData === 'object') {
+            return targetData;
+          }
         }
+      }
+    }
+
+    return toVerses[verseIndex] || null;
+  }
+
+  function highlightMatches(text, queryTokens) {
+    if (!text) return '';
+    if (!queryTokens || queryTokens.length === 0) return escapeHtml(text);
+
+    // Escape tokens for regex
+    const validTokens = queryTokens
+      .map((t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+      .filter((t) => t.length > 0);
+
+    if (validTokens.length === 0) return escapeHtml(text);
+
+    try {
+      const regex = new RegExp(`(${validTokens.join('|')})`, 'gi');
+      const parts = text.split(regex);
+      return parts.map((part) => {
+        if (validTokens.some((tok) => tok.toLowerCase() === part.toLowerCase())) {
+          return `<mark class="search-highlight">${escapeHtml(part)}</mark>`;
+        }
+        return escapeHtml(part);
+      }).join('');
+    } catch (e) {
+      return escapeHtml(text);
+    }
+  }
+
+  function executePsalterSearch(query) {
+    const raw = (query || '').trim();
+    if (!raw) {
+      closeSearchOverlay();
+      return;
+    }
+
+    // 1. Direct Jump Recognizer (number, "psalam X", "katizma Y")
+    const jumpResults = [];
+    const numOnlyMatch = raw.match(/^(\d+)$/);
+    if (numOnlyMatch) {
+      const n = parseInt(numOnlyMatch[1], 10);
+      if (n >= 1 && n <= 151) {
+        jumpResults.push({
+          type: 'psalm',
+          psalmNumber: n,
+          title: `Псалам ${n}`,
+          desc: `Директан скок на Псалам ${n}`
+        });
+      }
+      if (n >= 1 && n <= 20) {
+        jumpResults.push({
+          type: 'katizma',
+          katizmaNumber: n,
+          title: `Катизма ${n}`,
+          desc: `Отвори Катизму ${n} (групу псалама)`
+        });
+      }
+    }
+
+    const psalmKeywordMatch = raw.match(/^(?:псалам|psalam|ps|п)\s*(\d+)$/i);
+    if (psalmKeywordMatch) {
+      const n = parseInt(psalmKeywordMatch[1], 10);
+      if (n >= 1 && n <= 151) {
+        jumpResults.push({
+          type: 'psalm',
+          psalmNumber: n,
+          title: `Псалам ${n}`,
+          desc: `Директан скок на Псалам ${n}`
+        });
+      }
+    }
+
+    const katizmaKeywordMatch = raw.match(/^(?:катизма|katizma|кат|к)\s*(\d+)$/i);
+    if (katizmaKeywordMatch) {
+      const n = parseInt(katizmaKeywordMatch[1], 10);
+      if (n >= 1 && n <= 20) {
+        jumpResults.push({
+          type: 'katizma',
+          katizmaNumber: n,
+          title: `Катизма ${n}`,
+          desc: `Отвори Катизму ${n}`
+        });
+      }
+    }
+
+    // 2. Full-Text Search across active languages
+    const activeLangs = getActiveSearchLangs();
+    const isComparative = (psalterParallelModes && psalterParallelModes.length > 0);
+    const normalizedQ = normalizeForSearch(raw);
+    const tokens = normalizedQ.split(' ').filter((t) => t.length > 0);
+
+    const verseResults = [];
+    if (tokens.length > 0 && psalterSearchIndex.isReady) {
+      for (const lang of activeLangs) {
+        const pool = psalterSearchIndex[lang] || [];
+        for (const item of pool) {
+          // Check if query matches
+          let matched = false;
+          let score = 0;
+
+          if (item.normalized.includes(normalizedQ)) {
+            matched = true;
+            score = 100;
+          } else {
+            const allTokensPresent = tokens.every((tok) => item.normalized.includes(tok));
+            if (allTokensPresent) {
+              matched = true;
+              score = 50;
+            }
+          }
+
+          if (matched) {
+            verseResults.push({
+              type: 'verse',
+              score,
+              item,
+              tokens
+            });
+          }
+        }
+      }
+
+      // Sort: highest score first, then psalm asc, verse asc
+      verseResults.sort((a, b) => {
+        if (b.score !== a.score) return b.score - a.score;
+        if (a.item.psalmNumber !== b.item.psalmNumber) return a.item.psalmNumber - b.item.psalmNumber;
+        return a.item.verseIndex - b.item.verseIndex;
+      });
+    }
+
+    // Take top 40 results
+    const topVerseResults = verseResults.slice(0, 40);
+    activeSearchResults = [...jumpResults, ...topVerseResults];
+    selectedSearchResultIdx = activeSearchResults.length > 0 ? 0 : -1;
+
+    renderSearchOverlayResults(raw, activeLangs, isComparative, jumpResults, topVerseResults);
+  }
+
+  function renderSearchOverlayResults(query, activeLangs, isComparative, jumpResults, topVerseResults) {
+    if (!psalterSearchResults) return;
+
+    // Update Scope & Count badges
+    if (psalterSearchMeta && psalterSearchScope && psalterSearchCount) {
+      psalterSearchMeta.style.display = 'flex';
+      const scopeNames = activeLangs.map((l) => getLangDisplayName(l)).join(' + ');
+      psalterSearchScope.textContent = `Опсег: ${scopeNames}${isComparative ? ' (Упоредно)' : ''}`;
+      const total = jumpResults.length + topVerseResults.length;
+      psalterSearchCount.textContent = `${total} резултат${total === 1 ? '' : (total < 5 ? 'а' : 'а')}`;
+    }
+
+    if (activeSearchResults.length === 0) {
+      psalterSearchResults.innerHTML = `
+        <div class="search-empty-state">
+          Није пронађен ниједан стих за упит <b>"${escapeHtml(query)}"</b> у активним језицима.
+        </div>
+      `;
+      return;
+    }
+
+    let html = '';
+    let itemIdx = 0;
+
+    // Render Jump Cards
+    for (const j of jumpResults) {
+      const isSel = (itemIdx === selectedSearchResultIdx);
+      html += `
+        <div class="search-jump-card ${isSel ? 'selected' : ''}" data-idx="${itemIdx}" data-type="${j.type}" data-psalm="${j.psalmNumber || ''}" data-katizma="${j.katizmaNumber || ''}">
+          <div class="jump-card-icon">${j.type === 'psalm' ? '📖' : '📜'}</div>
+          <div class="jump-card-info">
+            <div class="jump-card-title">${escapeHtml(j.title)}</div>
+            <div class="jump-card-desc">${escapeHtml(j.desc)}</div>
+          </div>
+          <div class="jump-card-badge">Скочи ↵</div>
+        </div>
+      `;
+      itemIdx++;
+    }
+
+    // Render Verse Cards
+    for (const r of topVerseResults) {
+      const isSel = (itemIdx === selectedSearchResultIdx);
+      const v = r.item;
+      const langName = getLangDisplayName(v.lang);
+      const highlightedText = highlightMatches(v.text, r.tokens);
+
+      let parallelHtml = '';
+      if (isComparative) {
+        parallelHtml = '<div class="search-parallel-snippets">';
+        for (const otherLang of activeLangs) {
+          if (otherLang !== v.lang) {
+            const par = getParallelVerseFor(v.psalmNumber, v.verseIndex, v.lang, otherLang);
+            if (par && par.text) {
+              const otherLangName = getLangDisplayName(otherLang);
+              parallelHtml += `
+                <div class="search-parallel-line">
+                  <span class="search-parallel-lang">${escapeHtml(otherLangName)}:</span>
+                  <span class="search-parallel-text ${otherLang === 'cs_old' ? 'font-churchslavonic' : ''}">${escapeHtml(par.text)}</span>
+                </div>
+              `;
+            }
+          }
+        }
+        parallelHtml += '</div>';
+      }
+
+      html += `
+        <div class="psalter-search-item ${isSel ? 'selected' : ''}" data-idx="${itemIdx}" data-psalm="${v.psalmNumber}" data-katizma="${v.katizmaNumber}" data-verse="${v.verseIndex}" data-vnum="${escapeHtml(v.verseNum)}">
+          <div class="psalter-search-header">
+            <span class="search-item-badge">[${escapeHtml(langName)}, Псалам ${v.psalmNumber}:${escapeHtml(v.verseNum)}]</span>
+            <span class="search-item-katizma">Катизма ${v.katizmaNumber}</span>
+          </div>
+          <div class="search-snippet-text ${v.lang === 'cs_old' ? 'font-churchslavonic' : ''}">
+            ${highlightedText}
+          </div>
+          ${parallelHtml}
+        </div>
+      `;
+      itemIdx++;
+    }
+
+    psalterSearchResults.innerHTML = html;
+
+    // Attach click events
+    psalterSearchResults.querySelectorAll('.search-jump-card, .psalter-search-item').forEach((el) => {
+      el.addEventListener('click', () => {
+        const idx = parseInt(el.dataset.idx, 10);
+        selectedSearchResultIdx = idx;
+        selectActiveSearchResult();
       });
     });
   }
 
-  function highlightExcerpt(snippet, matchStart, matchLength) {
-    if (!snippet) return '';
-    if (matchStart < 0 || matchLength <= 0 || matchStart >= snippet.length) {
-      return escapeHtml(snippet);
-    }
-    const before = snippet.substring(0, matchStart);
-    const match = snippet.substring(matchStart, matchStart + matchLength);
-    const after = snippet.substring(matchStart + matchLength);
-    return `${escapeHtml(before)}<mark class="highlight">${escapeHtml(match)}</mark>${escapeHtml(after)}`;
-  }
+  function moveSearchResultSelection(delta) {
+    if (activeSearchResults.length === 0) return;
+    selectedSearchResultIdx += delta;
+    if (selectedSearchResultIdx < 0) selectedSearchResultIdx = activeSearchResults.length - 1;
+    if (selectedSearchResultIdx >= activeSearchResults.length) selectedSearchResultIdx = 0;
 
-  function renderEmptySearchState() {
-    searchCounter.textContent = '';
-    searchResultsContainer.innerHTML = '';
-  }
-
-  function openFile(path) {
-    logToHost(`openFile: ${path}`);
-    callModule('search', 'open', { path });
-  }
-
-  function revealFile(path) {
-    logToHost(`revealFile: ${path}`);
-    callModule('search', 'reveal', { path });
-  }
-
-  function updateIndexerStatus(status) {
-    if (!status) return;
-    const count = status.totalFilesIndexed ?? status.TotalFilesIndexed ?? 0;
-    const isIndexing = status.isIndexing ?? status.IsIndexing ?? false;
-    const formattedCount = Number(count).toLocaleString();
-    const msg = status.statusMessage || status.StatusMessage || (count > 0 ? `Indexed ${formattedCount} files` : 'Ready');
-
-    indexerStatus.textContent = isIndexing ? 'Indexing...' : `${formattedCount} files`;
-    footerIndexerLabel.textContent = msg;
-    hudStatusIndicator.textContent = isIndexing ? 'INDEXING...' : 'ONLINE';
-  }
-
-  // ========================================================
-  // Module 2: System Stats / Telemetry Implementation
-  // ========================================================
-
-  async function refreshStats() {
-    const data = await callModule('stats', 'snapshot');
-    if (!data) return;
-
-    // Support both camelCase and PascalCase
-    const rawCpu = data.cpuPercent ?? data.CpuPercent ?? 0;
-    const cpu = Math.round(Number(rawCpu) || 0);
-    cpuPercent.textContent = `${cpu}%`;
-    cpuBar.style.width = `${Math.min(100, Math.max(0, cpu))}%`;
-
-    const machine = data.machineName || data.MachineName || 'System';
-    cpuStatusText.textContent = `${machine} Telemetry`;
-
-    // RAM
-    const ramPct = Math.round(Number(data.ramPercent ?? data.RamPercent ?? 0));
-    const ramUsed = data.ramUsedGb ?? data.RamUsedGb ?? 0;
-    const ramTotal = data.ramTotalGb ?? data.RamTotalGb ?? 0;
-    ramPercent.textContent = `${ramPct}%`;
-    ramBar.style.width = `${Math.min(100, Math.max(0, ramPct))}%`;
-    ramDetails.textContent = `${ramUsed} GB / ${ramTotal} GB Used`;
-
-    // Power
-    const pwrPct = Math.round(Number(data.batteryPercent ?? data.BatteryPercent ?? 100));
-    powerPercent.textContent = `${pwrPct}%`;
-    powerBar.style.width = `${Math.min(100, Math.max(0, pwrPct))}%`;
-    powerStatusText.textContent = data.batteryStatus || data.BatteryStatus || 'AC Connected';
-
-    // Uptime & System
-    statsUptime.textContent = data.uptimeFormatted || data.UptimeFormatted || '0h 0m';
-    const osVer = data.osVersion || data.OsVersion || '';
-    statsSystemInfo.textContent = `${machine} • ${osVer}`;
-
-    // Storage Volumes
-    const drives = data.drives || data.Drives || [];
-    let drivesHtml = '';
-    if (drives && drives.length > 0) {
-      for (const d of drives) {
-        const name = d.name || d.Name || '';
-        const label = d.volumeLabel || d.VolumeLabel || '';
-        const free = d.freeGb ?? d.FreeGb ?? 0;
-        const total = d.totalGb ?? d.TotalGb ?? 0;
-        const pct = d.percentUsed ?? d.PercentUsed ?? 0;
-        drivesHtml += `
-          <div class="drive-item">
-            <div class="drive-info-line">
-              <span class="drive-name">${escapeHtml(name)} (${escapeHtml(label)})</span>
-              <span class="drive-size">${free} GB free of ${total} GB (${pct}%)</span>
-            </div>
-            <div class="bar-track">
-              <div class="bar-fill" style="width: ${pct}%"></div>
-            </div>
-          </div>
-        `;
+    const cards = psalterSearchResults ? psalterSearchResults.querySelectorAll('.search-jump-card, .psalter-search-item') : [];
+    cards.forEach((c, idx) => {
+      c.classList.toggle('selected', idx === selectedSearchResultIdx);
+      if (idx === selectedSearchResultIdx) {
+        c.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
-    } else {
-      drivesHtml = '<div style="opacity:0.6;font-size:0.8rem;padding:8px;">No fixed drives found</div>';
-    }
-    drivesContainer.innerHTML = drivesHtml;
+    });
+  }
 
-    // Top Processes
-    const procs = data.topProcesses || data.TopProcesses || [];
-    let procHtml = '';
-    if (procs && procs.length > 0) {
-      for (const p of procs) {
-        const pName = p.name || p.Name || 'Process';
-        const pMem = p.memoryMb ?? p.MemoryMb ?? 0;
-        procHtml += `
-          <div class="process-item">
-            <span class="process-name">${escapeHtml(pName)}</span>
-            <span class="process-mem">${pMem} MB</span>
-          </div>
-        `;
-      }
-    } else {
-      procHtml = '<div style="opacity:0.6;font-size:0.8rem;padding:8px;">No process telemetry</div>';
+  function selectActiveSearchResult() {
+    if (selectedSearchResultIdx < 0 || selectedSearchResultIdx >= activeSearchResults.length) return;
+    const item = activeSearchResults[selectedSearchResultIdx];
+    if (!item) return;
+
+    if (item.type === 'katizma') {
+      closeSearchOverlay();
+      switchModule('psalter');
+      openKatizma(item.katizmaNumber);
+      return;
     }
-    processesContainer.innerHTML = procHtml;
+
+    if (item.type === 'psalm') {
+      closeSearchOverlay();
+      switchModule('psalter');
+      selectPsalm(item.psalmNumber, true);
+      setPsalterLayer('single', false);
+      return;
+    }
+
+    if (item.type === 'verse') {
+      closeSearchOverlay();
+      switchModule('psalter');
+      const v = item.item;
+      selectPsalm(v.psalmNumber, true);
+      setPsalterLayer('single', false);
+
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          scrollToVerseInReader(v.verseIndex);
+        }, 120);
+      });
+    }
+  }
+
+  function scrollToVerseInReader(verseIndex) {
+    if (!psalterReaderScroll) return;
+
+    let targetEl = null;
+    const activeParallel = (psalterParallelModes && psalterParallelModes.length > 0);
+    if (!activeParallel) {
+      targetEl = readerPsalmText ? readerPsalmText.querySelector(`.psalm-verse[data-verse-index="${verseIndex}"]`) : null;
+    } else {
+      targetEl = readerPsalmText ? readerPsalmText.querySelector(`.parallel-row[data-verse-index="${verseIndex}"]`) : null;
+    }
+
+    if (targetEl) {
+      targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      targetEl.classList.add('verse-highlight-flash');
+      setTimeout(() => {
+        targetEl.classList.remove('verse-highlight-flash');
+      }, 2600);
+      logToHost(`Scrolled to verse index ${verseIndex} with highlight flash`);
+    } else {
+      logToHost(`Verse element index ${verseIndex} not found in DOM`);
+    }
   }
 
   // ========================================================
@@ -1070,6 +1310,9 @@
     logToHost(`loadPsalter() called, currentPsalm=${currentPsalmNumber}, currentKatizma=${currentKatizmaNumber}, layer=${psalterLayer}`);
     await ensurePsalterResources();
     if (psalterData) {
+      if (!psalterSearchIndex.isReady) {
+        buildPsalterSearchIndex();
+      }
       setPsalterLayer(psalterLayer, true);
       return;
     }
@@ -1111,6 +1354,7 @@
 
       if (data && data.katizmas && data.katizmas.length > 0) {
         psalterData = data;
+        buildPsalterSearchIndex();
         logToHost(`Psalter loaded: ${data.katizmas.length} katizmas, ${data.totalPsalms || 151} psalms`);
         setPsalterLayer(psalterLayer, true);
       } else {
@@ -1337,6 +1581,10 @@
 
   function isLastPsalmOfCurrentKatizma() {
     return currentPsalmNumber === getLastPsalmOfKatizma(currentKatizmaNumber);
+  }
+
+  function isFirstPsalmOfCurrentKatizma() {
+    return currentPsalmNumber === getFirstPsalmOfKatizma(currentKatizmaNumber);
   }
 
   function formatLiturgicalMarkup(raw) {
@@ -1721,9 +1969,10 @@
         }
 
         let versesHtml = '';
-        for (const v of versesList) {
+        for (let idx = 0; idx < versesList.length; idx++) {
+          const v = versesList[idx];
           versesHtml += `
-            <div class="psalm-verse">
+            <div class="psalm-verse" data-verse-index="${idx}">
               <span class="verse-num">${escapeHtml(v.num)}</span>
               <span class="verse-text">${escapeHtml(v.text)}</span>
             </div>
@@ -1774,7 +2023,7 @@
               `;
             }
             parallelRowsHtml += `
-              <div class="parallel-row">
+              <div class="parallel-row" data-verse-index="${r}">
                 ${cellsHtml}
               </div>
             `;
@@ -1796,7 +2045,7 @@
               `;
             }
             parallelRowsHtml += `
-              <div class="parallel-row">
+              <div class="parallel-row" data-verse-index="${r}">
                 ${cellsHtml}
               </div>
             `;
@@ -1837,7 +2086,11 @@
 
     if (btnPrevPsalm) {
       btnPrevPsalm.disabled = currentPsalmNumber <= 1;
-      btnPrevPsalm.innerHTML = `◀ Претходни (←)`;
+      if (isFirstPsalmOfCurrentKatizma() && currentKatizmaNumber > 1) {
+        btnPrevPsalm.innerHTML = `◀ Молитве ${currentKatizmaNumber - 1}. катизме (←)`;
+      } else {
+        btnPrevPsalm.innerHTML = `◀ Претходни (←)`;
+      }
     }
 
     if (btnNextPsalm) {
@@ -1965,6 +2218,10 @@
         isViewingKatizmaPrayer = false;
         selectPsalm(lastP, true);
         displayCurrentPsalm(false);
+      } else if (isFirstPsalmOfCurrentKatizma() && currentKatizmaNumber > 1) {
+        // Going left from first psalm of a katizma opens prayers of previous katizma
+        selectKatizma(currentKatizmaNumber - 1);
+        displayKatizmaPrayers(currentKatizmaNumber);
       } else if (currentPsalmNumber > 1) {
         selectPsalm(currentPsalmNumber - 1, true);
         displayCurrentPsalm(false);
@@ -2349,6 +2606,7 @@
           showToast(`📌 Цитат сачуван у нову белешку "Белешке"!`);
         }
       }
+      switchModule('notes');
     } catch (err) {
       logToHost(`Error saving citation: ${err.message}`, 'ERROR');
       showToast('Грешка при чувању цитата.');
@@ -2360,6 +2618,14 @@
     document.querySelectorAll('.ctx-psalter-only').forEach((el) => {
       el.style.display = isPsalter ? 'flex' : 'none';
     });
+
+    if (checkSerbian) checkSerbian.textContent = (currentTheme === 'serbian-orthodox') ? '✓' : '';
+    if (checkSerbianParchment) checkSerbianParchment.textContent = (currentTheme === 'serbian-parchment') ? '✓' : '';
+    if (checkZastava) checkZastava.textContent = (currentTheme === 'zastava') ? '✓' : '';
+    if (checkRussian) checkRussian.textContent = (currentTheme === 'russian-orthodox') ? '✓' : '';
+    if (checkByzantine) checkByzantine.textContent = (currentTheme === 'byzantine-orthodox') ? '✓' : '';
+    if (checkJapanese) checkJapanese.textContent = (currentTheme === 'japanese') ? '✓' : '';
+    if (checkCyberpunk) checkCyberpunk.textContent = (currentTheme === 'cyberpunk') ? '✓' : '';
 
     if (!isPsalter) return;
 
@@ -2435,7 +2701,7 @@
   }
 
   btnHideHud.addEventListener('click', saveAndHideHud);
-  quickThemeToggle.addEventListener('click', toggleTheme);
+  if (quickThemeToggle) quickThemeToggle.addEventListener('click', toggleTheme);
 
   navButtons.forEach((btn) => {
     btn.addEventListener('click', () => {
@@ -2443,14 +2709,30 @@
     });
   });
 
-  // Drag handle for header
-  const dragHandle = document.getElementById('drag-handle');
-  dragHandle.addEventListener('mousedown', (e) => {
-    if (e.target.closest('button') || e.target.closest('input') || e.target.closest('.hud-nav') || e.target.closest('.theme-switch-pill')) {
-      return;
-    }
-    callHost('drag_window');
-  });
+  // Window Drag Handlers (Header, Brand, Footer, Navigation Bar)
+  function initWindowDragging() {
+    const dragTargets = [
+      document.getElementById('drag-handle'),
+      document.querySelector('.hud-footer'),
+      document.querySelector('.brand-group'),
+      document.querySelector('.layer-top-actions'),
+      document.querySelector('.psalter-reader-header')
+    ].filter(Boolean);
+
+    dragTargets.forEach((el) => {
+      el.addEventListener('mousedown', (e) => {
+        if (e.button !== 0) return; // Only left click drags window
+        if (e.target.closest('button') || e.target.closest('input') || e.target.closest('textarea') ||
+            e.target.closest('.hud-nav') || e.target.closest('.theme-switch-pill') ||
+            e.target.closest('.resize-grip') || e.target.closest('.resize-handle') ||
+            e.target.closest('.psalter-search-box') || e.target.closest('.psalter-search-modal')) {
+          return;
+        }
+        callHost('drag_window');
+      });
+    });
+  }
+  initWindowDragging();
 
   // Bootstrap Init
   async function init() {
@@ -2503,9 +2785,23 @@
 
     logToHost(`Initial psalter state restored: psalm=${currentPsalmNumber}, katizma=${currentKatizmaNumber}, layer=${psalterLayer}, scroll=${currentPsalmScrollPos}`);
 
-    renderEmptySearchState();
-    switchModule('search');
+    try {
+      await switchModule('psalter');
+    } catch (e) {
+      logToHost(`Error switching to psalter in init: ${e}`, 'ERROR');
+    }
     logToHost('Frontend init() completed.');
+  }
+
+  function updateIndexerStatus(status) {
+    if (!status) return;
+    if (footerIndexerLabel) {
+      if (typeof status === 'string') {
+        footerIndexerLabel.textContent = status;
+      } else if (status.statusMessage) {
+        footerIndexerLabel.textContent = status.statusMessage;
+      }
+    }
   }
 
   function escapeHtml(str) {
