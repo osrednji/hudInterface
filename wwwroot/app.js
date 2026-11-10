@@ -184,6 +184,10 @@
     }
   }
 
+  const isDesktopHost = typeof window !== 'undefined' && Boolean(
+    window.__TAURI__ || (window.chrome && window.chrome.webview)
+  );
+
   async function callHost(type, payload = {}) {
     // 1. Tauri Native IPC bridge
     if (typeof window !== 'undefined' && window.__TAURI__) {
@@ -218,18 +222,23 @@
     }
 
     // 2. WebView2 (C#) fallback bridge
-    return new Promise((resolve) => {
-      const id = 'req_' + Math.random().toString(36).substring(2, 10);
-      pendingRequests.set(id, resolve);
-      postToHost({ id, type, ...payload });
+    if (typeof window !== 'undefined' && window.chrome && window.chrome.webview) {
+      return new Promise((resolve) => {
+        const id = 'req_' + Math.random().toString(36).substring(2, 10);
+        pendingRequests.set(id, resolve);
+        postToHost({ id, type, ...payload });
 
-      setTimeout(() => {
-        if (pendingRequests.has(id)) {
-          pendingRequests.delete(id);
-          resolve(null);
-        }
-      }, 5000);
-    });
+        setTimeout(() => {
+          if (pendingRequests.has(id)) {
+            pendingRequests.delete(id);
+            resolve(null);
+          }
+        }, 3000);
+      });
+    }
+
+    // 3. Web browser environment (e.g. GitHub Pages) - no desktop host process
+    return null;
   }
 
   function callModule(moduleId, action, params = {}) {
@@ -1250,7 +1259,7 @@
     if (!psalmInstructions && typeof window !== 'undefined' && window.PSALM_INSTRUCTIONS) {
       psalmInstructions = window.PSALM_INSTRUCTIONS;
     }
-    if (!psalmInstructions) {
+    if (!psalmInstructions && isDesktopHost) {
       try {
         const hostInst = await callModule('psalter', 'get_instructions');
         if (hostInst && typeof hostInst === 'object' && Object.keys(hostInst).length > 0) {
@@ -1270,7 +1279,7 @@
     if (!katizmaPrayers && typeof window !== 'undefined' && window.KATIZMA_PRAYERS) {
       katizmaPrayers = window.KATIZMA_PRAYERS;
     }
-    if (!katizmaPrayers) {
+    if (!katizmaPrayers && isDesktopHost) {
       try {
         const hostPrayers = await callModule('psalter', 'get_katizma_prayers');
         if (hostPrayers && typeof hostPrayers === 'object' && Object.keys(hostPrayers).length > 0) {
@@ -1290,7 +1299,7 @@
     if (!psalterPreface && typeof window !== 'undefined' && window.PSALTER_PREFACE) {
       psalterPreface = window.PSALTER_PREFACE;
     }
-    if (!psalterPreface) {
+    if (!psalterPreface && isDesktopHost) {
       try {
         const hostPref = await callModule('psalter', 'get_preface');
         if (hostPref && typeof hostPref === 'object') {
@@ -1310,7 +1319,7 @@
     if (!psalmsCsOld && typeof window !== 'undefined' && window.psalmsCsOld) {
       psalmsCsOld = window.psalmsCsOld;
     }
-    if (!psalmsCsOld) {
+    if (!psalmsCsOld && isDesktopHost) {
       try {
         const hostCsOld = await callModule('psalter', 'get_cs_old');
         if (hostCsOld && typeof hostCsOld === 'object' && Object.keys(hostCsOld).length > 0) {
@@ -1330,7 +1339,7 @@
     if (!psalmsCsCyrillic && typeof window !== 'undefined' && window.psalmsCsCyrillic) {
       psalmsCsCyrillic = window.psalmsCsCyrillic;
     }
-    if (!psalmsCsCyrillic) {
+    if (!psalmsCsCyrillic && isDesktopHost) {
       try {
         const hostCsCyr = await callModule('psalter', 'get_cs_cyrillic');
         if (hostCsCyr && typeof hostCsCyr === 'object' && Object.keys(hostCsCyr).length > 0) {
@@ -1370,8 +1379,8 @@
     }
 
     try {
-      // 1. Try host module
-      let data = await callModule('psalter', 'get_all');
+      // 1. Try host module only if running in desktop shell
+      let data = isDesktopHost ? await callModule('psalter', 'get_all') : null;
       if (!data || !data.katizmas || data.katizmas.length === 0) {
         // 2. Fallback to data/psalter.json
         const resp = await fetch('data/psalter.json');
