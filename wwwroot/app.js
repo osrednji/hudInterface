@@ -205,7 +205,8 @@
           }
           if (type === 'save_theme') return await invoke('save_theme', { theme: payload.theme });
           if (type === 'drag_window') return await invoke('drag_window');
-          if (type === 'hide_window') return await invoke('hide_window');
+          if (type === 'hide_window' || type === 'hide_hud') return await invoke('hide_window');
+          if (type === 'exit_app' || type === 'exit') return await invoke('exit_app');
           if (type === 'module_action') {
             if (payload.moduleId === 'notes') {
               if (payload.action === 'get_all') return await invoke('get_notes');
@@ -2143,9 +2144,12 @@
       }
     }
 
+    const isMobile = window.innerWidth <= 768;
     if (btnPrevPsalm) {
       btnPrevPsalm.disabled = currentPsalmNumber <= 1;
-      if (isFirstPsalmOfCurrentKatizma() && currentKatizmaNumber > 1) {
+      if (isMobile) {
+        btnPrevPsalm.innerHTML = 'Претходни';
+      } else if (isFirstPsalmOfCurrentKatizma() && currentKatizmaNumber > 1) {
         btnPrevPsalm.innerHTML = `◀ Молитве ${currentKatizmaNumber - 1}. катизме (←)`;
       } else {
         btnPrevPsalm.innerHTML = `◀ Претходни (←)`;
@@ -2153,7 +2157,10 @@
     }
 
     if (btnNextPsalm) {
-      if (isLastPsalmOfCurrentKatizma()) {
+      if (isMobile) {
+        btnNextPsalm.disabled = currentPsalmNumber >= 151;
+        btnNextPsalm.innerHTML = 'Следећи';
+      } else if (isLastPsalmOfCurrentKatizma()) {
         btnNextPsalm.disabled = false;
         btnNextPsalm.innerHTML = `Молитве после катизме (→ / Space) ▶`;
       } else {
@@ -2419,6 +2426,23 @@
     });
   }
 
+    // In-app double-press Ctrl shortcut to save and hide
+  let lastInAppCtrlTime = 0;
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Control') {
+      if (e.repeat) return;
+      const now = Date.now();
+      if (now - lastInAppCtrlTime >= 80 && now - lastInAppCtrlTime <= 500) {
+        lastInAppCtrlTime = 0;
+        saveAndHideHud();
+      } else {
+        lastInAppCtrlTime = now;
+      }
+    } else {
+      lastInAppCtrlTime = 0;
+    }
+  });
+
   // Continuously record scroll position while user is reading/scrolling
   if (psalterReaderScroll) {
     psalterReaderScroll.addEventListener('scroll', () => {
@@ -2451,7 +2475,7 @@
     const sel = window.getSelection().toString().trim();
     const ctxSaveCitation = document.getElementById('ctx-save-citation');
     if (ctxSaveCitation) {
-      if (sel && activeModuleId === 'psalter' && psalterLayer === 'single') {
+      if (isDesktopHost && sel && activeModuleId === 'psalter' && psalterLayer === 'single') {
         ctxSaveCitation.style.display = 'flex';
         selectedQuoteText = sel;
       } else {
@@ -2846,6 +2870,20 @@
   // Bootstrap Init
   async function init() {
     logToHost('Frontend init() started.');
+    // Disable Notes module and quote saving in web view (allow only in desktop app)
+    if (!isDesktopHost) {
+      const notesBtn = document.querySelector('.nav-btn[data-module="notes"]');
+      if (notesBtn) notesBtn.style.display = 'none';
+      const ctxNotes = document.querySelector('.ctx-item[data-target="notes"]');
+      if (ctxNotes) ctxNotes.style.display = 'none';
+      const ctxCite = document.getElementById('ctx-save-citation');
+      if (ctxCite) ctxCite.style.display = 'none';
+      const footerNotes = document.querySelectorAll('.shortcut-tip');
+      footerNotes.forEach(el => {
+        if (el.textContent.includes('Белешке')) el.style.display = 'none';
+      });
+    }
+
     const initData = await callHost('get_init_data');
     if (initData) {
       const theme = initData.theme || initData.Theme;

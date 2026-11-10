@@ -213,6 +213,11 @@ fn hide_window(window: WebviewWindow) {
 }
 
 #[tauri::command]
+fn exit_app(app: AppHandle) {
+    app.exit(0);
+}
+
+#[tauri::command]
 fn log_to_host(message: String, level: Option<String>) {
     let lvl = level.unwrap_or_else(|| "INFO".into());
     println!("[{}] {}", lvl, message);
@@ -241,12 +246,16 @@ unsafe extern "system" fn low_level_keyboard_proc(
             let now = Instant::now();
             let mut last_guard = LAST_CTRL_TIME.lock().unwrap();
             if let Some(last) = *last_guard {
-                if now.duration_since(last) <= Duration::from_millis(400) {
+                let elapsed = now.duration_since(last);
+                // Human double-tap between 80ms and 500ms (avoids holding key autorepeats)
+                if elapsed >= Duration::from_millis(80) && elapsed <= Duration::from_millis(500) {
                     *last_guard = None;
                     drop(last_guard);
 
                     if let Some(app) = GLOBAL_APP_HANDLE.get() {
-                        if let Some(window) = app.get_webview_window("main") {
+                        let win = app.get_webview_window("main")
+                            .or_else(|| app.webview_windows().values().next().cloned());
+                        if let Some(window) = win {
                             if window.is_visible().unwrap_or(false) {
                                 let _ = window.hide();
                             } else {
@@ -274,15 +283,17 @@ fn setup_global_keyboard_hook(app_handle: AppHandle) {
     let _ = GLOBAL_APP_HANDLE.set(app_handle);
 
     std::thread::spawn(|| unsafe {
+        use windows_sys::Win32::System::LibraryLoader::GetModuleHandleW;
         use windows_sys::Win32::UI::WindowsAndMessaging::{
             DispatchMessageW, GetMessageW, SetWindowsHookExW, TranslateMessage, MSG,
             WH_KEYBOARD_LL,
         };
 
+        let h_mod = GetModuleHandleW(std::ptr::null());
         let hook = SetWindowsHookExW(
             WH_KEYBOARD_LL,
             Some(low_level_keyboard_proc),
-            std::ptr::null_mut(),
+            h_mod,
             0,
         );
 
@@ -320,6 +331,7 @@ fn main() {
             delete_note,
             drag_window,
             hide_window,
+            exit_app,
             log_to_host
         ])
         .run(tauri::generate_context!())
