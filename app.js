@@ -48,11 +48,30 @@
   let isViewingKatizmaPrayer = false;
   let prefaceExpanded = false;
   let postPrayerInlineExpanded = false;
-  let currentKatizmaNumber = 1;
-  let currentPsalmNumber = 1;
-  let psalterLayer = 'single'; // 'katizmas', 'psalms', or 'single'
-  let currentPsalmScrollPos = 0;
+  // Synchronous restoration from localStorage on first execution
+  let savedPNum = 1;
+  let savedKNum = 1;
+  let savedLayer = 'single';
+  let savedScroll = 0;
+  try {
+    const lp = localStorage.getItem('hud_last_psalm_num');
+    if (lp) savedPNum = parseInt(lp, 10) || 1;
+    const lk = localStorage.getItem('hud_last_katizma_num');
+    if (lk) savedKNum = parseInt(lk, 10) || 1;
+    const ll = localStorage.getItem('hud_last_psalter_level');
+    if (ll) savedLayer = ll;
+    const ls = localStorage.getItem('hud_last_psalm_scroll');
+    if (ls) savedScroll = parseInt(ls, 10) || 0;
+  } catch (e) {}
+
+  let currentKatizmaNumber = savedKNum;
+  let currentPsalmNumber = savedPNum;
+  let psalterLayer = savedLayer; // 'katizmas', 'psalms', or 'single'
+  let currentPsalmScrollPos = savedScroll;
   let psalmScrollPositions = {};
+  if (currentPsalmNumber && currentPsalmScrollPos) {
+    psalmScrollPositions[currentPsalmNumber] = currentPsalmScrollPos;
+  }
 
   // --- DOM Elements ---
   const hudRoot = document.getElementById('hud-root');
@@ -2072,9 +2091,11 @@
     renderPostKatizmaBanner();
 
     if (psalterReaderScroll) {
-      psalterReaderScroll.scrollTop = 0; // Immediate reset
-      if (restoreScroll) {
-        const targetScroll = psalmScrollPositions[currentPsalmNumber] || 0;
+      if (!restoreScroll) {
+        psalterReaderScroll.scrollTop = 0;
+      } else {
+        const targetScroll = psalmScrollPositions[currentPsalmNumber] || currentPsalmScrollPos || 0;
+        psalterReaderScroll.scrollTop = targetScroll;
         requestAnimationFrame(() => {
           if (psalterReaderScroll) {
             psalterReaderScroll.scrollTop = targetScroll;
