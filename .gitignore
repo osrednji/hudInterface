@@ -20,3 +20,9 @@ build/
 
 ## Temporary / Logs
 *.log
+
+target/
+src-tauri/target/
+tauri_release/
+node_modules/
+*.bat

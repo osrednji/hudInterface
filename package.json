@@ -1,0 +1,12 @@
+{
+  "name": "hudinteface",
+  "version": "1.0.0",
+  "description": "hudInteface Psalter",
+  "private": true,
+  "scripts": {
+    "tauri": "tauri"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.12.4"
+  }
+}

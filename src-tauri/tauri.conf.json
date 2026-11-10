@@ -1,0 +1,32 @@
+{
+  "$schema": "https://raw.githubusercontent.com/tauri-apps/tauri/refs/heads/v2/crates/tauri-cli/schema.json",
+  "productName": "hudInteface",
+  "version": "1.0.0",
+  "identifier": "com.osrednji.hudinteface",
+  "build": {
+    "frontendDist": "../wwwroot"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "title": "hudInteface",
+        "width": 1060,
+        "height": 720,
+        "minWidth": 800,
+        "minHeight": 500,
+        "resizable": true,
+        "decorations": false,
+        "transparent": true,
+        "center": true,
+        "shadow": false
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": false
+  }
+}
