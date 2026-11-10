@@ -15,7 +15,7 @@
     { id: 'japanese', name: 'Japan 🌸' },
     { id: 'cyberpunk', name: 'Cyber ⚡' }
   ];
-  let currentTheme = 'serbian-orthodox';
+  let currentTheme = localStorage.getItem('hud_theme') || 'serbian-parchment';
   let activeModuleId = 'psalter';
   // Psalter Fast In-Memory Search Index State
   let psalterSearchIndex = {
@@ -1848,15 +1848,16 @@
     const nextK = katizmaNum === 20 ? 1 : katizmaNum + 1;
     const nextP = katizmaNum === 20 ? 1 : getFirstPsalmOfKatizma(nextK);
 
+    const isMobileKatizma = window.innerWidth <= 768;
     if (btnPrevPsalm) {
       btnPrevPsalm.disabled = false;
-      btnPrevPsalm.innerHTML = `◀ Псалам ${lastP} (←)`;
+      btnPrevPsalm.innerHTML = isMobileKatizma ? 'Претходни' : `◀ Псалам ${lastP} (←)`;
     }
     if (btnNextPsalm) {
       btnNextPsalm.disabled = false;
-      btnNextPsalm.innerHTML = katizmaNum === 20 
+      btnNextPsalm.innerHTML = isMobileKatizma ? 'Следећи' : (katizmaNum === 20 
         ? `Прва Катизма (Псалам 1) (→ / Space) ▶` 
-        : `Катизма ${nextK} (Псалам ${nextP}) (→ / Space) ▶`;
+        : `Катизма ${nextK} (Псалам ${nextP}) (→ / Space) ▶`);
     }
 
     if (readerPsalmText) {
@@ -1869,16 +1870,7 @@
           <div class="liturgical-text" style="font-size: 1.05rem; line-height: 1.8;">
             ${formatLiturgicalMarkup(prayerObj.fullText)}
           </div>
-          <div class="prayer-nav-action-card">
-            <div class="action-card-text">
-              <span class="action-card-icon">📖</span>
-              <span>Завршили сте молитве после ${katizmaNum}. катизме</span>
-            </div>
-            <button class="btn-proceed-next-katizma" id="btn-proceed-next-katizma" type="button">
-              <span>${katizmaNum === 20 ? 'Повратак на 1. Катизму (Псалам 1)' : 'Пређи на ' + nextK + '. Катизму (Псалам ' + nextP + ')'}</span>
-              <span class="nav-key-badge">→ / Space</span>
-            </button>
-          </div>
+
         </div>
       `;
       readerPsalmText.innerHTML = contentHtml;
@@ -2448,6 +2440,9 @@
     if (btnPrevPsalm) {
       if (isMobile) {
         btnPrevPsalm.innerHTML = 'Претходни';
+      } else if (isViewingKatizmaPrayer) {
+        const lastP = getLastPsalmOfKatizma(currentKatizmaNumber);
+        btnPrevPsalm.innerHTML = `◀ Псалам ${lastP} (←)`;
       } else if (isFirstPsalmOfCurrentKatizma() && currentKatizmaNumber > 1) {
         btnPrevPsalm.innerHTML = `◀ Молитве ${currentKatizmaNumber - 1}. катизме (←)`;
       } else {
@@ -2457,6 +2452,12 @@
     if (btnNextPsalm) {
       if (isMobile) {
         btnNextPsalm.innerHTML = 'Следећи';
+      } else if (isViewingKatizmaPrayer) {
+        const nextK = currentKatizmaNumber === 20 ? 1 : currentKatizmaNumber + 1;
+        const nextP = currentKatizmaNumber === 20 ? 1 : getFirstPsalmOfKatizma(nextK);
+        btnNextPsalm.innerHTML = currentKatizmaNumber === 20
+          ? `Прва Катизма (Псалам 1) (→ / Space) ▶`
+          : `Катизма ${nextK} (Псалам ${nextP}) (→ / Space) ▶`;
       } else if (isLastPsalmOfCurrentKatizma()) {
         btnNextPsalm.innerHTML = `Молитве после катизме (→ / Space) ▶`;
       } else {
