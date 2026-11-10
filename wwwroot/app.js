@@ -2443,6 +2443,29 @@
     }
   });
 
+    function updateNavButtonsResponsive() {
+    const isMobile = window.innerWidth <= 768;
+    if (btnPrevPsalm) {
+      if (isMobile) {
+        btnPrevPsalm.innerHTML = 'Претходни';
+      } else if (isFirstPsalmOfCurrentKatizma() && currentKatizmaNumber > 1) {
+        btnPrevPsalm.innerHTML = `◀ Молитве ${currentKatizmaNumber - 1}. катизме (←)`;
+      } else {
+        btnPrevPsalm.innerHTML = `◀ Претходни (←)`;
+      }
+    }
+    if (btnNextPsalm) {
+      if (isMobile) {
+        btnNextPsalm.innerHTML = 'Следећи';
+      } else if (isLastPsalmOfCurrentKatizma()) {
+        btnNextPsalm.innerHTML = `Молитве после катизме (→ / Space) ▶`;
+      } else {
+        btnNextPsalm.innerHTML = `Следећи (→ / Space) ▶`;
+      }
+    }
+  }
+  window.addEventListener('resize', updateNavButtonsResponsive);
+
   // Continuously record scroll position while user is reading/scrolling
   if (psalterReaderScroll) {
     psalterReaderScroll.addEventListener('scroll', () => {
@@ -2486,6 +2509,20 @@
 
     // 2. Update Psalter options dynamically
     updateContextMenuPsalterOptions();
+    // Hide desktop-only items in web view or mobile view
+    const isMobileView = window.innerWidth <= 768;
+    if (!isDesktopHost || isMobileView) {
+      const psalterItem = contextMenu.querySelector('.ctx-item[data-target="psalter"]');
+      if (psalterItem) psalterItem.style.display = 'none';
+      const notesItem = contextMenu.querySelector('.ctx-item[data-target="notes"]');
+      if (notesItem) notesItem.style.display = 'none';
+      const saveHideItem = contextMenu.querySelector('.ctx-item[data-action="save_and_hide"]');
+      if (saveHideItem) saveHideItem.style.display = 'none';
+      const exitItem = contextMenu.querySelector('.ctx-item[data-action="exit"]');
+      if (exitItem) exitItem.style.display = 'none';
+      const firstHdr = contextMenu.querySelector('.ctx-header');
+      if (firstHdr && firstHdr.textContent.includes('ПСАЛТИР - МЕНИ')) firstHdr.style.display = 'none';
+    }
 
     contextMenu.style.display = 'flex';
     contextMenu.classList.add('open');
@@ -2870,17 +2907,25 @@
   // Bootstrap Init
   async function init() {
     logToHost('Frontend init() started.');
-    // Disable Notes module and quote saving in web view (allow only in desktop app)
+    // In web browser / mobile view: hide the lone Psalter tab and disable desktop-only features
     if (!isDesktopHost) {
-      const notesBtn = document.querySelector('.nav-btn[data-module="notes"]');
-      if (notesBtn) notesBtn.style.display = 'none';
-      const ctxNotes = document.querySelector('.ctx-item[data-target="notes"]');
-      if (ctxNotes) ctxNotes.style.display = 'none';
-      const ctxCite = document.getElementById('ctx-save-citation');
-      if (ctxCite) ctxCite.style.display = 'none';
+      const moduleNav = document.getElementById('module-nav');
+      if (moduleNav) moduleNav.style.display = 'none';
+
+      const psalterCtxItem = document.querySelector('.ctx-item[data-target="psalter"]');
+      if (psalterCtxItem) psalterCtxItem.style.display = 'none';
+      const notesCtxItem = document.querySelector('.ctx-item[data-target="notes"]');
+      if (notesCtxItem) notesCtxItem.style.display = 'none';
+      const saveHideCtxItem = document.querySelector('.ctx-item[data-action="save_and_hide"]');
+      if (saveHideCtxItem) saveHideCtxItem.style.display = 'none';
+      const exitCtxItem = document.querySelector('.ctx-item[data-action="exit"]');
+      if (exitCtxItem) exitCtxItem.style.display = 'none';
+      const firstCtxHeader = document.querySelector('.hud-context-menu .ctx-header');
+      if (firstCtxHeader) firstCtxHeader.style.display = 'none';
+
       const footerNotes = document.querySelectorAll('.shortcut-tip');
       footerNotes.forEach(el => {
-        if (el.textContent.includes('Белешке')) el.style.display = 'none';
+        if (el.textContent.includes('Белешке') || el.textContent.includes('Затвори')) el.style.display = 'none';
       });
     }
 

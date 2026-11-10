@@ -1166,27 +1166,7 @@ mark.highlight {
 }
 
 
-  /* Hide duplicate subheader bar on mobile view */
-  #btn-return-psalms,
-  #reader-katizma-badge,
-  #reader-range-badge {
-    display: none !important;
-  }
 
-  .reader-header-left {
-    display: flex !important;
-    justify-content: center !important;
-    width: 100% !important;
-    margin-bottom: 4px !important;
-  }
-
-  .reader-header-left .btn-preface-link {
-    width: 100% !important;
-    text-align: center !important;
-    justify-content: center !important;
-    padding: 8px 12px !important;
-    font-size: 0.85rem !important;
-  }
 
   .reader-header-left {
   display: flex;
@@ -2369,10 +2349,24 @@ mark.highlight {
 
   .reader-header-left {
     display: flex !important;
-    flex-wrap: wrap !important;
-    align-items: center !important;
-    gap: 6px !important;
+    justify-content: center !important;
     width: 100% !important;
+    margin-bottom: 2px !important;
+  }
+
+  /* Hide duplicate subheader bar on mobile view */
+  #btn-return-psalms,
+  #reader-katizma-badge,
+  #reader-range-badge {
+    display: none !important;
+  }
+
+  .reader-header-left .btn-preface-link {
+    width: 100% !important;
+    text-align: center !important;
+    justify-content: center !important;
+    padding: 8px 12px !important;
+    font-size: 0.85rem !important;
   }
 
   .reader-header-left .btn-back-layer,
@@ -2593,3 +2587,5 @@ mark.highlight {
     display: none !important;
   }
 }
+
+.brand-status { display: none !important; }
