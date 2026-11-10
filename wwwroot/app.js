@@ -2369,6 +2369,56 @@
     });
   });
 
+  // Touch Gestures: Swipe Left for next psalm, Swipe Right for previous psalm
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let touchEndX = 0;
+  let touchEndY = 0;
+
+  document.addEventListener('touchstart', (e) => {
+    if (e.touches && e.touches.length === 1) {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+      touchEndX = touchStartX;
+      touchEndY = touchStartY;
+    }
+  }, { passive: true });
+
+  document.addEventListener('touchmove', (e) => {
+    if (e.touches && e.touches.length === 1) {
+      touchEndX = e.touches[0].clientX;
+      touchEndY = e.touches[0].clientY;
+    }
+  }, { passive: true });
+
+  document.addEventListener('touchend', (e) => {
+    const diffX = touchEndX - touchStartX;
+    const diffY = touchEndY - touchStartY;
+    if (Math.abs(diffX) > 60 && Math.abs(diffX) > Math.abs(diffY) * 1.4) {
+      if (activeModuleId === 'psalter' && psalterLayer === 'single') {
+        if (diffX < 0) {
+          psalterTraverseRight();
+        } else {
+          psalterTraverseLeft();
+        }
+      }
+    }
+  }, { passive: true });
+
+  // Mobile Tap on Brand Logo/Title opens Theme & Settings Menu
+  const brandGroupEl = document.querySelector('.brand-group');
+  if (brandGroupEl) {
+    brandGroupEl.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (contextMenu && contextMenu.classList.contains('open')) {
+        closeContextMenu();
+      } else {
+        const rect = brandGroupEl.getBoundingClientRect();
+        openContextMenu(rect.left, rect.bottom + 6);
+      }
+    });
+  }
+
   // Continuously record scroll position while user is reading/scrolling
   if (psalterReaderScroll) {
     psalterReaderScroll.addEventListener('scroll', () => {
