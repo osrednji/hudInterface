@@ -10,10 +10,8 @@ using System.Windows.Interop;
 using Microsoft.Web.WebView2.Core;
 using hudInteface.Core;
 using hudInteface.Modules;
-using hudInteface.Services.FileSearch;
 using hudInteface.Services.Notes;
 using hudInteface.Services.Psalter;
-using hudInteface.Services.SystemStats;
 using WinForms = System.Windows.Forms;
 
 namespace hudInteface;
@@ -23,8 +21,6 @@ public partial class MainWindow : Window
     private readonly GlobalKeyboardHook _keyboardHook;
     private readonly AppSettings _settings;
     private readonly ModuleManager _moduleManager;
-    private readonly FileIndexerService _indexerService;
-    private readonly SystemStatsService _statsService;
     private readonly NotesService _notesService;
     private readonly PsalterService _psalterService;
 
@@ -64,6 +60,7 @@ public partial class MainWindow : Window
 
     private const int SW_SHOW = 5;
     private const int WM_NCLBUTTONDOWN = 0xA1;
+    private const int HTCAPTION = 2;
     private const int HTLEFT = 10;
     private const int HTRIGHT = 11;
     private const int HTTOP = 12;
@@ -127,25 +124,12 @@ public partial class MainWindow : Window
 
         _moduleManager = new ModuleManager(_settings);
 
-        _indexerService = new FileIndexerService();
-        _statsService = new SystemStatsService();
         _notesService = new NotesService();
         _psalterService = new PsalterService();
 
         // Register Modules
-        _moduleManager.RegisterModule(new FileSearchModule(_indexerService));
-        _moduleManager.RegisterModule(new SystemStatsModule(_statsService));
         _moduleManager.RegisterModule(new NotesModule(_notesService));
         _moduleManager.RegisterModule(new PsalterModule(_psalterService));
-
-        // Forward index status
-        _indexerService.IndexStatusChanged += status =>
-        {
-            Dispatcher.InvokeAsync(() =>
-            {
-                PostMessageToWeb("index_status", status);
-            });
-        };
 
         // Initialize Global Keyboard Hook
         _keyboardHook = new GlobalKeyboardHook();
@@ -162,8 +146,7 @@ public partial class MainWindow : Window
         HudLogger.Log("MainWindow_Loaded event fired.");
         await InitializeWebViewAsync();
 
-        _indexerService.StartBackgroundIndexing();
-        ShowHud();
+        ShowHud("psalter");
     }
 
     private async Task InitializeWebViewAsync()
@@ -189,6 +172,34 @@ public partial class MainWindow : Window
 
             var htmlPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "wwwroot", "index.html");
             HudLogger.Log($"Navigating WebView2 to: {htmlPath}");
+
+            webView.CoreWebView2.NavigationCompleted += (s, args) =>
+            {
+                HudLogger.Log($"WebView2 NavigationCompleted. Success={args.IsSuccess}");
+                _isWebViewReady = true;
+                if (_isHudVisible)
+                {
+                    PostMessageToWeb("hud_visibility", new
+                    {
+                        visible = true,
+                        targetModule = "psalter"
+                    });
+                }
+            };
+
+            webView.CoreWebView2.NavigationCompleted += (s, args) =>
+            {
+                HudLogger.Log($"WebView2 NavigationCompleted. Success={args.IsSuccess}");
+                _isWebViewReady = true;
+                if (_isHudVisible)
+                {
+                    PostMessageToWeb("hud_visibility", new
+                    {
+                        visible = true,
+                        targetModule = "psalter"
+                    });
+                }
+            };
 
             if (File.Exists(htmlPath))
             {
@@ -234,7 +245,7 @@ public partial class MainWindow : Window
                         theme = _settings.Theme,
                         lastActiveModule = _settings.LastActiveModule,
                         modules = _moduleManager.GetAllDescriptors(),
-                        indexStatus = _indexerService.CurrentStatus,
+                        indexStatus = "ready",
                         lastPsalmNumber = _settings.LastPsalmNumber,
                         lastKatizmaNumber = _settings.LastKatizmaNumber,
                         lastPsalterLevel = _settings.LastPsalterLevel,
@@ -279,7 +290,9 @@ public partial class MainWindow : Window
                     break;
 
                 case "drag_window":
-                    DragMove();
+                    var dragHwnd = new WindowInteropHelper(this).Handle;
+                    ReleaseCapture();
+                    SendMessage(dragHwnd, WM_NCLBUTTONDOWN, (IntPtr)HTCAPTION, IntPtr.Zero);
                     break;
 
                 case "resize_window":
@@ -382,13 +395,14 @@ public partial class MainWindow : Window
             }
             else
             {
-                ShowHud();
+                ShowHud("psalter");
             }
         });
     }
 
     public void ShowHud(string? targetModule = null)
     {
+        targetModule ??= "psalter";
         HudLogger.Log($"ShowHud() called. TargetModule: {targetModule ?? "default"}");
         _isHudVisible = true;
         Show();
@@ -410,7 +424,7 @@ public partial class MainWindow : Window
 
         if (_isWebViewReady && webView.CoreWebView2 != null)
         {
-            _ = webView.ExecuteScriptAsync("if (window.focusHudSearch) { window.focusHudSearch(); }");
+            _ = webView.ExecuteScriptAsync("window.focus();");
         }
     }
 
