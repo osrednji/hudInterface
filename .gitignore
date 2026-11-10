@@ -1,6 +1,7 @@
 ## Build and output directories
 bin/
 obj/
+publish/
 [Dd]ebug/
 [Rr]elease/
 x64/

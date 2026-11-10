@@ -41,6 +41,44 @@
           <span class="theme-glyph-byzantine">☧</span>
           <span class="theme-glyph-jp">詩篇</span>
           <span class="theme-glyph-cyber">HUD//01</span>
+          <!-- Stylized Serbian Cross with 4 Ocila (File:Ocilo.svg) for Zastava Theme -->
+          <svg class="theme-glyph-zastava" viewBox="0 0 360 360" width="30" height="30" aria-label="Српски крст са 4 оцила">
+            <defs>
+              <path id="zastava-ocilo-shape" d="m 240,55 v 55 c 13.35156,3.585938 45.86328,16.535155 47.55468,-11.855469 0.78516,-13.121093 -16.28515,-21.777343 -20.88671,-10.1875 -2.17969,5.488282 0.19531,9.371094 3.40234,10.628907 3.46875,1.351562 6.90625,-1.449219 5.98828,-5.625 13.82031,7.222656 -12.34766,22.554687 -24.16406,2.597656 -3.44141,-5.808594 5.80859,-11.867188 5.82031,-16.175781 0.0117,-4.3125 -9.08984,-10.765625 -5.82031,-16.1875 11.96484,-19.859375 37.98437,-4.625 24.16406,2.597656 0.91797,-4.175781 -2.51953,-6.976563 -5.98828,-5.621094 -3.20703,1.253906 -5.58203,5.140625 -3.40234,10.625 4.60156,11.59375 21.67187,2.933594 20.88671,-10.1875 -1.6914,-28.390625 -34.20312,-15.441406 -47.55468,-11.855469 z" fill="#FFFFFF" transform="translate(-80,-40) scale(1.40)"/>
+            </defs>
+            <rect width="360" height="360" rx="44" fill="#C6363C" stroke="#D4AF37" stroke-width="12"/>
+            <rect y="146" width="360" height="68" fill="#FFFFFF"/>
+            <rect x="146" width="68" height="360" fill="#FFFFFF"/>
+            <use href="#zastava-ocilo-shape" xlink:href="#zastava-ocilo-shape"/>
+            <use href="#zastava-ocilo-shape" xlink:href="#zastava-ocilo-shape" transform="translate(360) scale(-1,1)"/>
+            <use href="#zastava-ocilo-shape" xlink:href="#zastava-ocilo-shape" y="216"/>
+            <use href="#zastava-ocilo-shape" xlink:href="#zastava-ocilo-shape" y="216" transform="translate(360) scale(-1,1)"/>
+          </svg>
+          <!-- Stylized Serbian Orthodox Church Flag (Flag of the SPC) for Serbian Orthodox & Parchment Themes -->
+          <svg class="theme-glyph-spc" viewBox="0 0 360 240" width="36" height="24" aria-label="Застава Српске православне цркве">
+            <defs>
+              <clipPath id="spc-flag-clip">
+                <rect width="360" height="240" rx="16"/>
+              </clipPath>
+              <path id="spc-ocilo-shape" d="m 240,55 v 55 c 13.35156,3.585938 45.86328,16.535155 47.55468,-11.855469 0.78516,-13.121093 -16.28515,-21.777343 -20.88671,-10.1875 -2.17969,5.488282 0.19531,9.371094 3.40234,10.628907 3.46875,1.351562 6.90625,-1.449219 5.98828,-5.625 13.82031,7.222656 -12.34766,22.554687 -24.16406,2.597656 -3.44141,-5.808594 5.80859,-11.867188 5.82031,-16.175781 0.0117,-4.3125 -9.08984,-10.765625 -5.82031,-16.1875 11.96484,-19.859375 37.98437,-4.625 24.16406,2.597656 0.91797,-4.175781 -2.51953,-6.976563 -5.98828,-5.621094 -3.20703,1.253906 -5.58203,5.140625 -3.40234,10.625 4.60156,11.59375 21.67187,2.933594 20.88671,-10.1875 -1.6914,-28.390625 -34.20312,-15.441406 -47.55468,-11.855469 z" fill="#F0C453" transform="translate(-80,-40) scale(1.40)"/>
+            </defs>
+            <g clip-path="url(#spc-flag-clip)">
+              <!-- Serbian Tricolor: Red, Blue, White -->
+              <rect width="360" height="80" fill="#C6363C"/>
+              <rect y="80" width="360" height="80" fill="#0C4076"/>
+              <rect y="160" width="360" height="80" fill="#FFFFFF"/>
+              <!-- Golden Serbian Cross and 4 Ocila -->
+              <g transform="translate(85, 25) scale(0.528)">
+                <rect x="144" y="10" width="72" height="340" rx="10" fill="#F0C453" stroke="#B8860B" stroke-width="4"/>
+                <rect x="10" y="144" width="340" height="72" rx="10" fill="#F0C453" stroke="#B8860B" stroke-width="4"/>
+                <use href="#spc-ocilo-shape" xlink:href="#spc-ocilo-shape"/>
+                <use href="#spc-ocilo-shape" xlink:href="#spc-ocilo-shape" transform="translate(360) scale(-1,1)"/>
+                <use href="#spc-ocilo-shape" xlink:href="#spc-ocilo-shape" y="216"/>
+                <use href="#spc-ocilo-shape" xlink:href="#spc-ocilo-shape" y="216" transform="translate(360) scale(-1,1)"/>
+              </g>
+            </g>
+            <rect width="360" height="240" rx="16" fill="none" stroke="#D4AF37" stroke-width="8"/>
+          </svg>
         </div>
         <div class="brand-meta">
           <span class="brand-title">ПСАЛТИР</span>
@@ -133,9 +171,9 @@
               <span class="breadcrumb-separator">/</span>
               <button class="breadcrumb-btn" id="bc-katizmas" title="Кликни или притисни ↑ за Листу Катизама">Катизме (1–20)</button>
               <span class="breadcrumb-separator" id="bc-sep-1">/</span>
-              <button class="breadcrumb-btn" id="bc-psalms" title="Кликни или притисни ↑ за Листу Псалама">Катизма 1</button>
+              <button class="breadcrumb-btn" id="bc-psalms" title="Кликни или притисни ↑ за Листу Псалама"></button>
               <span class="breadcrumb-separator" id="bc-sep-2">/</span>
-              <span class="breadcrumb-current" id="bc-single-psalm">Псалам 1</span>
+              <span class="breadcrumb-current" id="bc-single-psalm"></span>
             </div>
 
             <!-- Layer Indicator Pills -->
@@ -170,8 +208,8 @@
             <div class="layer-view-header">
               <div class="layer-title-group">
                 <button class="btn-back-layer" id="btn-back-to-katizmas">▲ Листа Катизама (↑)</button>
-                <h2 class="layer-title" id="layer-psalms-title">КАТИЗМА 1</h2>
-                <span class="layer-range-badge" id="layer-psalms-range">Пс. 1–8</span>
+                <h2 class="layer-title" id="layer-psalms-title"></h2>
+                <span class="layer-range-badge" id="layer-psalms-range"></span>
               </div>
               <span class="layer-subtitle">Користите <b>← / →</b> за избор псалма, <b>↓</b> или <b>Enter</b> за читање, <b>↑</b> за повратак на катизме</span>
             </div>
@@ -185,8 +223,8 @@
             <div class="psalter-reader-header">
               <div class="reader-header-left">
                 <button class="btn-back-layer" id="btn-return-psalms">▲ Псалми ове Катизме (↑)</button>
-                <span class="katizma-badge" id="reader-katizma-badge">Катизма 1</span>
-                <span class="psalm-range-badge" id="reader-range-badge">Пс. 1–8</span>
+                <span class="katizma-badge" id="reader-katizma-badge"></span>
+                <span class="psalm-range-badge" id="reader-range-badge"></span>
                 <button class="btn-preface-link" id="btn-preface-link" title="Отвори/затвори молитве пре читања Псалтира">☦ Молитве пре Псалтира</button>
               </div>
               <div class="reader-header-right">
@@ -200,8 +238,8 @@
                 <!-- Uniform Collapsible Pre-Psalter Prayers Banner -->
                 <div class="preface-prayers-container" id="preface-prayers-banner"></div>
 
-                <h1 class="psalm-title" id="reader-psalm-title">Псалам 1.</h1>
-                <p class="psalm-subtitle" id="reader-psalm-subtitle">(Псалам Давидов, не натписан у Јевреја)</p>
+                <h1 class="psalm-title" id="reader-psalm-title"></h1>
+                <p class="psalm-subtitle" id="reader-psalm-subtitle" style="display: none;"></p>
                 <div class="reader-instruction-container" id="reader-instruction-container"></div>
                 <div class="psalm-ornament" id="reader-psalm-ornament">
                   <span class="ornament-line"></span>

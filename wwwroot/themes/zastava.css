@@ -90,20 +90,26 @@
 .theme-zastava .theme-glyph-jp,
 .theme-zastava .theme-glyph-cyber,
 .theme-zastava .theme-glyph-russian,
-.theme-zastava .theme-glyph-byzantine { display: none; }
-.theme-zastava .theme-glyph-serbian { 
-  display: inline-block;
-  font-size: 1.35rem;
-  line-height: 1;
+.theme-zastava .theme-glyph-byzantine,
+.theme-zastava .theme-glyph-serbian,
+.theme-zastava .theme-glyph-spc { 
+  display: none !important; 
+}
+
+.theme-zastava .theme-glyph-zastava { 
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 3px 10px rgba(198, 54, 60, 0.45)) drop-shadow(0 0 6px rgba(212, 175, 55, 0.35));
 }
 
 .theme-zastava .brand-glyph {
-  background: linear-gradient(180deg, #C6363C 33%, #0C4076 33%, #0C4076 66%, #FFFFFF 66%);
-  border: 2px solid #D4AF37;
-  color: #12161E;
-  border-radius: 6px 6px 14px 14px;
-  box-shadow: 0 4px 14px rgba(198, 54, 60, 0.4), 0 0 10px rgba(212, 175, 55, 0.35);
-  text-shadow: 0 0 4px #FFFFFF;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  width: auto !important;
+  height: auto !important;
 }
 
 .theme-zastava .brand-title {

@@ -74,10 +74,20 @@ html, body {
 }
 
 .theme-glyph-serbian,
+.theme-glyph-spc,
+.theme-glyph-zastava,
 .theme-glyph-russian,
 .theme-glyph-byzantine,
-.theme-glyph-jp {
+.theme-glyph-jp,
+.theme-glyph-cyber {
   display: none;
+}
+
+.theme-glyph-zastava,
+.theme-glyph-spc {
+  display: none;
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.45));
+  vertical-align: middle;
 }
 
 .nav-serbian,

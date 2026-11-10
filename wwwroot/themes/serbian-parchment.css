@@ -80,19 +80,26 @@
 .theme-serbian-parchment .theme-glyph-jp,
 .theme-serbian-parchment .theme-glyph-cyber,
 .theme-serbian-parchment .theme-glyph-russian,
-.theme-serbian-parchment .theme-glyph-byzantine { display: none; }
-.theme-serbian-parchment .theme-glyph-serbian { 
-  display: inline-block;
-  font-size: 1.35rem;
-  line-height: 1;
+.theme-serbian-parchment .theme-glyph-byzantine,
+.theme-serbian-parchment .theme-glyph-serbian,
+.theme-serbian-parchment .theme-glyph-zastava { 
+  display: none !important; 
+}
+
+.theme-serbian-parchment .theme-glyph-spc { 
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 2px 6px rgba(198, 54, 60, 0.35)) drop-shadow(0 0 4px rgba(212, 175, 55, 0.3));
 }
 
 .theme-serbian-parchment .brand-glyph {
-  background: #C6363C;
-  border: 2px solid #D4AF37;
-  color: #FAF6F0;
-  border-radius: 6px 6px 14px 14px;
-  box-shadow: 0 3px 12px rgba(198, 54, 60, 0.35);
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  width: auto !important;
+  height: auto !important;
 }
 
 .theme-serbian-parchment .brand-title {
