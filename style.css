@@ -2667,3 +2667,217 @@ mark.highlight {
   gap: 12px;
   flex-shrink: 0;
 }
+
+
+/* Commentary Hover Tooltip & Popup */
+.commentary-tooltip {
+  position: fixed;
+  z-index: 10000;
+  max-width: 460px;
+  background: rgba(26, 24, 22, 0.97);
+  color: #e8e2d8;
+  border: 1px solid rgba(212, 175, 55, 0.55);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65), 0 2px 8px rgba(212, 175, 55, 0.2);
+  border-radius: 8px;
+  padding: 14px 18px;
+  font-family: inherit;
+  font-size: 0.92rem;
+  line-height: 1.62;
+  pointer-events: none;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: opacity 0.12s ease;
+}
+
+.theme-serbian-parchment .commentary-tooltip {
+  background: rgba(248, 243, 233, 0.98);
+  color: #2b2219;
+  border-color: rgba(184, 134, 11, 0.6);
+  box-shadow: 0 16px 40px rgba(50, 35, 20, 0.35), 0 2px 8px rgba(184, 134, 11, 0.2);
+}
+
+.commentary-tooltip-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.25);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #d4af37;
+  text-transform: uppercase;
+}
+
+.theme-serbian-parchment .commentary-tooltip-header {
+  color: #8b2500;
+  border-bottom-color: rgba(139, 37, 0, 0.2);
+}
+
+.commentary-tooltip-body {
+  overflow-wrap: break-word;
+  max-height: 380px;
+  overflow-y: auto;
+}
+
+.commentary-tooltip-footer {
+  margin-top: 8px;
+  font-size: 0.72rem;
+  opacity: 0.65;
+  text-align: right;
+  font-style: italic;
+}
+
+/* Commentary Indicator & Cursor */
+.psalm-verse.has-commentary,
+.reader-psalm-subtitle.has-commentary {
+  cursor: pointer;
+  position: relative;
+}
+
+.psalm-verse.has-commentary:hover {
+  background: rgba(212, 175, 55, 0.09);
+  border-radius: 6px;
+}
+
+.theme-serbian-parchment .psalm-verse.has-commentary:hover {
+  background: rgba(198, 54, 60, 0.07);
+}
+
+.reader-psalm-subtitle.has-commentary {
+  border-bottom: 1px dashed rgba(212, 175, 55, 0.4);
+  padding-bottom: 2px;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.reader-psalm-subtitle.has-commentary:hover {
+  background: rgba(212, 175, 55, 0.1);
+  border-bottom-color: rgba(212, 175, 55, 0.8);
+}
+
+.theme-serbian-parchment .reader-psalm-subtitle.has-commentary {
+  border-bottom-color: rgba(139, 37, 0, 0.4);
+}
+
+.theme-serbian-parchment .reader-psalm-subtitle.has-commentary:hover {
+  background: rgba(198, 54, 60, 0.08);
+  border-bottom-color: rgba(139, 37, 0, 0.8);
+}
+
+/* Mobile Commentary Modal */
+.commentary-mobile-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.commentary-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.commentary-modal-card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 520px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-card, #1c1d22);
+  border: 1px solid var(--border-color, rgba(212, 175, 55, 0.4));
+  border-radius: 12px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.75);
+  padding: 18px 20px;
+  animation: searchOverlayFadeIn 0.2s ease-out;
+}
+
+.theme-serbian-parchment .commentary-modal-card {
+  background: #fdfaf3;
+  border-color: rgba(184, 134, 11, 0.5);
+  box-shadow: 0 20px 50px rgba(50, 35, 20, 0.4);
+  color: #2c251e;
+}
+
+.commentary-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.theme-serbian-parchment .commentary-modal-header {
+  border-bottom-color: rgba(0, 0, 0, 0.1);
+}
+
+.commentary-modal-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--accent-gold, #d4af37);
+  text-transform: uppercase;
+}
+
+.theme-serbian-parchment .commentary-modal-title {
+  color: #8b2500;
+}
+
+.commentary-modal-close {
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  line-height: 1;
+  color: inherit;
+  opacity: 0.65;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.commentary-modal-close:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.commentary-modal-body {
+  overflow-y: auto;
+  font-size: 0.95rem;
+  line-height: 1.65;
+  padding-right: 6px;
+  margin-bottom: 12px;
+}
+
+.commentary-modal-footer {
+  font-size: 0.75rem;
+  opacity: 0.6;
+  text-align: right;
+  font-style: italic;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding-top: 8px;
+}
+
+.theme-serbian-parchment .commentary-modal-footer {
+  border-top-color: rgba(0, 0, 0, 0.06);
+}
+
+/* Parallel commentary column cell styling */
+.parallel-cell.commentary-cell {
+  font-style: normal;
+  color: rgba(230, 223, 213, 0.9);
+  line-height: 1.6;
+}
+
+.theme-serbian-parchment .parallel-cell.commentary-cell {
+  color: #433324;
+}
