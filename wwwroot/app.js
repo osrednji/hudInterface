@@ -2969,6 +2969,7 @@
   let commentaryTooltip = null;
   let commentaryMobileModal = null;
   let tooltipTargetEl = null;
+  let tooltipHideTimeout = null;
 
   function initCommentarySystem() {
     if (!commentaryTooltip) {
@@ -2977,6 +2978,24 @@
       commentaryTooltip.className = 'commentary-tooltip';
       commentaryTooltip.style.display = 'none';
       document.body.appendChild(commentaryTooltip);
+
+      // Keep tooltip visible when mouse enters the tooltip itself
+      commentaryTooltip.addEventListener('mouseenter', () => {
+        if (tooltipHideTimeout) {
+          clearTimeout(tooltipHideTimeout);
+          tooltipHideTimeout = null;
+        }
+      });
+
+      // Hide with grace period when mouse leaves the tooltip
+      commentaryTooltip.addEventListener('mouseleave', (e) => {
+        if (tooltipTargetEl && tooltipTargetEl.contains(e.relatedTarget)) {
+          return;
+        }
+        tooltipHideTimeout = setTimeout(() => {
+          hideCommentaryTooltip();
+        }, 250);
+      });
     }
 
     if (!commentaryMobileModal) {
@@ -3038,34 +3057,70 @@
 
     document.addEventListener('mouseover', (e) => {
       if (window.matchMedia('(hover: none)').matches) return;
-      const comm = getCommentaryForElement(e.target);
-      if (comm) {
-        tooltipTargetEl = e.target.closest('.psalm-verse, .parallel-row, #reader-psalm-subtitle');
-        showCommentaryTooltip(comm.title, comm.text, e);
-      }
-    });
-
-    document.addEventListener('mousemove', (e) => {
-      if (commentaryTooltip && commentaryTooltip.style.display !== 'none') {
-        positionCommentaryTooltip(e);
+      const targetEl = e.target.closest('.psalm-verse, .parallel-row, #reader-psalm-subtitle');
+      if (targetEl) {
+        if (tooltipHideTimeout) {
+          clearTimeout(tooltipHideTimeout);
+          tooltipHideTimeout = null;
+        }
+        if (targetEl !== tooltipTargetEl) {
+          const comm = getCommentaryForElement(targetEl);
+          if (comm) {
+            tooltipTargetEl = targetEl;
+            showCommentaryTooltip(comm.title, comm.text, e);
+          }
+        }
       }
     });
 
     document.addEventListener('mouseout', (e) => {
       if (tooltipTargetEl) {
         const related = e.relatedTarget;
-        if (!related || !tooltipTargetEl.contains(related)) {
-          hideCommentaryTooltip();
-          tooltipTargetEl = null;
+        if (!related || (!tooltipTargetEl.contains(related) && !(commentaryTooltip && commentaryTooltip.contains(related)))) {
+          if (tooltipHideTimeout) clearTimeout(tooltipHideTimeout);
+          tooltipHideTimeout = setTimeout(() => {
+            hideCommentaryTooltip();
+          }, 250);
         }
       }
     });
 
+    // Forward mouse wheel scrolling from verse or tooltip directly to the tooltip body
+    window.addEventListener('wheel', (e) => {
+      if (commentaryTooltip && commentaryTooltip.style.display !== 'none') {
+        const isOverTarget = tooltipTargetEl && tooltipTargetEl.contains(e.target);
+        const isOverTooltip = commentaryTooltip.contains(e.target);
+        if (isOverTarget || isOverTooltip) {
+          const bodyEl = commentaryTooltip.querySelector('.commentary-tooltip-body');
+          if (bodyEl && bodyEl.scrollHeight > bodyEl.clientHeight) {
+            const atTop = bodyEl.scrollTop <= 0 && e.deltaY < 0;
+            const atBottom = Math.ceil(bodyEl.scrollTop + bodyEl.clientHeight) >= bodyEl.scrollHeight && e.deltaY > 0;
+            if (!atTop && !atBottom) {
+              e.preventDefault();
+              bodyEl.scrollTop += e.deltaY;
+            }
+          }
+        }
+      }
+    }, { passive: false });
+
+    // Click handler for opening full readable modal (desktop & mobile)
     document.addEventListener('click', (e) => {
+      if (e.target.closest('.commentary-dialog-hint')) {
+        e.stopPropagation();
+        const comm = tooltipTargetEl ? getCommentaryForElement(tooltipTargetEl) : null;
+        if (comm) {
+          hideCommentaryTooltip();
+          showCommentaryMobileModal(comm.title, comm.text);
+        }
+        return;
+      }
+      if (e.target.closest('.commentary-tooltip')) return;
       const targetEl = e.target.closest('.psalm-verse, .parallel-row, #reader-psalm-subtitle');
       if (!targetEl) return;
       const comm = getCommentaryForElement(targetEl);
-      if (comm && (window.innerWidth <= 768 || window.matchMedia('(hover: none)').matches)) {
+      if (comm) {
+        hideCommentaryTooltip();
         showCommentaryMobileModal(comm.title, comm.text);
       }
     });
@@ -3079,7 +3134,10 @@
         <span class="commentary-title">${escapeHtml(title)}</span>
       </div>
       <div class="commentary-tooltip-body">${escapeHtml(text)}</div>
-      <div class="commentary-tooltip-footer">Св. Атанасије Велики • Светосавље.орг</div>
+      <div class="commentary-tooltip-footer">
+        <span class="commentary-dialog-hint" title="Кликните за већи приказ у засебном прозору">⛶ отвори дијалог</span>
+        <span>Св. Атанасије Велики • Светосавље.орг</span>
+      </div>
     `;
     commentaryTooltip.style.display = 'block';
     commentaryTooltip.style.opacity = '1';
@@ -3089,11 +3147,11 @@
   function positionCommentaryTooltip(evt) {
     if (!commentaryTooltip || commentaryTooltip.style.display === 'none') return;
     const padding = 16;
-    const ttWidth = commentaryTooltip.offsetWidth || 420;
-    const ttHeight = commentaryTooltip.offsetHeight || 160;
+    const ttWidth = commentaryTooltip.offsetWidth || 480;
+    const ttHeight = commentaryTooltip.offsetHeight || 220;
 
     let left = evt.clientX + 16;
-    let top = evt.clientY + 16;
+    let top = Math.max(padding, evt.clientY - 40);
 
     if (left + ttWidth > window.innerWidth - padding) {
       left = evt.clientX - ttWidth - 16;
@@ -3101,7 +3159,7 @@
     }
 
     if (top + ttHeight > window.innerHeight - padding) {
-      top = evt.clientY - ttHeight - 16;
+      top = window.innerHeight - ttHeight - padding;
       if (top < padding) top = padding;
     }
 
@@ -3113,6 +3171,11 @@
     if (commentaryTooltip) {
       commentaryTooltip.style.display = 'none';
       commentaryTooltip.style.opacity = '0';
+    }
+    tooltipTargetEl = null;
+    if (tooltipHideTimeout) {
+      clearTimeout(tooltipHideTimeout);
+      tooltipHideTimeout = null;
     }
   }
 

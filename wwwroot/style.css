@@ -2673,7 +2673,7 @@ mark.highlight {
 .commentary-tooltip {
   position: fixed;
   z-index: 10000;
-  max-width: 460px;
+  max-width: 500px;
   background: rgba(26, 24, 22, 0.97);
   color: #e8e2d8;
   border: 1px solid rgba(212, 175, 55, 0.55);
@@ -2683,7 +2683,7 @@ mark.highlight {
   font-family: inherit;
   font-size: 0.92rem;
   line-height: 1.62;
-  pointer-events: none;
+  pointer-events: auto;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   transition: opacity 0.12s ease;
@@ -2718,16 +2718,54 @@ mark.highlight {
 
 .commentary-tooltip-body {
   overflow-wrap: break-word;
-  max-height: 380px;
+  max-height: min(460px, 60vh);
   overflow-y: auto;
+  padding-right: 6px;
+  overscroll-behavior: contain;
+}
+
+.commentary-tooltip-body::-webkit-scrollbar {
+  width: 5px;
+}
+
+.commentary-tooltip-body::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 4px;
+}
+
+.commentary-tooltip-body::-webkit-scrollbar-thumb {
+  background: rgba(212, 175, 55, 0.45);
+  border-radius: 4px;
+}
+
+.commentary-tooltip-body::-webkit-scrollbar-thumb:hover {
+  background: rgba(212, 175, 55, 0.75);
+}
+
+.theme-serbian-parchment .commentary-tooltip-body::-webkit-scrollbar-thumb {
+  background: rgba(139, 37, 0, 0.4);
+}
+
+.theme-serbian-parchment .commentary-tooltip-body::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 37, 0, 0.7);
 }
 
 .commentary-tooltip-footer {
   margin-top: 8px;
   font-size: 0.72rem;
   opacity: 0.65;
-  text-align: right;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   font-style: italic;
+}
+
+.commentary-dialog-hint {
+  font-size: 0.7rem;
+  opacity: 0.8;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 /* Commentary Indicator & Cursor */
