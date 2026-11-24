@@ -87,6 +87,12 @@
         </div>
       </div>
 
+      <!-- Search Trigger Button (Accessible on Mobile & Desktop) -->
+      <button class="hud-search-trigger-btn" id="btn-hud-search-trigger" title="Претражи Псалтир">
+        <span class="search-trigger-icon">🔍</span>
+        <span class="search-trigger-label">Претрага</span>
+      </button>
+
       <!-- Navigation Bar (S, D, N shortcuts) -->
       <nav class="hud-nav" id="module-nav">
         <button class="nav-btn active" data-module="psalter" title="Псалтир (Пречица: P)">
@@ -114,7 +120,7 @@
       <div class="psalter-search-modal" id="psalter-search-modal">
         <div class="psalter-search-box">
           <span class="search-box-icon">🔍</span>
-          <input type="text" id="psalter-search-input" class="psalter-search-input" placeholder="Претражи текст Псалтира или укуцај број (нпр. 22, кат 3)..." autocomplete="off" spellcheck="false" />
+          <input type="text" id="psalter-search-input" class="psalter-search-input" placeholder="Претражи текст Псалтира или укуцај број (нпр. 22, кат 3)..." autocomplete="off" spellcheck="false" enterkeyhint="search" />
           <button class="search-box-clear" id="psalter-search-clear" title="Затвори (Esc)">✕</button>
         </div>
         <div class="psalter-search-meta" id="psalter-search-meta" style="display: none;">
@@ -318,6 +324,12 @@
         <span class="ctx-shortcut">N</span>
       </div>
 
+      <div class="ctx-item" data-action="open_search">
+        <span class="ctx-icon">🔍</span>
+        <span class="ctx-text">Претражи Псалтир</span>
+        <span class="ctx-shortcut">Претрага</span>
+      </div>
+
       <!-- Citation saving item (only visible when text selected in psalm) -->
       <div class="ctx-item" id="ctx-save-citation" data-action="save_citation" style="display:none; color: #D4AF37;">
         <span class="ctx-icon">📌</span>
@@ -365,6 +377,14 @@
       <div class="ctx-item ctx-psalter-only" id="ctx-disable-parallel" data-action="disable_parallel" style="display:none; opacity: 0.75;">
         <span class="ctx-icon">✕</span>
         <span class="ctx-text">Искључи упоредни приказ</span>
+      </div>
+
+      <div class="ctx-divider ctx-psalter-only"></div>
+      <div class="ctx-label ctx-psalter-only">ТУМАЧЕЊА</div>
+      <div class="ctx-item ctx-psalter-only" id="ctx-toggle-commentary-popup" data-action="toggle_commentary_popup">
+        <span class="ctx-icon">💬</span>
+        <span class="ctx-text">Искачућа тумачења (popup)</span>
+        <span class="ctx-check" id="check-commentary-popup">✓</span>
       </div>
 
       <div class="ctx-divider"></div>

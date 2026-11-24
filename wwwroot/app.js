@@ -714,6 +714,14 @@
     });
   }
 
+  const btnHudSearchTrigger = document.getElementById('btn-hud-search-trigger');
+  if (btnHudSearchTrigger) {
+    btnHudSearchTrigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openSearchOverlay('');
+    });
+  }
+
   if (psalterSearchOverlay) {
     psalterSearchOverlay.addEventListener('click', (e) => {
       if (e.target === psalterSearchOverlay) {
@@ -726,7 +734,9 @@
     psalterSearchInput.addEventListener('input', (e) => {
       const val = e.target.value;
       if (!val || !val.trim()) {
-        closeSearchOverlay();
+        activeSearchResults = [];
+        selectedSearchResultIdx = -1;
+        renderSearchInitialPrompt();
         return;
       }
       clearTimeout(searchDebounceTimer);
@@ -2605,6 +2615,10 @@
       toggleParallelMode(item.dataset.parallel);
     } else if (action === 'disable_parallel') {
       disableParallelModes();
+    } else if (action === 'toggle_commentary_popup') {
+      toggleCommentaryPopupSetting();
+    } else if (action === 'open_search') {
+      openSearchOverlay('');
     } else if (action === 'save_citation') {
       saveCurrentCitation();
     } else if (action === 'reindex') {
@@ -2912,6 +2926,8 @@
     if (disableOpt) {
       disableOpt.style.display = (psalterParallelModes.length > 0) ? 'flex' : 'none';
     }
+
+    updateCommentaryPopupToggleUI();
   }
 
   // ========================================================
@@ -2970,8 +2986,59 @@
   let commentaryMobileModal = null;
   let tooltipTargetEl = null;
   let tooltipHideTimeout = null;
+  let lastSelectionTimestamp = 0;
+
+  let isCommentaryPopupEnabled = true;
+  try {
+    const savedCommPopup = localStorage.getItem('hud_commentary_popup_enabled');
+    if (savedCommPopup !== null) {
+      isCommentaryPopupEnabled = (savedCommPopup === '1' || savedCommPopup === 'true');
+    }
+  } catch (e) {
+    isCommentaryPopupEnabled = true;
+  }
+
+  function updateCommentaryPopupToggleUI() {
+    const checkEl = document.getElementById('check-commentary-popup');
+    if (checkEl) {
+      checkEl.textContent = isCommentaryPopupEnabled ? '✓' : '';
+    }
+    const itemEl = document.getElementById('ctx-toggle-commentary-popup');
+    if (itemEl) {
+      itemEl.setAttribute('data-enabled', isCommentaryPopupEnabled ? 'true' : 'false');
+    }
+    document.body.classList.toggle('commentary-popups-disabled', !isCommentaryPopupEnabled);
+  }
+
+  function toggleCommentaryPopupSetting() {
+    isCommentaryPopupEnabled = !isCommentaryPopupEnabled;
+    try {
+      localStorage.setItem('hud_commentary_popup_enabled', isCommentaryPopupEnabled ? '1' : '0');
+    } catch (e) {}
+    updateCommentaryPopupToggleUI();
+    if (!isCommentaryPopupEnabled) {
+      hideCommentaryTooltip();
+      hideCommentaryMobileModal();
+    }
+  }
 
   function initCommentarySystem() {
+    updateCommentaryPopupToggleUI();
+
+    // Do not show or allow commentary tooltip while text is selected
+    document.addEventListener('selectionchange', () => {
+      const activeSel = window.getSelection ? window.getSelection().toString().trim() : '';
+      if (activeSel.length > 0) {
+        lastSelectionTimestamp = Date.now();
+        hideCommentaryTooltip();
+      }
+    });
+
+    document.addEventListener('mousedown', (e) => {
+      if (commentaryTooltip && commentaryTooltip.contains(e.target)) return;
+      if (commentaryMobileModal && commentaryMobileModal.contains(e.target)) return;
+      hideCommentaryTooltip();
+    });
     if (!commentaryTooltip) {
       commentaryTooltip = document.createElement('div');
       commentaryTooltip.id = 'commentary-tooltip';
@@ -3056,7 +3123,17 @@
     }
 
     document.addEventListener('mouseover', (e) => {
+      if (!isCommentaryPopupEnabled) return;
       if (window.matchMedia('(hover: none)').matches) return;
+      if (e.buttons > 0) {
+        hideCommentaryTooltip();
+        return;
+      }
+      const activeSel = window.getSelection ? window.getSelection().toString().trim() : '';
+      if (activeSel.length > 0) {
+        hideCommentaryTooltip();
+        return;
+      }
       const targetEl = e.target.closest('.psalm-verse, .parallel-row, #reader-psalm-subtitle');
       if (targetEl) {
         if (tooltipHideTimeout) {
@@ -3116,6 +3193,14 @@
         return;
       }
       if (e.target.closest('.commentary-tooltip')) return;
+
+      if (!isCommentaryPopupEnabled) return;
+
+      const activeSel = window.getSelection ? window.getSelection().toString().trim() : '';
+      if (activeSel.length > 0 || (Date.now() - lastSelectionTimestamp < 350)) {
+        return;
+      }
+
       const targetEl = e.target.closest('.psalm-verse, .parallel-row, #reader-psalm-subtitle');
       if (!targetEl) return;
       const comm = getCommentaryForElement(targetEl);
