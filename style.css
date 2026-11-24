@@ -184,6 +184,43 @@ html, body {
   font-weight: 600;
 }
 
+/* Search Trigger Button */
+.hud-search-trigger-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.15));
+  color: var(--text-main, #eee);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+  pointer-events: auto;
+}
+
+.hud-search-trigger-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: var(--primary-accent, #c9933e);
+  color: #fff;
+}
+
+.theme-serbian-parchment .hud-search-trigger-btn {
+  background: #EFE4D0;
+  border-color: rgba(198, 54, 60, 0.35);
+  color: #631215;
+}
+
+.theme-serbian-parchment .hud-search-trigger-btn:hover {
+  background: #E5D8C1;
+  border-color: #C6363C;
+  color: #C6363C;
+}
+
 .action-btn {
   background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.15);
@@ -2297,6 +2334,15 @@ mark.highlight {
     display: none !important;
   }
 
+  /* Search trigger button in header on mobile */
+  .hud-search-trigger-btn {
+    display: inline-flex !important;
+    padding: 5px 12px !important;
+    font-size: 0.8rem !important;
+    border-radius: 16px !important;
+    margin-left: auto !important;
+  }
+
   .hud-nav {
     gap: 4px !important;
   }
@@ -2588,6 +2634,54 @@ mark.highlight {
   .editor-hint {
     display: none !important;
   }
+
+  /* Mobile search overlay */
+  .psalter-search-overlay {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    height: 100dvh !important;
+    padding: 10px 8px !important;
+    box-sizing: border-box !important;
+    z-index: 100000 !important;
+  }
+
+  .psalter-search-modal {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100% !important;
+    max-height: calc(100dvh - 20px) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    border-radius: 10px !important;
+  }
+
+  .psalter-search-box {
+    padding: 10px 12px !important;
+    gap: 8px !important;
+  }
+
+  .psalter-search-input {
+    font-size: 16px !important;
+  }
+
+  .search-box-clear {
+    padding: 8px 12px !important;
+    font-size: 1.25rem !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+  }
+
+  .psalter-search-results {
+    flex: 1 1 auto !important;
+    max-height: none !important;
+    -webkit-overflow-scrolling: touch;
+    overflow-y: auto !important;
+    padding: 8px 8px !important;
+  }
 }
 
 .brand-status { display: none !important; }
@@ -2802,6 +2896,23 @@ mark.highlight {
 .theme-serbian-parchment .reader-psalm-subtitle.has-commentary:hover {
   background: rgba(198, 54, 60, 0.08);
   border-bottom-color: rgba(139, 37, 0, 0.8);
+}
+
+/* Disabled commentary popups */
+body.commentary-popups-disabled .psalm-verse.has-commentary,
+body.commentary-popups-disabled .reader-psalm-subtitle.has-commentary {
+  cursor: default !important;
+}
+body.commentary-popups-disabled .psalm-verse.has-commentary:hover,
+body.commentary-popups-disabled .reader-psalm-subtitle.has-commentary:hover {
+  background: transparent !important;
+}
+body.commentary-popups-disabled .reader-psalm-subtitle.has-commentary {
+  border-bottom: none !important;
+}
+body.commentary-popups-disabled .commentary-tooltip,
+body.commentary-popups-disabled .commentary-mobile-modal {
+  display: none !important;
 }
 
 /* Mobile Commentary Modal */
