@@ -42,6 +42,7 @@
   let psalmsCsOld = (typeof window !== "undefined" && window.psalmsCsOld) ? window.psalmsCsOld : null;
   let psalmsCsCyrillic = (typeof window !== "undefined" && window.psalmsCsCyrillic) ? window.psalmsCsCyrillic : null;
   let psalmAlignments = (typeof window !== "undefined" && window.psalmAlignments) ? window.psalmAlignments : null;
+  let psalmCommentaries = (typeof window !== "undefined" && window.psalmCommentaries) ? window.psalmCommentaries : null;
   let currentPsalterLanguage = localStorage.getItem('hud_psalter_language') || 'serbian';
   let psalterParallelModes = JSON.parse(localStorage.getItem('hud_psalter_parallel') || '[]');
   let selectedQuoteText = '';
@@ -589,6 +590,7 @@
     if (lang === 'serbian') return 'Српски';
     if (lang === 'cs_cyrillic') return 'Црквенословенски ћирилица';
     if (lang === 'cs_old') return 'Црквенословенски';
+    if (lang === 'commentary') return 'Тумачење';
     return lang;
   }
 
@@ -772,12 +774,14 @@
         if (fromLang === 'serbian' && row[0] === verseIndex) matched = true;
         else if (fromLang === 'cs_cyrillic' && row[1] === verseIndex) matched = true;
         else if (fromLang === 'cs_old' && row[2] === verseIndex) matched = true;
+        else if (fromLang === 'commentary' && row[0] === verseIndex) matched = true;
 
         if (matched) {
           let targetData = null;
           if (toLang === 'serbian') targetData = row[0];
           else if (toLang === 'cs_cyrillic') targetData = row[1];
           else if (toLang === 'cs_old') targetData = row[2];
+          else if (toLang === 'commentary') targetData = row[0];
 
           if (typeof targetData === 'number') {
             return toVerses[targetData] || null;
@@ -1364,6 +1368,17 @@
       try {
         const respAlign = await fetch('data/psalm_alignments.json');
         psalmAlignments = await respAlign.json();
+      } catch (e) {}
+    }
+
+    // 7. Psalm Commentaries (St. Athanasius / Euthymius Zigabenus)
+    if (!psalmCommentaries && typeof window !== 'undefined' && window.psalmCommentaries) {
+      psalmCommentaries = window.psalmCommentaries;
+    }
+    if (!psalmCommentaries) {
+      try {
+        const respComm = await fetch('data/psalm_commentaries.json');
+        psalmCommentaries = await respComm.json();
       } catch (e) {}
     }
   }
@@ -1975,6 +1990,19 @@
       }
     }
 
+    const commObj = (psalmCommentaries && psalmCommentaries[String(currentPsalmNumber)]) || (window.psalmCommentaries && window.psalmCommentaries[String(currentPsalmNumber)]) || null;
+    const hasSubComm = !!(commObj && commObj.summary);
+    if (readerPsalmSubtitle) {
+      readerPsalmSubtitle.classList.toggle('has-commentary', hasSubComm);
+      if (hasSubComm) {
+        readerPsalmSubtitle.setAttribute('data-has-commentary', 'true');
+        readerPsalmSubtitle.title = 'Пређите мишем за тумачење натписа';
+      } else {
+        readerPsalmSubtitle.removeAttribute('data-has-commentary');
+        readerPsalmSubtitle.removeAttribute('title');
+      }
+    }
+
     // 3. St. Paisios Instructions
     if (readerInstructionContainer) {
       const instObj = psalmInstructions ? psalmInstructions[String(currentPsalmNumber)] : null;
@@ -2021,8 +2049,10 @@
         let versesHtml = '';
         for (let idx = 0; idx < versesList.length; idx++) {
           const v = versesList[idx];
+          const vNumInt = parseInt(v.num, 10);
+          const hasComm = !!(commObj && commObj.verses && (commObj.verses[String(vNumInt)] || commObj.verses[v.num]));
           versesHtml += `
-            <div class="psalm-verse" data-verse-index="${idx}">
+            <div class="psalm-verse ${hasComm ? 'has-commentary' : ''}" data-verse-index="${idx}" data-verse-num="${vNumInt}" ${hasComm ? 'title="Пређите мишем за тумачење"' : ''}>
               <span class="verse-num">${escapeHtml(v.num)}</span>
               <span class="verse-text">${escapeHtml(v.text)}</span>
             </div>
@@ -2056,6 +2086,7 @@
               if (colLang === 'serbian') cellData = rowMap[0];
               else if (colLang === 'cs_cyrillic') cellData = rowMap[1];
               else if (colLang === 'cs_old') cellData = rowMap[2];
+              else if (colLang === 'commentary') cellData = rowMap[0];
 
               let v = { num: '', text: '' };
               if (typeof cellData === 'number') {
@@ -2065,15 +2096,17 @@
               }
 
               const isCsOld = (colLang === 'cs_old');
+              const isCommentary = (colLang === 'commentary');
               cellsHtml += `
-                <div class="parallel-cell ${isCsOld ? 'font-churchslavonic' : ''}">
+                <div class="parallel-cell ${isCsOld ? 'font-churchslavonic' : ''} ${isCommentary ? 'commentary-cell' : ''}" data-col="${colLang}">
                   <span class="verse-num">${escapeHtml(v.num)}</span>
                   <span class="verse-text">${escapeHtml(v.text)}</span>
                 </div>
               `;
             }
+            const rowVNum = parseInt((colVerses[0] && colVerses[0][r] && colVerses[0][r].num) || (r + 1), 10);
             parallelRowsHtml += `
-              <div class="parallel-row" data-verse-index="${r}">
+              <div class="parallel-row" data-verse-index="${r}" data-verse-num="${rowVNum}">
                 ${cellsHtml}
               </div>
             `;
@@ -2087,15 +2120,17 @@
               const colLang = activeCols[c];
               const v = colVerses[c][r] || { num: '', text: '' };
               const isCsOld = (colLang === 'cs_old');
+              const isCommentary = (colLang === 'commentary');
               cellsHtml += `
-                <div class="parallel-cell ${isCsOld ? 'font-churchslavonic' : ''}">
+                <div class="parallel-cell ${isCsOld ? 'font-churchslavonic' : ''} ${isCommentary ? 'commentary-cell' : ''}" data-col="${colLang}">
                   <span class="verse-num">${escapeHtml(v.num)}</span>
                   <span class="verse-text">${escapeHtml(v.text)}</span>
                 </div>
               `;
             }
+            const rowVNum = parseInt((colVerses[0] && colVerses[0][r] && colVerses[0][r].num) || (r + 1), 10);
             parallelRowsHtml += `
-              <div class="parallel-row" data-verse-index="${r}">
+              <div class="parallel-row" data-verse-index="${r}" data-verse-num="${rowVNum}">
                 ${cellsHtml}
               </div>
             `;
@@ -2583,6 +2618,21 @@
   });
 
   function getVersesForLang(lang, pNum, defaultPsalmObj) {
+    if (lang === 'commentary') {
+      const commData = (psalmCommentaries && psalmCommentaries[String(pNum)]) || (window.psalmCommentaries && window.psalmCommentaries[String(pNum)]) || null;
+      const baseVerses = getVersesForLang('serbian', pNum, defaultPsalmObj);
+      return baseVerses.map(v => {
+        const vNumInt = parseInt(v.num, 10);
+        let commText = '';
+        if (commData && commData.verses) {
+          commText = commData.verses[String(vNumInt)] || commData.verses[v.num] || '';
+        }
+        return {
+          num: v.num,
+          text: commText || '—'
+        };
+      });
+    }
     if (lang === 'cs_old') {
       const obj = (psalmsCsOld && psalmsCsOld[String(pNum)]) || (window.psalmsCsOld && window.psalmsCsOld[String(pNum)]) || null;
       if (obj && obj.verses && obj.verses.length > 0) return obj.verses;
@@ -2622,6 +2672,8 @@
       return csOldObj ? csOldObj.title : `Ѱало́мъ ${pNum}`;
     } else if (col === 'cs_cyrillic') {
       return `Псалом ${pNum}. (${pNum})`;
+    } else if (col === 'commentary') {
+      return `Тумачење (${pNum})`;
     } else {
       return `Псалам ${pNum}.`;
     }
@@ -2630,6 +2682,7 @@
   function getColumnTag(col) {
     if (col === 'cs_old') return 'Црквенословенски';
     if (col === 'cs_cyrillic') return 'Црквенослов. ћирилица';
+    if (col === 'commentary') return 'Тумачење (Св. Атанасије)';
     return 'Српски превод';
   }
 
@@ -2851,6 +2904,11 @@
       check2.textContent = psalterParallelModes.includes(mode2Key) ? '✓' : '';
     }
 
+    const checkComm = document.getElementById('check-parallel-commentary');
+    if (checkComm) {
+      checkComm.textContent = psalterParallelModes.includes('commentary') ? '✓' : '';
+    }
+
     if (disableOpt) {
       disableOpt.style.display = (psalterParallelModes.length > 0) ? 'flex' : 'none';
     }
@@ -2905,9 +2963,176 @@
   }
   initWindowDragging();
 
+  // ========================================================
+  // Orthodox Commentary Hover & Modal System
+  // ========================================================
+  let commentaryTooltip = null;
+  let commentaryMobileModal = null;
+  let tooltipTargetEl = null;
+
+  function initCommentarySystem() {
+    if (!commentaryTooltip) {
+      commentaryTooltip = document.createElement('div');
+      commentaryTooltip.id = 'commentary-tooltip';
+      commentaryTooltip.className = 'commentary-tooltip';
+      commentaryTooltip.style.display = 'none';
+      document.body.appendChild(commentaryTooltip);
+    }
+
+    if (!commentaryMobileModal) {
+      commentaryMobileModal = document.createElement('div');
+      commentaryMobileModal.id = 'commentary-mobile-modal';
+      commentaryMobileModal.className = 'commentary-mobile-modal';
+      commentaryMobileModal.style.display = 'none';
+      commentaryMobileModal.innerHTML = `
+        <div class="commentary-modal-backdrop"></div>
+        <div class="commentary-modal-card">
+          <div class="commentary-modal-header">
+            <span class="commentary-modal-title">☦ ТУМАЧЕЊЕ</span>
+            <button class="commentary-modal-close" aria-label="Затвори">✕</button>
+          </div>
+          <div class="commentary-modal-body"></div>
+          <div class="commentary-modal-footer">Свети Атанасије Велики / Јевтимије Зигабен • Светосавље.орг</div>
+        </div>
+      `;
+      document.body.appendChild(commentaryMobileModal);
+      commentaryMobileModal.querySelector('.commentary-modal-backdrop').addEventListener('click', hideCommentaryMobileModal);
+      commentaryMobileModal.querySelector('.commentary-modal-close').addEventListener('click', hideCommentaryMobileModal);
+    }
+
+    function getCommentaryForElement(target) {
+      if (!target) return null;
+      // 1. Check if subtitle
+      const subEl = target.closest('#reader-psalm-subtitle');
+      if (subEl) {
+        const commObj = (psalmCommentaries && psalmCommentaries[String(currentPsalmNumber)]) || (window.psalmCommentaries && window.psalmCommentaries[String(currentPsalmNumber)]) || null;
+        if (commObj && commObj.summary) {
+          return {
+            title: `☦ Садржај и натпис (Псалам ${currentPsalmNumber})`,
+            text: commObj.summary
+          };
+        }
+        return null;
+      }
+
+      // 2. Check if verse
+      const verseEl = target.closest('.psalm-verse, .parallel-row');
+      if (verseEl) {
+        const vNumStr = verseEl.getAttribute('data-verse-num');
+        const vNum = parseInt(vNumStr, 10);
+        if (!isNaN(vNum)) {
+          const commObj = (psalmCommentaries && psalmCommentaries[String(currentPsalmNumber)]) || (window.psalmCommentaries && window.psalmCommentaries[String(currentPsalmNumber)]) || null;
+          if (commObj && commObj.verses) {
+            const text = commObj.verses[String(vNum)] || commObj.verses[vNumStr] || null;
+            if (text) {
+              return {
+                title: `☦ Тумачење: Стих ${vNum} (Псалам ${currentPsalmNumber})`,
+                text: text
+              };
+            }
+          }
+        }
+      }
+      return null;
+    }
+
+    document.addEventListener('mouseover', (e) => {
+      if (window.matchMedia('(hover: none)').matches) return;
+      const comm = getCommentaryForElement(e.target);
+      if (comm) {
+        tooltipTargetEl = e.target.closest('.psalm-verse, .parallel-row, #reader-psalm-subtitle');
+        showCommentaryTooltip(comm.title, comm.text, e);
+      }
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (commentaryTooltip && commentaryTooltip.style.display !== 'none') {
+        positionCommentaryTooltip(e);
+      }
+    });
+
+    document.addEventListener('mouseout', (e) => {
+      if (tooltipTargetEl) {
+        const related = e.relatedTarget;
+        if (!related || !tooltipTargetEl.contains(related)) {
+          hideCommentaryTooltip();
+          tooltipTargetEl = null;
+        }
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      const targetEl = e.target.closest('.psalm-verse, .parallel-row, #reader-psalm-subtitle');
+      if (!targetEl) return;
+      const comm = getCommentaryForElement(targetEl);
+      if (comm && (window.innerWidth <= 768 || window.matchMedia('(hover: none)').matches)) {
+        showCommentaryMobileModal(comm.title, comm.text);
+      }
+    });
+  }
+
+  function showCommentaryTooltip(title, text, evt) {
+    if (!commentaryTooltip || !text) return;
+    commentaryTooltip.innerHTML = `
+      <div class="commentary-tooltip-header">
+        <span class="commentary-cross">☦</span>
+        <span class="commentary-title">${escapeHtml(title)}</span>
+      </div>
+      <div class="commentary-tooltip-body">${escapeHtml(text)}</div>
+      <div class="commentary-tooltip-footer">Св. Атанасије Велики • Светосавље.орг</div>
+    `;
+    commentaryTooltip.style.display = 'block';
+    commentaryTooltip.style.opacity = '1';
+    positionCommentaryTooltip(evt);
+  }
+
+  function positionCommentaryTooltip(evt) {
+    if (!commentaryTooltip || commentaryTooltip.style.display === 'none') return;
+    const padding = 16;
+    const ttWidth = commentaryTooltip.offsetWidth || 420;
+    const ttHeight = commentaryTooltip.offsetHeight || 160;
+
+    let left = evt.clientX + 16;
+    let top = evt.clientY + 16;
+
+    if (left + ttWidth > window.innerWidth - padding) {
+      left = evt.clientX - ttWidth - 16;
+      if (left < padding) left = padding;
+    }
+
+    if (top + ttHeight > window.innerHeight - padding) {
+      top = evt.clientY - ttHeight - 16;
+      if (top < padding) top = padding;
+    }
+
+    commentaryTooltip.style.left = `${left}px`;
+    commentaryTooltip.style.top = `${top}px`;
+  }
+
+  function hideCommentaryTooltip() {
+    if (commentaryTooltip) {
+      commentaryTooltip.style.display = 'none';
+      commentaryTooltip.style.opacity = '0';
+    }
+  }
+
+  function showCommentaryMobileModal(title, text) {
+    if (!commentaryMobileModal) return;
+    commentaryMobileModal.querySelector('.commentary-modal-title').textContent = title;
+    commentaryMobileModal.querySelector('.commentary-modal-body').textContent = text;
+    commentaryMobileModal.style.display = 'flex';
+  }
+
+  function hideCommentaryMobileModal() {
+    if (commentaryMobileModal) {
+      commentaryMobileModal.style.display = 'none';
+    }
+  }
+
   // Bootstrap Init
   async function init() {
     logToHost('Frontend init() started.');
+    initCommentarySystem();
     // In web browser / mobile view: hide the lone Psalter tab and disable desktop-only features
     if (!isDesktopHost) {
       const moduleNav = document.getElementById('module-nav');
